@@ -972,7 +972,7 @@
    - B. zero, because {Q,v} is T-odd
    - C. equal to the OHC
    - D. equal to the SHC
-5. Which diagrams are NOT included in feynlab's Hall engines?
+5. Which diagrams were added to the NCA Hall engine in v0.2 (continuum) and v1.0 (lattice)?
    - A. Born self-energy
    - B. ladder vertex
    - C. crossed X and Ψ diagrams
@@ -984,7 +984,7 @@
 2. **A** — Sinitsyn et al. 2007, reproduced to 1e-16.
 3. **B** — 
 4. **B** — 
-5. **C** — Ado et al. EPL 2015 — stated limitation.
+5. **C** — Ado et al. EPL 2015; lattice version via BZ FFT.
 
 </details>
 
@@ -1115,16 +1115,16 @@
    - B. MaxEnt
    - C. the semiclassical rate-by-rate Gaussian skew decomposition
    - D. polaron DiagMC
-2. Which analytic continuation is implemented?
-   - A. MaxEnt
-   - B. Padé
-   - C. stochastic optimisation
+2. Which analytic-continuation methods does feynlab v1.0 provide?
+   - A. MaxEnt only
+   - B. MaxEnt, Nevanlinna and stochastic
+   - C. Padé only
    - D. none
-3. DMFT in feynlab is…
-   - A. cluster DMFT
-   - B. single-site, Bethe lattice
+3. Which DMFT flavours does feynlab v1.0 provide?
+   - A. only single-site Bethe
+   - B. single-site (Bethe/lattice), DCA clusters and DFT+DMFT from Wannier90
    - C. GW+DMFT
-   - D. lattice QMC
+   - D. lattice QMC only
 4. Practical limit of brute-force generic diagram enumeration:
    - A. order 4
    - B. order 20
@@ -1143,5 +1143,269 @@
 3. **B** — 
 4. **A** — 
 5. **B** — 
+
+</details>
+
+## T10 — Infrastructure: errors, mixing, checkpoints, CLI
+
+1. The naive error σ/√N of correlated Monte Carlo data must be multiplied by…
+   - A. τ_int
+   - B. √(2τ_int)
+   - C. 2
+   - D. 1/√τ_int
+2. For an AR(1) process x_{t+1} = φx_t + noise, τ_int equals…
+   - A. φ
+   - B. 1/(1−φ)
+   - C. (1+φ)/(2(1−φ))
+   - D. φ²
+3. The jackknife is needed for…
+   - A. primary averages
+   - B. errors of nonlinear functions of averages, e.g. ⟨a⟩/⟨b⟩
+   - C. removing autocorrelation
+   - D. speed
+4. Why does linear mixing become slow near the Mott transition?
+   - A. FFT errors
+   - B. the largest Jacobian eigenvalue of the DMFT map approaches 1
+   - C. the sign problem
+   - D. memory
+5. Anderson mixing is equivalent to…
+   - A. Newton's method with the exact Jacobian
+   - B. Pulay/DIIS extrapolation over previous residuals
+   - C. simulated annealing
+   - D. linear mixing with α = 1
+6. Why does feynlab store input_json inside every HDF5 output?
+   - A. compression
+   - B. provenance: each result file carries its own input parameters
+   - C. speed
+   - D. GPU support
+
+<details><summary>Answer key</summary>
+
+1. **B** — Integrated autocorrelation time τ_int (Wolff's Γ-method).
+2. **C** — feynlab's ar1_series test; φ = 0.9 gives 9.5.
+3. **B** — 
+4. **B** — Anderson/Broyden: 78 → 13 iterations at U = 2.6.
+5. **B** — 
+6. **B** — 
+
+</details>
+
+## T11 — CT-HYB, Kanamori, DFT+DMFT
+
+1. CT-HYB expands the partition function in powers of…
+   - A. U
+   - B. the hybridization Δ(τ)
+   - C. temperature
+   - D. the hopping t of the lattice
+2. Why is CT-HYB preferred at strong coupling?
+   - A. its average order DECREASES with U
+   - B. it has no sign problem ever
+   - C. it works at T = 0
+   - D. it needs no bath
+3. In the segment picture the local trace for density–density U is…
+   - A. a determinant
+   - B. exp(−U·overlap + μ·length)
+   - C. always 1
+   - D. a Pfaffian
+4. Two-orbital Kanamori atom with N = 2: the ground multiplet energy is…
+   - A. U
+   - B. U − 3J (spin triplet)
+   - C. U + J
+   - D. U − J
+5. The t₂g³ (three electrons, three orbitals) ground state is…
+   - A. a singlet at 3U − 3J
+   - B. the 4-fold ⁴S state at 3U − 9J
+   - C. a doublet at 3U
+   - D. non-degenerate
+6. In Hubbard-I DFT+DMFT, why must the 'occupation' double-counting sit at the plateau CENTRE?
+   - A. for speed
+   - B. inside a Mott gap every shift gives the same n; the edge is unstable
+   - C. required by FLL
+   - D. to reduce J
+
+<details><summary>Answer key</summary>
+
+1. **B** — Werner et al. PRL 97, 076405 (2006).
+2. **A** — 
+3. **B** — 
+4. **B** — Hund's first rule.
+5. **B** — 
+6. **B** — 
+
+</details>
+
+## T12 — DCA, two-particle response, NRG
+
+1. DCA with N_c = 1 reduces to…
+   - A. Hartree–Fock
+   - B. single-site DMFT
+   - C. RPA
+   - D. the atomic limit
+2. In 2×2 DCA the more strongly renormalised patch is…
+   - A. (0,0)
+   - B. (π,0) — the antinode
+   - C. (π,π)
+   - D. none
+3. The compressibility sum rule states…
+   - A. χ₀(q→0, Ω=0) = ∂n/∂μ
+   - B. χ₀ = 0
+   - C. χ₀(π,π) = n
+   - D. χ = U
+4. The Wilson-chain hopping t_n decays as…
+   - A. 1/n
+   - B. Λ^{−n/2}
+   - C. e^{−n²}
+   - D. it is constant
+5. For the symmetric Anderson model, S_imp on the local-moment plateau equals…
+   - A. 0
+   - B. ln 2
+   - C. ln 4
+   - D. 1
+6. Haldane's T_K contains the exponential factor…
+   - A. exp(−U/Γ)
+   - B. exp(−πU/8Γ + πΓ/2U)
+   - C. exp(−Γ/U)
+   - D. exp(−1/Jρ) with no U
+
+<details><summary>Answer key</summary>
+
+1. **B** — feynlab: Z 0.486644 vs 0.486638.
+2. **B** — Coupling to (π,π) spin fluctuations; seed of the pseudogap.
+3. **A** — 
+4. **B** — 
+5. **B** — Free orbital: ln 4; Fermi liquid: 0.
+6. **B** — feynlab NRG reproduces the slope −1.00.
+
+</details>
+
+## T13 — Analytic continuation
+
+1. Analytic continuation is hard because…
+   - A. the kernel 1/(iω−ω) is singular
+   - B. the inverse problem is exponentially ill-conditioned
+   - C. of the fermion sign
+   - D. of the FFT
+2. The Nevanlinna method exploits that…
+   - A. G is a Nevanlinna (Herglotz) function, mapped to a Schur function
+   - B. A is Gaussian
+   - C. the noise is white
+   - D. G is real
+3. The Pick criterion tells you…
+   - A. the best α in MaxEnt
+   - B. whether a causal interpolant of the data exists
+   - C. the number of poles
+   - D. the temperature
+4. Why does feynlab's Nevanlinna use mpmath with 64 digits?
+   - A. style
+   - B. the Schur recursion loses ~1 digit per point
+   - C. speed
+   - D. GPU
+5. Stochastic continuation picks the fictitious temperature Θ where…
+   - A. χ² is minimal
+   - B. χ²/N ≈ 1
+   - C. the entropy is maximal
+   - D. A is smoothest
+6. Recommended practice in feynlab:
+   - A. trust any single method
+   - B. MaxEnt with two default models + stochastic cross-check (Nevanlinna for near-exact data)
+   - C. always Padé
+   - D. fit Lorentzians by eye
+
+<details><summary>Answer key</summary>
+
+1. **B** — 
+2. **A** — Fei, Yeh, Gull PRL 126, 056402 (2021).
+3. **B** — 
+4. **B** — 
+5. **B** — 
+6. **B** — 
+
+</details>
+
+## T14 — CDet, resummation, polaron Z and m*
+
+1. Rossi's CDet recursion obtains the sum of connected diagrams at cost…
+   - A. n!
+   - B. 3ⁿ
+   - C. 2^(n²)
+   - D. n³
+2. For the Hubbard atom, X(U) = ⟨n↑n↓⟩ − ¼ is…
+   - A. −¼ tanh(βU/4)
+   - B. U/4
+   - C. e^{−βU}
+   - D. 0
+3. The Domb–Sykes plot of a_n/a_{n−1} vs 1/n gives…
+   - A. the sum of the series
+   - B. 1/R at 1/n → 0
+   - C. the sign
+   - D. Z
+4. A conformal map is used to…
+   - A. speed up DiagMC
+   - B. sum a series beyond its radius of convergence
+   - C. remove tails
+   - D. fix μ
+5. The polaron Z factor in feynlab is normalised using…
+   - A. Feynman's bound
+   - B. the exactly known order-0 diagram
+   - C. experiment
+   - D. sum rule on m*
+6. At weak coupling the Fröhlich effective mass is…
+   - A. 1 − α
+   - B. 1 + α/6 + 0.0236α²
+   - C. e^{α}
+   - D. 1 + α
+
+<details><summary>Answer key</summary>
+
+1. **B** — Inclusion–exclusion over subsets.
+2. **A** — CDet matches every Taylor coefficient.
+3. **B** — 
+4. **B** — 
+5. **B** — 
+6. **B** — Rösler 1968; Smondyrev 1986.
+
+</details>
+
+## T15 — Advanced transport
+
+1. Expanding the T-matrix to third order in V produces…
+   - A. side jump
+   - B. conventional skew scattering ∝ n_i V³
+   - C. intrinsic AHE
+   - D. nothing new
+2. Why is the crossed Ψ diagram nonzero for QWZ near Γ but zero for Ado's Dirac model?
+   - A. numerical error
+   - B. the quadratic mass Δ − k²/2 of the lattice model
+   - C. temperature
+   - D. spin–orbit
+3. The gapped Dirac valley orbital moment is m(k) =
+   - A. Δv²/[2(Δ² + v²k²)], equal in both bands
+   - B. zero
+   - C. opposite in the two bands
+   - D. v k
+4. The Berry-curvature dipole Fermi-sea and Fermi-surface forms agree because of…
+   - A. integration by parts
+   - B. time reversal
+   - C. particle–hole symmetry
+   - D. Wick's theorem
+5. For the Rashba 2DEG with both bands occupied, |δS_y| per eEτ is…
+   - A. mα/(4π), independent of μ
+   - B. ∝ μ
+   - C. zero
+   - D. ∝ α²
+6. Adaptive k refinement in WannierTB3D refines points where…
+   - A. k is large
+   - B. |Ω| is large or a band lies within a window of μ
+   - C. randomly
+   - D. at Γ only
+
+<details><summary>Answer key</summary>
+
+1. **B** — 
+2. **B** — 
+3. **A** — Xiao, Yao, Niu PRL 99, 236809 (2007).
+4. **A** — 
+5. **A** — Edelstein 1990.
+6. **B** — Wang, Yates, Souza, Vanderbilt PRB 74, 195118 (2006).
 
 </details>

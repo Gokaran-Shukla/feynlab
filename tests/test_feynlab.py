@@ -170,3 +170,148 @@ def test_ed_dmft_metal_7bath_quick():
     d = BetheDMFT(beta=200, U=2.0, n_iw=512)
     r = d.solve("ed", n_iter=40, mix=0.5, tol=1e-5, ctint_kwargs=dict(n_bath=7))
     assert 0.25 < r["Z"] < 0.31   # 7-bath T=0 value 0.279; NRG ~0.28-0.30
+
+
+# ============================================================================ v1.0 (ROADMAP modules)
+def test_gamma_method_and_jackknife():
+    from feynlab.utils.errors import ar1_series, gamma_method, jackknife
+    _, _, tau, _ = gamma_method(ar1_series(200000, 0.8))
+    assert abs(tau - 4.5) / 4.5 < 0.1
+    rng = np.random.default_rng(0)
+    m, e = jackknife(lambda a, b: a / b, 1 + 0.1 * rng.standard_normal(5000), 2 + 0.1 * rng.standard_normal(5000))[:2]
+    assert abs(m - 0.5) < 5 * e + 1e-3
+
+
+def test_mixers_reach_same_fixed_point():
+    from feynlab.utils.mixing import LinearMixer, AndersonMixer, BroydenMixer, solve_fixed_point
+    F = lambda x: 0.9 * np.cos(x) + 0.1 * np.roll(x, 1)
+    sols = [solve_fixed_point(F, np.zeros(10), mx)[0] for mx in (LinearMixer(0.5), AndersonMixer(), BroydenMixer())]
+    assert np.abs(sols[0] - sols[1]).max() < 1e-7 and np.abs(sols[0] - sols[2]).max() < 1e-7
+
+
+def test_hdf5_checkpoint(tmp_path):
+    from feynlab.utils.io import Checkpoint
+    ck = Checkpoint(str(tmp_path / "c.h5"), {"U": 2.0})
+    ck.save(1, sigma=np.ones(3) * 1j)
+    ck.save(2, sigma=np.ones(3) * 2j)
+    it, d = ck.latest()
+    assert it == 2 and np.allclose(d["sigma"], 2j)
+
+
+def test_cthyb_vs_ed_quick():
+    from feynlab.qmc.cthyb import CTHYBSolver
+    beta = 10.0
+    g = MatsubaraGrid(beta, 512)
+    ed = AndersonED(-1.2, 3.0, [-1.0, 0.0, 1.2], [0.5, 0.4, 0.6])
+    r = CTHYBSolver(g, 3.0, n_iw_meas=4).solve(ed.hybridization(g.iw), -ed.eps_d, n_meas=200_000, n_chains=2)
+    assert abs(np.mean(r["n"]) - ed.occupation(beta)) < 0.02
+    assert abs(r["docc"] - ed.double_occupancy(beta)) < 0.01
+
+
+def test_kanamori_multiplets():
+    from feynlab.qmc.multiorbital import KanamoriAtom
+    m = KanamoriAtom(2, 4.0, 0.6).multiplets(2)
+    assert abs(m[0] - 2.2) < 1e-10 and np.sum(np.abs(m - 2.2) < 1e-9) == 3
+
+
+def test_dca_nc1_equals_dmft():
+    from feynlab.dmft.dca import DCA2D
+    from feynlab.dmft.bethe import LatticeDMFT
+    r = DCA2D(Lc=1, nk=32, U=1.5, beta=10.0, n_iw=256).solve()
+    k = 2 * np.pi * np.arange(32) / 32
+    kx, ky = np.meshgrid(k, k, indexing="ij")
+    ref = LatticeDMFT.from_eps_k(10.0, 1.5, -0.5 * (np.cos(kx) + np.cos(ky)), n_iw=256).solve("ipt", tol=1e-8)
+    assert abs(r["Z"][0] - ref["Z"]) < 1e-4
+
+
+def test_compressibility_sum_rule():
+    from feynlab.twoparticle import bubble
+    from feynlab.core.matsubara import fermi
+    from feynlab.core.lattice import square_lattice_eps
+    g = MatsubaraGrid(5.0, 256)
+    eps = square_lattice_eps(16)
+    chi = bubble(eps, np.zeros(256), g, 0.3)
+    f = fermi(eps - 0.3, 5.0)
+    assert abs(chi[0, 0, 0].real - np.mean(5.0 * f * (1 - f))) < 1e-6
+
+
+def test_nevanlinna_interpolates():
+    from feynlab.continuation.nevanlinna import Nevanlinna
+    w = np.linspace(-4, 4, 401)
+    dw = w[1] - w[0]
+    A = np.exp(-w**2 / 0.5) / np.sqrt(0.5 * np.pi)
+    iw = 1j * np.pi * (2 * np.arange(12) + 1) / 30
+    G = (A[None] * dw / (iw[:, None] - w[None])).sum(1)
+    assert np.abs(Nevanlinna(iw, G)(iw) - G).max() < 1e-10
+
+
+def test_resummation():
+    from scipy.special import binom
+    from feynlab.diagrams.resum import domb_sykes, pade, pade_eval, conformal_map_sum
+    a = np.array([binom(-0.5, k) for k in range(20)])
+    assert abs(domb_sykes(a)[0] - 1) < 1e-6
+    p, q = pade(a, 8, 8)
+    assert abs(pade_eval(p, q, 3.0).real - 0.5) < 1e-6
+    assert abs(conformal_map_sum(a, 1.0, 3.0) - 0.5) < 1e-6
+
+
+def test_cdet_atom():
+    from feynlab.qmc.cdet import cdet_series, atom_exact_coefficients
+    g = MatsubaraGrid(5.0, 1024)
+    c, e = cdet_series(g, 1 / g.iw, max_order=3, n_samples=50000)
+    assert np.allclose(c, atom_exact_coefficients(5.0, 3), atol=1e-6 + 5 * np.max(e))
+
+
+def test_nrg_resonant_level():
+    from feynlab.qmc.nrg import NRG, resonant_level_exact
+    a = NRG(0.0, None, 0.01, 2.5, 20, 200, 2.0, True).run()
+    b = NRG(0.0, None, 0.01, 2.5, 20, 200, 2.0, False).run()
+    S = 0.5 * ((a[1:, 1] - b[1:, 1]) + (a[:-1, 1] - b[:-1, 1]))
+    T = np.sqrt(a[1:, 0] * a[:-1, 0])
+    Se, _ = resonant_level_exact(T[[12]], 0.01)
+    assert abs(S[12] / Se[0] - 1) < 0.08
+
+
+def test_orbital_moment_and_bcd():
+    from feynlab.transport.models import MassiveDirac, TiltedDirac
+    from feynlab.transport.response import orbital_moment, dirac_valley_moment, berry_curvature_dipole
+    from feynlab.transport.intrinsic import k_grid_polar
+    k = np.array([0.0, 0.4])
+    assert np.allclose(orbital_moment(MassiveDirac(1, 0.3), k, 0 * k)[1][:, 0], dirac_valley_moment(1, 0.3, k))
+    g = k_grid_polar(2.0, nr=200, nth=128, dense=[(0.283, 0.2, 800)])
+    a = berry_curvature_dipole(TiltedDirac(1, 0.1, 0.3), 0.3, g, beta=300)[0]
+    b = berry_curvature_dipole(TiltedDirac(1, 0.1, 0.3), 0.3, g, beta=300, form="sea")[0]
+    assert abs(a - b) < 1e-4 * abs(a) and abs(a) > 1e-3
+
+
+def test_rashba_edelstein():
+    from feynlab.transport.models import Rashba2DEG
+    from feynlab.transport.response import edelstein_boltzmann, rashba_edelstein_reference
+    from feynlab.transport.intrinsic import k_grid_polar
+    g = k_grid_polar(4.0, nr=200, nth=64, dense=[(np.sqrt(2.0), 0.5, 1500)])
+    s = edelstein_boltzmann(Rashba2DEG(1.0, 0.3, 0.0), 1.0, np.array([[0, -1j], [1j, 0]]) / 2, g)
+    assert abs(abs(s) / rashba_edelstein_reference(1.0, 0.3) - 1) < 0.01
+
+
+def test_tmatrix_identity_limit():
+    from feynlab.transport.models import MassiveDirac
+    from feynlab.transport.kubo_streda import DisorderedHall
+    from feynlab.transport.intrinsic import k_grid_polar
+    d = MassiveDirac(1.0, 0.5)
+    g = k_grid_polar(6.0, nr=150, nth=32, dense=[(d.kF(1.0), 0.3, 600)])
+    a = DisorderedHall(d, 1.0, n_i=1.0, V0=0.07, grid=g).sigma_I()
+    b = DisorderedHall(d, 1.0, n_i=1.0, V0=0.07, grid=g, imp_matrix=np.eye(2)).sigma_I()
+    assert abs(a - b) < 1e-12
+
+
+def test_wannier3d_quantised():
+    from feynlab.transport.wannier3d import WannierTB3D, stacked_qwz_hr
+    R, H = stacked_qwz_hr(1.0, 0.2)
+    w = WannierTB3D(Rs=R, HR=H, lat=np.diag([1.0, 1.0, 3.0]))
+    assert abs(w.intrinsic_hall(0.0, nk=(16, 16, 4), adaptive=False)["sigma"][2] - 1 / 3) < 2e-3
+
+
+def test_cli_parser():
+    from feynlab.cli.main import build_parser
+    p = build_parser()
+    assert p.parse_args(["hall", "--model", "dirac"]).command == "hall"

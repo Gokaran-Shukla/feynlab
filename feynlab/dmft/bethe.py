@@ -68,7 +68,18 @@ class BetheDMFT:
     # ------------------------------------------------------------------
     def solve(self, solver: str = "ipt", n_iter: int = 200, mix: float = 0.5, tol: float = 1e-7,
               sigma_init=None, ctint_kwargs: dict | None = None, insulating_start: bool = False,
-              verbose: bool = False):
+              verbose: bool = False, mixer: str = "linear", checkpoint: str | None = None):
+        """mixer: 'linear' | 'anderson' | 'broyden' (utils.mixing); checkpoint: HDF5 path
+        (iteration data saved each step; an existing file restarts from its last Sigma)."""
+        from ..utils.mixing import LinearMixer, AndersonMixer, BroydenMixer
+        mixobj = {"linear": LinearMixer(mix), "anderson": AndersonMixer(mix), "broyden": BroydenMixer(mix)}[mixer]
+        ck = None
+        if checkpoint:
+            from ..utils.io import Checkpoint
+            ck = Checkpoint(checkpoint, dict(U=self.U, beta=self.grid.beta, solver=solver))
+            last = ck.latest()
+            if last is not None and sigma_init is None:
+                sigma_init = last[1]["sigma"]
         iw = self.grid.iw
         if sigma_init is not None:
             sigma = np.asarray(sigma_init, complex)
@@ -101,6 +112,18 @@ class BetheDMFT:
                 if abs(self.mu - self.U / 2) < 1e-12:  # enforce p-h symmetry exactly
                     sym = self.U / 2.0 + 1j * sym.imag
                 sigma_new[:m] = sym
+            elif solver == "cthyb":
+                from ..qmc.cthyb import CTHYBSolver
+                kw = dict(n_warm=10000, n_meas=500000, meas_every=20, n_chains=2)
+                kw.update(ctint_kwargs or {})
+                n_meas_iw = kw.pop("n_iw_meas", 64)
+                delta = iw + self.mu - 1.0 / g0
+                res = CTHYBSolver(self.grid, self.U, n_iw_meas=n_meas_iw).solve(delta, self.mu, seed=3000 + it, **kw)
+                self.cthyb_last = res
+                nloc = float(np.mean(res["n"]))
+                sigma_new = self.U * nloc + self.U**2 * nloc * (1 - nloc) / iw
+                m = len(res["Sigma"])
+                sigma_new[:m] = res["Sigma"]
             elif solver == "ed":
                 from ..qmc.ed_sector import SectorED, fit_bath
                 kw = dict(n_bath=5, beta_fit=200.0, n_fit=200, beta_ed=1e4, ed_method="auto")
@@ -136,8 +159,10 @@ class BetheDMFT:
                 # particle-hole symmetry at half filling: Re Sigma = U/2 exactly
                 sigma_new = self.U / 2.0 + 1j * sigma_new.imag
             diff = float(np.max(np.abs(sigma_new - sigma)))
-            sigma = mix * sigma_new + (1 - mix) * sigma
+            sigma = mixobj(sigma, sigma_new)
             g = self.g_lattice(sigma)
+            if ck is not None:
+                ck.save(it, sigma=sigma, diff=diff)
             self.history.append(diff)
             if verbose:
                 print(f"iter {it:3d}  |dSigma| = {diff:.3e}")

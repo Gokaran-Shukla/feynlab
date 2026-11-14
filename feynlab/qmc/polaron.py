@@ -29,7 +29,7 @@ def _overlap(a1, a2, b1, b2):
 
 
 @njit(cache=True)
-def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax):
+def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax, p=0.0):
     np.random.seed(seed)
     t1 = np.zeros(nmax)
     t2 = np.zeros(nmax)
@@ -37,7 +37,9 @@ def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax):
     n = 0
     tau = 0.5
     hist = np.zeros(n_bins)
+    hist0 = np.zeros(n_bins)
     order_hist = np.zeros(nmax)
+    e_p = 0.5 * p * p
     pref = np.sqrt(2.0) * alpha / np.pi   # (alpha/(2 sqrt2 pi^2)) * 4 pi
     for step in range(n_steps):
         r = np.random.random()
@@ -47,7 +49,7 @@ def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax):
             for i in range(n):
                 if t2[i] > tlast:
                     tlast = t2[i]
-            new = tlast - np.log(np.random.random()) / (-mu)
+            new = tlast - np.log(np.random.random()) / (e_p - mu)
             if new < tau_max:
                 tau = new
         elif r < 0.6:
@@ -64,7 +66,7 @@ def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax):
                 ph = 2 * np.pi * np.random.random()
                 st = np.sqrt(1 - ct * ct)
                 qx, qy, qz = qm * st * np.cos(ph), qm * st * np.sin(ph), qm * ct
-                dS = 0.5 * qm * qm * dt
+                dS = 0.5 * qm * qm * dt - p * qz * dt     # external momentum p along z
                 for j in range(n):
                     ov = _overlap(ta, tb, t1[j], t2[j])
                     if ov > 0:
@@ -83,7 +85,7 @@ def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax):
                 qm = np.sqrt(qx * qx + qy * qy + qz * qz)
                 sig = 1.0 / np.sqrt(dt)
                 Pq = 2.0 / (sig * np.sqrt(2 * np.pi)) * np.exp(-qm * qm / (2 * sig * sig))
-                dS = 0.5 * qm * qm * dt   # action of the arc relative to configuration without it
+                dS = 0.5 * qm * qm * dt - p * qz * dt   # action of the arc relative to configuration without it
                 for j in range(n):
                     if j != i:
                         ov = _overlap(t1[i], t2[i], t1[j], t2[j])
@@ -97,32 +99,60 @@ def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax):
         b = int(tau / tau_max * n_bins)
         if b < n_bins:
             hist[b] += 1.0
+            if n == 0:
+                hist0[b] += 1.0
         order_hist[n] += 1.0
-    return hist, order_hist
+    return hist, order_hist, hist0
 
 
 def polaron_diagmc(alpha: float, mu: float | None = None, tau_max: float = 30.0,
                    n_steps: int = 50_000_000, n_bins: int = 300, n_chains: int = 4,
-                   fit_window=(0.5, 0.95), seed: int = 11):
-    """Ground-state energy from the exponential tail of G(p=0, tau).
-    Returns dict(E, E_err, Z_rel, order_mean, tau, G)."""
+                   fit_window=(0.5, 0.95), seed: int = 11, p: float = 0.0):
+    """Energy E(p), quasiparticle weight Z(p) from the tail G(p, tau) ~ Z exp[-(E - mu) tau].
+    The absolute normalisation of the histogram is fixed by the order-0 diagram, whose weight
+    exp[-(p^2/2 - mu) tau] is known exactly."""
     if mu is None:
         mu = feynman_energy(alpha) - 0.3
     tau_grid = (np.arange(n_bins) + 0.5) * tau_max / n_bins
-    Es, hs, ords = [], [], []
+    Es, Zs, hs, ords = [], [], [], []
     for c in range(n_chains):
-        h, o = _run(alpha, mu, tau_max, n_steps, n_bins, seed + 101 * c, 4000)
+        h, o, h0 = _run(alpha, mu, tau_max, n_steps, n_bins, seed + 101 * c, 4000, p)
         hs.append(h)
         ords.append(o)
         lo, hi = int(fit_window[0] * n_bins), int(fit_window[1] * n_bins)
         m = h[lo:hi] > 0
-        p = np.polyfit(tau_grid[lo:hi][m], np.log(h[lo:hi][m]), 1, w=np.sqrt(h[lo:hi][m]))
-        Es.append(mu - p[0])
-    Es = np.array(Es)
+        fit = np.polyfit(tau_grid[lo:hi][m], np.log(h[lo:hi][m]), 1, w=np.sqrt(h[lo:hi][m]))
+        Es.append(mu - fit[0])
+        # normalisation C: h0(tau) = C exp[-(p^2/2 - mu) tau]  (fit on the short-time region)
+        m0 = h0 > 20
+        C = np.exp(np.mean(np.log(h0[m0]) + (0.5 * p * p - mu) * tau_grid[m0])) if m0.any() else np.nan
+        Zs.append(np.exp(fit[1]) / C)
+    Es, Zs = np.array(Es), np.array(Zs)
     o = np.sum(ords, axis=0)
-    return dict(E=float(Es.mean()), E_err=float(Es.std(ddof=1) / np.sqrt(len(Es))) if len(Es) > 1 else np.nan,
+    se = lambda x: float(x.std(ddof=1) / np.sqrt(len(x))) if len(x) > 1 else np.nan
+    return dict(E=float(Es.mean()), E_err=se(Es), Z=float(Zs.mean()), Z_err=se(Zs),
                 tau=tau_grid, G=np.sum(hs, axis=0), order_mean=float((np.arange(len(o)) * o).sum() / o.sum()),
-                mu=mu)
+                mu=mu, p=p)
+
+
+def polaron_effective_mass(alpha, p=0.4, **kw):
+    """m* from E(p) - E(0) = p^2 / (2 m*) (same seeds -> correlated errors partly cancel)."""
+    r0 = polaron_diagmc(alpha, p=0.0, **kw)
+    r1 = polaron_diagmc(alpha, p=p, **kw)
+    dE = r1["E"] - r0["E"]
+    err = np.hypot(r0["E_err"], r1["E_err"])
+    m = p * p / (2 * dE)
+    return dict(m_star=m, m_err=m * err / dE, E0=r0, Ep=r1)
+
+
+def weak_coupling_mass(alpha):
+    """m*/m = 1 + alpha/6 + 0.02362763 alpha^2 (Roseler 1968; Smondyrev 1986)."""
+    return 1 + alpha / 6 + 0.02362763 * alpha**2
+
+
+def weak_coupling_Z(alpha):
+    """Z = 1 - alpha/2 + O(alpha^2) (first-order Froehlich)."""
+    return 1 - alpha / 2
 
 
 # ----------------------------------------------------------------------------

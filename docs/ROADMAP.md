@@ -1,5 +1,11 @@
 # feynlab roadmap — what would make it powerful and robust
 
+> **v1.0 status:** all 22 items below are implemented (A6 two-particle, B11 lattice polarons, C13 finite-range
+> disorder and D17 MPI are partial). Per-item status and benchmarks are listed in
+> `docs/software_tutorials/07_benchmarks_and_limitations.md` and `benchmarks/RESULTS_v1.md`; tutorials 09–14 and
+> quizzes T10–T15 cover them. **Next:** vertex ladders / DΓA, full-J CT-HYB (matrix trace), charge-self-consistent
+> DFT+DMFT, Holstein/SSH polarons, finite-range disorder, orbital crossed diagrams for 3D Wannier models, MPI.
+
 Prioritised by (scientific impact) × (fit with the existing code). Items marked ★ connect directly to
 orbitronics / correlated-materials research (Wannier-based OHC/SHC, kagome metals, altermagnets).
 

@@ -1,0 +1,20 @@
+{
+  "title": "feynlab: a Feynman-diagram laboratory for many-body physics and Hall transport",
+  "creators": [
+    {
+      "name": "Shukla, Gokaran",
+      "affiliation": "KAUST",
+      "orcid": "0000-0001-9332-3332"
+    }
+  ],
+  "license": "MIT",
+  "upload_type": "software",
+  "keywords": [
+    "Feynman diagrams",
+    "DMFT",
+    "quantum Monte Carlo",
+    "anomalous Hall effect",
+    "orbital Hall effect"
+  ],
+  "version": "1.0.0"
+}

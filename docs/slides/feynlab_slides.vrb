@@ -1,0 +1,24 @@
+\frametitle{Getting started in five lines}
+\begin{columns}[T]
+\column{0.55\textwidth}
+\scriptsize
+\begin{verbatim}
+git clone https://github.com/Gokaran-Shukla/feynlab
+cd feynlab && pip install -e .
+pytest -q                          # unit tests
+feynlab hall --model dirac         # AHE mechanisms
+feynlab bench --suite all          # every benchmark
+
+from feynlab.dmft.bethe import BetheDMFT
+r = BetheDMFT(beta=200, U=2.6).solve(
+        'ed', ctint_kwargs=dict(n_bath=7))
+print(r['Z'])
+\end{verbatim}
+\column{0.42\textwidth}
+\begin{block}{Cite}
+\small G.\ Shukla, \emph{feynlab: Feynman diagrams, QMC and Hall transport}, v1.0 (2026), github.com/Gokaran-Shukla/feynlab (see CITATION.cff)
+\end{block}
+\begin{block}{Roadmap}
+\small vertex ladders / D$\Gamma$A, full-$J$ CT-HYB, charge self-consistent DFT+DMFT, orbital crossed diagrams for Wannier models
+\end{block}
+\end{columns}

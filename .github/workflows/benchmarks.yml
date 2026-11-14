@@ -1,0 +1,20 @@
+name: benchmarks
+on:
+  schedule:
+    - cron: "17 3 * * 1"     # weekly, Monday 03:17 UTC
+  workflow_dispatch:
+jobs:
+  quick-benchmarks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e .[test]
+      - run: python benchmarks/run_benchmarks.py --quick
+      - uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: benchmarks/RESULTS.md

@@ -1,6 +1,6 @@
 # feynlab benchmark results
 
-102/102 checks passed, plus 2 informational rows  (runtime 1200 s, full mode)
+102/102 checks passed, plus 2 informational rows  (runtime 1221 s, full mode)
 
 IPT coexistence (beta=100): U_c1 ~ 2.6D, U_c2 ~ 3.4D; Lanczos ED-DMFT (6/7 bath sites, T=0): U_c1 ~ 2.38D, U_c2 ~ 2.96D (consensus 2.39D / 2.92-3.0D).
 

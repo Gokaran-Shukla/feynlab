@@ -88,6 +88,45 @@ class MassiveDirac(BandModel):
         return -4 * c * (1 + c**2) / (1 + 3 * c**2) ** 2
 
 
+class DiracQuadraticMass(BandModel):
+    """H = v (kx sx + ky sy) + (Delta + b k^2) sz  (continuum limit of QWZ / BHZ near Gamma, b = 1/2)."""
+
+    def __init__(self, v: float = 1.0, Delta: float = 0.3, b: float = 0.5):
+        self.v, self.Delta, self.b = float(v), float(Delta), float(b)
+        self.operators = {"sz/2": sz / 2}
+
+    def H(self, kx, ky):
+        kx, ky = _bc(kx, ky)
+        k2 = kx**2 + ky**2
+        return (self.v * (kx[..., None, None] * sx + ky[..., None, None] * sy)
+                + (self.Delta + self.b * k2)[..., None, None] * sz)
+
+    def dH(self, kx, ky):
+        kx, ky = _bc(kx, ky)
+        return (self.v * sx + 2 * self.b * kx[..., None, None] * sz,
+                self.v * sy + 2 * self.b * ky[..., None, None] * sz)
+
+
+class TiltedDirac(BandModel):
+    """H = t kx 1 + v (kx sx + ky sy) + Delta sz : a single tilted massive Dirac cone
+    (minimal model with a Berry curvature dipole, Sodemann & Fu PRL 115, 216806 (2015))."""
+
+    def __init__(self, v: float = 1.0, Delta: float = 0.1, t: float = 0.2):
+        self.v, self.Delta, self.t = float(v), float(Delta), float(t)
+        self.operators = {"sz/2": sz / 2}
+
+    def H(self, kx, ky):
+        kx, ky = _bc(kx, ky)
+        return (self.t * kx[..., None, None] * np.eye(2) + self.v * (kx[..., None, None] * sx + ky[..., None, None] * sy)
+                + self.Delta * sz)
+
+    def dH(self, kx, ky):
+        kx, ky = _bc(kx, ky)
+        sh = kx.shape + (2, 2)
+        return (np.broadcast_to(self.t * np.eye(2) + self.v * sx, sh).copy(),
+                np.broadcast_to(self.v * sy, sh).copy())
+
+
 class Rashba2DEG(BandModel):
     """H = k^2/2m + alpha (sx ky - sy kx) + Delta_ex sz.
     Delta_ex = 0: Rashba spin Hall model (Sinova et al. PRL 92, 126603 (2004);

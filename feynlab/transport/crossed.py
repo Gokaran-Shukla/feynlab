@@ -24,14 +24,21 @@ import numpy as np
 
 class CrossedDiagrams:
     def __init__(self, model, mu: float, nV2: float, L: float = 400.0, N: int = 1024,
-                 born_iter: int = 40):
+                 born_iter: int = 40, lattice: bool = False):
+        """lattice=True: model is a square-lattice tight-binding model (a = 1); the momentum grid
+        is then the full Brillouin zone (L = N sites, periodic), r runs over lattice vectors and
+        no Nyquist masking is needed (H(k) is periodic)."""
+        if lattice:
+            L = float(N)
         self.model, self.mu, self.nV2 = model, float(mu), float(nV2)
         self.L, self.N = float(L), int(N)
         p = 2 * np.pi * np.fft.fftfreq(N, d=L / N)
         self.px, self.py = np.meshgrid(p, p, indexing="ij")
         # drop the Nyquist row/column so that the grid is inversion symmetric
         # (otherwise odd functions such as v_x leak into the singular density channel)
-        m1 = np.ones(N); m1[N // 2] = 0.0
+        m1 = np.ones(N)
+        if not lattice:
+            m1[N // 2] = 0.0
         self.mask = np.outer(m1, m1)
         H = model.H(self.px, self.py)
         self.vx, self.vy = model.dH(self.px, self.py)
@@ -100,12 +107,14 @@ class CrossedDiagrams:
                     Gamma_broadening=float(np.max(np.abs(self.Sigma))))
 
 
-def crossed_hall(model, mu, op=None, runs=((0.015, 900.0, 1536), (0.0075, 1600.0, 2048))):
+def crossed_hall(model, mu, op=None, runs=((0.015, 900.0, 1536), (0.0075, 1600.0, 2048)),
+                 lattice: bool = False):
     """X and Psi contributions extrapolated linearly to vanishing broadening.
-    runs = sequence of (n V0^2, box L, grid N); keep L >> v/Gamma and pi N/L >~ 4 k_F."""
+    runs = sequence of (n V0^2, box L, grid N); keep L >> v/Gamma and pi N/L >~ 4 k_F.
+    lattice=True: tight-binding model on the full BZ (L is ignored, L = N)."""
     xs, ps, gs = [], [], []
     for nv, L, N in runs:
-        r = CrossedDiagrams(model, mu, nv, L=L, N=N).compute(op)
+        r = CrossedDiagrams(model, mu, nv, L=L, N=N, lattice=lattice).compute(op)
         xs.append(r["X"]); ps.append(r["Psi"]); gs.append(r["Gamma_broadening"])
     if len(gs) > 1:
         X0 = float(np.polyval(np.polyfit(gs, xs, 1), 0.0))

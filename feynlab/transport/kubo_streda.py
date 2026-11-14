@@ -32,10 +32,17 @@ from .intrinsic import intrinsic_hall, k_grid_polar, k_grid_lattice
 
 class DisorderedHall:
     def __init__(self, model, mu: float, n_i: float, V0: float, V1: float = 0.0,
-                 grid=None, scba: bool = False, scba_iter: int = 50):
+                 grid=None, scba: bool = False, scba_iter: int = 50, imp_matrix=None,
+                 t_matrix: bool = False):
+        """imp_matrix: orbital/spin structure M of one impurity, V_imp = V0 * M (default identity;
+        e.g. sigma_z for magnetic impurities, an orbital projector for orbital-selective disorder).
+        t_matrix=True: self-consistent T-matrix approximation (strong scatterers):
+        Sigma = n_i T, T = V (1 - g V)^-1 with g = int G (anti-Hermitian part), and the ladder
+        rung T^R (.) T^A instead of V0^2 M (.) M."""
         self.model = model
         self.mu = float(mu)
         self.n_i, self.V0, self.V1 = float(n_i), float(V0), float(V1)
+        self.t_matrix = t_matrix
         self.grid = grid
         kx, ky, w = grid
         self.w = w
@@ -44,11 +51,17 @@ class DisorderedHall:
         nb = self.H.shape[-1]
         self.nb = nb
         self.I = np.eye(nb)
+        self.Mimp = np.eye(nb) if imp_matrix is None else np.asarray(imp_matrix, complex)
         self.sigma_R = self._born(scba, scba_iter)
         z = self.mu * self.I - self.H
         self.GR = np.linalg.inv(z - self.sigma_R)
         self.GA = np.conj(np.swapaxes(self.GR, -1, -2))
-        self.gR_loc = self.sigma_R / (self.n_i * self.V0**2)
+        self.gR_loc = self._integrate(self.GR)
+        self.gR_loc = 0.5 * (self.gR_loc - np.conj(self.gR_loc.T))  # anti-Hermitian (on-shell) part
+        if self.t_matrix:
+            V = self.V0 * self.Mimp
+            self.TR = V @ np.linalg.inv(self.I - self.gR_loc @ V)
+            self.TA = np.conj(self.TR.T)
 
     # ------------------------------------------------------------------
     def _integrate(self, A):
@@ -63,10 +76,17 @@ class DisorderedHall:
         # iterate SCBA on the anti-Hermitian part starting from a small guess.
         gam = 1e-3
         S = -1j * gam * self.I
+        M = self.Mimp
         for _ in range(n_iter if scba else 30):
             G = np.linalg.inv(z - S)
             g = self._integrate(G)
-            S_new = self.n_i * self.V0**2 * g
+            if getattr(self, "t_matrix", False):
+                ga = 0.5 * (g - np.conj(g.T))
+                V = self.V0 * M
+                # first-order term n_i V is a static band shift absorbed in mu (as in the Born case)
+                S_new = self.n_i * (V @ np.linalg.inv(self.I - ga @ V) - V)
+            else:
+                S_new = self.n_i * self.V0**2 * M @ g @ np.conj(M.T)
             S_new = 0.5 * (S_new - np.conj(S_new.T))  # anti-Hermitian part only
             if np.max(np.abs(S_new - S)) < 1e-12:
                 S = S_new
@@ -87,14 +107,20 @@ class DisorderedHall:
         GAf = GA.reshape(-1, nb, nb)
         # (G^R X G^A)_{ij} = sum_ab GR_ia X_ab GA_bj  ->  L[(i,j),(a,b)]
         L = np.einsum("kia,kbj->ijab", GRf, GAf).reshape(nb * nb, nb * nb)
-        a = self.n_i * self.V0**2 if ladder else 0.0
         b = self.n_i * self.V1**3 if skew else 0.0
         gR, gA = self.gR_loc, np.conj(self.gR_loc.T)
-        # X = a M + b (gR M + M gA),  M = M0 + L X
         Id = np.eye(nb * nb)
-        lgR = np.kron(gR, np.eye(nb))        # vec(gR M) = (gR (x) I) vec(M) for row-major vec
-        rgA = np.kron(np.eye(nb), gA.T)      # vec(M gA)
-        K = a * Id + b * (lgR + rgA)
+        if not ladder:
+            Kl = np.zeros((nb * nb, nb * nb))
+        elif self.t_matrix:
+            Kl = self.n_i * np.kron(self.TR, self.TA.T)                 # vec(T^R M T^A)
+        else:
+            Mi = self.Mimp
+            Kl = self.n_i * self.V0**2 * np.kron(Mi, np.conj(Mi))       # vec(M X M^+)
+        # X = Kl M + b (gR M + M gA),  M = M0 + L X   (row-major vec)
+        lgR = np.kron(gR, np.eye(nb))
+        rgA = np.kron(np.eye(nb), gA.T)
+        K = Kl + b * (lgR + rgA)
         # X = K (M0 + L X)  ->  (I - K L) X = K M0   (row-major vec, L acts on vec(X))
         X = np.linalg.solve(Id - K @ L, K @ M0.reshape(-1))
         return X.reshape(nb, nb)

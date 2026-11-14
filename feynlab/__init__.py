@@ -12,4 +12,4 @@ transport   Berry-curvature, Kubo-Streda (ladder + skew) and Boltzmann (side jum
             Hall responses for charge, spin, orbital and orbital-quadrupole currents
 book        companion calculators for Mattuck's 'A Guide to Feynman Diagrams'
 """
-__version__ = "0.3.0"
+__version__ = "1.0.0"

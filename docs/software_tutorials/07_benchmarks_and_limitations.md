@@ -48,8 +48,45 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
    Improve with longer runs or the exact energy estimator of Mishchenko et al.
 4. **Bold scheme** evaluates skeleton diagrams up to order 4 by direct MC (no sampling over orders); the
    Kozik et al. misleading convergence is reproduced qualitatively at these orders.
-5. Single-site DMFT only (no cluster DMFT); X/Ψ engine is for continuum models (lattice FFT version is a
-   straightforward extension).
+5. ~~Single-site DMFT only; X/Ψ for continuum models only~~ → **resolved in v1.0** (DCA 2×2, lattice X/Ψ via BZ FFT).
+
+## What changed in v1.0 (all 22 ROADMAP items)
+
+| roadmap item | v1.0 status | benchmark (`benchmarks/RESULTS_v1.md`, 54/54 pass) |
+|---|---|---|
+| A1 CT-HYB | **done** (segment picture, density–density) | n, ⟨n↑n↓⟩, Σ(iω₀) vs ED |
+| A2 Kanamori multi-orbital | **done** (atom, Hubbard-I, sparse ED ≤ 8 sites) | U−3J, U+J, 3U−9J |
+| A3 DCA | **done** (2D, N_c = 1, 4; second-order cluster solver) | N_c = 1 ≡ DMFT |
+| A4 DFT+DMFT | **done** (hr.dat, FLL/AMF/occupation dc; Hubbard-I, ED) | U = 0 limit, Mott |
+| A5 continuation | **done** (Nevanlinna, stochastic) | interpolation, sum rules |
+| A6 two-particle | **partial** (bubble, RPA; no vertex ladders / DΓA) | compressibility sum rule |
+| A7 NRG | **done** (thermodynamics, Kondo) | resonant level, ln 2, Haldane slope |
+| B8 CDet | **done** | atom exact, Anderson vs ED |
+| B9 bold / misleading convergence | **done** (diagnostic) | Kozik et al. |
+| B10 resummation | **done** | Domb–Sykes, Padé, conformal |
+| B11 polaron Z, m* | **done** (Fröhlich; Holstein/SSH not yet) | weak coupling |
+| C12 3D Wannier + modern OAM | **done** | Chern stacks; Xiao–Yao–Niu |
+| C13 matrix disorder + T-matrix | **done** (finite-range disorder not yet) | Born + skew |
+| C14 lattice crossed diagrams | **done** | k·p limit |
+| C15 BCD, Edelstein, SOT | **done** | Sodemann–Fu; Edelstein |
+| C16 finite-T Kubo–Bastin | **done** | Sommerfeld/Bastin consistency |
+| D17 GPU backend | **done** (CuPy optional; MPI not yet) | — |
+| D18 HDF5 checkpoints | **done** | restart test |
+| D19 Γ-method, jackknife, Anderson/Broyden | **done** | AR(1) τ_int; same fixed point |
+| D20 CI, CITATION, Zenodo, MkDocs | **done** | weekly benchmarks |
+| D21 CLI + TOML | **done** | `feynlab dmft|hall|polaron|nrg|bench` |
+| D22 units | **done** | (e²/h)/Å → S/cm |
+
+## Remaining limitations after v1.0
+
+* CT-HYB: density–density interaction only (no full rotationally invariant Kanamori in the segment picture).
+* DFT+DMFT: no charge self-consistency; impurity solvers Hubbard-I and ED.
+* DCA: the cluster solver is second-order perturbation theory (exact only to U²).
+* Nevanlinna: no Hardy-basis optimisation; at most ~40 Matsubara points before precision loss.
+* Stochastic continuation: L1 error 0.8 vs 0.21 for MaxEnt on the two-Gaussian test (use as a cross-check).
+* Polaron m*: few-% statistical spread at 3·10⁷ steps per chain; finite-p O(p⁴) bias.
+* Two-particle: bubble and RPA only.
+* Adaptive 3D refinement improves accuracy at fixed coarse mesh but is not yet cost-optimal (refines whole Fermi-surface cells).
 
 "Best in the world" is not something a benchmark suite can establish. What the suite does establish is that
 every number it reports agrees with an exact or published result within the stated tolerance.

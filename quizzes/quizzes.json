@@ -1573,7 +1573,7 @@
     "explanation": ""
    },
    {
-    "q": "Which diagrams are NOT included in feynlab's Hall engines?",
+    "q": "Which diagrams were added to the NCA Hall engine in v0.2 (continuum) and v1.0 (lattice)?",
     "options": [
      "Born self-energy",
      "ladder vertex",
@@ -1581,7 +1581,7 @@
      "third-order skew vertex"
     ],
     "answer": 2,
-    "explanation": "Ado et al. EPL 2015 — stated limitation."
+    "explanation": "Ado et al. EPL 2015; lattice version via BZ FFT."
    }
   ]
  },
@@ -1795,23 +1795,23 @@
     "explanation": "The Kubo route gives it exactly; the w(4a) decomposition reproduces 1/2."
    },
    {
-    "q": "Which analytic continuation is implemented?",
+    "q": "Which analytic-continuation methods does feynlab v1.0 provide?",
     "options": [
-     "MaxEnt",
-     "Padé",
-     "stochastic optimisation",
+     "MaxEnt only",
+     "MaxEnt, Nevanlinna and stochastic",
+     "Padé only",
      "none"
     ],
     "answer": 1,
     "explanation": ""
    },
    {
-    "q": "DMFT in feynlab is…",
+    "q": "Which DMFT flavours does feynlab v1.0 provide?",
     "options": [
-     "cluster DMFT",
-     "single-site, Bethe lattice",
+     "only single-site Bethe",
+     "single-site (Bethe/lattice), DCA clusters and DFT+DMFT from Wannier90",
      "GW+DMFT",
-     "lattice QMC"
+     "lattice QMC only"
     ],
     "answer": 1,
     "explanation": ""
@@ -1837,6 +1837,438 @@
     ],
     "answer": 1,
     "explanation": ""
+   }
+  ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T10 — Infrastructure: errors, mixing, checkpoints, CLI",
+  "questions": [
+   {
+    "q": "The naive error σ/√N of correlated Monte Carlo data must be multiplied by…",
+    "options": [
+     "τ_int",
+     "√(2τ_int)",
+     "2",
+     "1/√τ_int"
+    ],
+    "answer": 1,
+    "explanation": "Integrated autocorrelation time τ_int (Wolff's Γ-method)."
+   },
+   {
+    "q": "For an AR(1) process x_{t+1} = φx_t + noise, τ_int equals…",
+    "options": [
+     "φ",
+     "1/(1−φ)",
+     "(1+φ)/(2(1−φ))",
+     "φ²"
+    ],
+    "answer": 2,
+    "explanation": "feynlab's ar1_series test; φ = 0.9 gives 9.5."
+   },
+   {
+    "q": "The jackknife is needed for…",
+    "options": [
+     "primary averages",
+     "errors of nonlinear functions of averages, e.g. ⟨a⟩/⟨b⟩",
+     "removing autocorrelation",
+     "speed"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "Why does linear mixing become slow near the Mott transition?",
+    "options": [
+     "FFT errors",
+     "the largest Jacobian eigenvalue of the DMFT map approaches 1",
+     "the sign problem",
+     "memory"
+    ],
+    "answer": 1,
+    "explanation": "Anderson/Broyden: 78 → 13 iterations at U = 2.6."
+   },
+   {
+    "q": "Anderson mixing is equivalent to…",
+    "options": [
+     "Newton's method with the exact Jacobian",
+     "Pulay/DIIS extrapolation over previous residuals",
+     "simulated annealing",
+     "linear mixing with α = 1"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "Why does feynlab store input_json inside every HDF5 output?",
+    "options": [
+     "compression",
+     "provenance: each result file carries its own input parameters",
+     "speed",
+     "GPU support"
+    ],
+    "answer": 1,
+    "explanation": ""
+   }
+  ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T11 — CT-HYB, Kanamori, DFT+DMFT",
+  "questions": [
+   {
+    "q": "CT-HYB expands the partition function in powers of…",
+    "options": [
+     "U",
+     "the hybridization Δ(τ)",
+     "temperature",
+     "the hopping t of the lattice"
+    ],
+    "answer": 1,
+    "explanation": "Werner et al. PRL 97, 076405 (2006)."
+   },
+   {
+    "q": "Why is CT-HYB preferred at strong coupling?",
+    "options": [
+     "its average order DECREASES with U",
+     "it has no sign problem ever",
+     "it works at T = 0",
+     "it needs no bath"
+    ],
+    "answer": 0,
+    "explanation": ""
+   },
+   {
+    "q": "In the segment picture the local trace for density–density U is…",
+    "options": [
+     "a determinant",
+     "exp(−U·overlap + μ·length)",
+     "always 1",
+     "a Pfaffian"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "Two-orbital Kanamori atom with N = 2: the ground multiplet energy is…",
+    "options": [
+     "U",
+     "U − 3J (spin triplet)",
+     "U + J",
+     "U − J"
+    ],
+    "answer": 1,
+    "explanation": "Hund's first rule."
+   },
+   {
+    "q": "The t₂g³ (three electrons, three orbitals) ground state is…",
+    "options": [
+     "a singlet at 3U − 3J",
+     "the 4-fold ⁴S state at 3U − 9J",
+     "a doublet at 3U",
+     "non-degenerate"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "In Hubbard-I DFT+DMFT, why must the 'occupation' double-counting sit at the plateau CENTRE?",
+    "options": [
+     "for speed",
+     "inside a Mott gap every shift gives the same n; the edge is unstable",
+     "required by FLL",
+     "to reduce J"
+    ],
+    "answer": 1,
+    "explanation": ""
+   }
+  ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T12 — DCA, two-particle response, NRG",
+  "questions": [
+   {
+    "q": "DCA with N_c = 1 reduces to…",
+    "options": [
+     "Hartree–Fock",
+     "single-site DMFT",
+     "RPA",
+     "the atomic limit"
+    ],
+    "answer": 1,
+    "explanation": "feynlab: Z 0.486644 vs 0.486638."
+   },
+   {
+    "q": "In 2×2 DCA the more strongly renormalised patch is…",
+    "options": [
+     "(0,0)",
+     "(π,0) — the antinode",
+     "(π,π)",
+     "none"
+    ],
+    "answer": 1,
+    "explanation": "Coupling to (π,π) spin fluctuations; seed of the pseudogap."
+   },
+   {
+    "q": "The compressibility sum rule states…",
+    "options": [
+     "χ₀(q→0, Ω=0) = ∂n/∂μ",
+     "χ₀ = 0",
+     "χ₀(π,π) = n",
+     "χ = U"
+    ],
+    "answer": 0,
+    "explanation": ""
+   },
+   {
+    "q": "The Wilson-chain hopping t_n decays as…",
+    "options": [
+     "1/n",
+     "Λ^{−n/2}",
+     "e^{−n²}",
+     "it is constant"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "For the symmetric Anderson model, S_imp on the local-moment plateau equals…",
+    "options": [
+     "0",
+     "ln 2",
+     "ln 4",
+     "1"
+    ],
+    "answer": 1,
+    "explanation": "Free orbital: ln 4; Fermi liquid: 0."
+   },
+   {
+    "q": "Haldane's T_K contains the exponential factor…",
+    "options": [
+     "exp(−U/Γ)",
+     "exp(−πU/8Γ + πΓ/2U)",
+     "exp(−Γ/U)",
+     "exp(−1/Jρ) with no U"
+    ],
+    "answer": 1,
+    "explanation": "feynlab NRG reproduces the slope −1.00."
+   }
+  ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T13 — Analytic continuation",
+  "questions": [
+   {
+    "q": "Analytic continuation is hard because…",
+    "options": [
+     "the kernel 1/(iω−ω) is singular",
+     "the inverse problem is exponentially ill-conditioned",
+     "of the fermion sign",
+     "of the FFT"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "The Nevanlinna method exploits that…",
+    "options": [
+     "G is a Nevanlinna (Herglotz) function, mapped to a Schur function",
+     "A is Gaussian",
+     "the noise is white",
+     "G is real"
+    ],
+    "answer": 0,
+    "explanation": "Fei, Yeh, Gull PRL 126, 056402 (2021)."
+   },
+   {
+    "q": "The Pick criterion tells you…",
+    "options": [
+     "the best α in MaxEnt",
+     "whether a causal interpolant of the data exists",
+     "the number of poles",
+     "the temperature"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "Why does feynlab's Nevanlinna use mpmath with 64 digits?",
+    "options": [
+     "style",
+     "the Schur recursion loses ~1 digit per point",
+     "speed",
+     "GPU"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "Stochastic continuation picks the fictitious temperature Θ where…",
+    "options": [
+     "χ² is minimal",
+     "χ²/N ≈ 1",
+     "the entropy is maximal",
+     "A is smoothest"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "Recommended practice in feynlab:",
+    "options": [
+     "trust any single method",
+     "MaxEnt with two default models + stochastic cross-check (Nevanlinna for near-exact data)",
+     "always Padé",
+     "fit Lorentzians by eye"
+    ],
+    "answer": 1,
+    "explanation": ""
+   }
+  ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T14 — CDet, resummation, polaron Z and m*",
+  "questions": [
+   {
+    "q": "Rossi's CDet recursion obtains the sum of connected diagrams at cost…",
+    "options": [
+     "n!",
+     "3ⁿ",
+     "2^(n²)",
+     "n³"
+    ],
+    "answer": 1,
+    "explanation": "Inclusion–exclusion over subsets."
+   },
+   {
+    "q": "For the Hubbard atom, X(U) = ⟨n↑n↓⟩ − ¼ is…",
+    "options": [
+     "−¼ tanh(βU/4)",
+     "U/4",
+     "e^{−βU}",
+     "0"
+    ],
+    "answer": 0,
+    "explanation": "CDet matches every Taylor coefficient."
+   },
+   {
+    "q": "The Domb–Sykes plot of a_n/a_{n−1} vs 1/n gives…",
+    "options": [
+     "the sum of the series",
+     "1/R at 1/n → 0",
+     "the sign",
+     "Z"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "A conformal map is used to…",
+    "options": [
+     "speed up DiagMC",
+     "sum a series beyond its radius of convergence",
+     "remove tails",
+     "fix μ"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "The polaron Z factor in feynlab is normalised using…",
+    "options": [
+     "Feynman's bound",
+     "the exactly known order-0 diagram",
+     "experiment",
+     "sum rule on m*"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "At weak coupling the Fröhlich effective mass is…",
+    "options": [
+     "1 − α",
+     "1 + α/6 + 0.0236α²",
+     "e^{α}",
+     "1 + α"
+    ],
+    "answer": 1,
+    "explanation": "Rösler 1968; Smondyrev 1986."
+   }
+  ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T15 — Advanced transport",
+  "questions": [
+   {
+    "q": "Expanding the T-matrix to third order in V produces…",
+    "options": [
+     "side jump",
+     "conventional skew scattering ∝ n_i V³",
+     "intrinsic AHE",
+     "nothing new"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "Why is the crossed Ψ diagram nonzero for QWZ near Γ but zero for Ado's Dirac model?",
+    "options": [
+     "numerical error",
+     "the quadratic mass Δ − k²/2 of the lattice model",
+     "temperature",
+     "spin–orbit"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "The gapped Dirac valley orbital moment is m(k) =",
+    "options": [
+     "Δv²/[2(Δ² + v²k²)], equal in both bands",
+     "zero",
+     "opposite in the two bands",
+     "v k"
+    ],
+    "answer": 0,
+    "explanation": "Xiao, Yao, Niu PRL 99, 236809 (2007)."
+   },
+   {
+    "q": "The Berry-curvature dipole Fermi-sea and Fermi-surface forms agree because of…",
+    "options": [
+     "integration by parts",
+     "time reversal",
+     "particle–hole symmetry",
+     "Wick's theorem"
+    ],
+    "answer": 0,
+    "explanation": ""
+   },
+   {
+    "q": "For the Rashba 2DEG with both bands occupied, |δS_y| per eEτ is…",
+    "options": [
+     "mα/(4π), independent of μ",
+     "∝ μ",
+     "zero",
+     "∝ α²"
+    ],
+    "answer": 0,
+    "explanation": "Edelstein 1990."
+   },
+   {
+    "q": "Adaptive k refinement in WannierTB3D refines points where…",
+    "options": [
+     "k is large",
+     "|Ω| is large or a band lies within a window of μ",
+     "randomly",
+     "at Γ only"
+    ],
+    "answer": 1,
+    "explanation": "Wang, Yates, Souza, Vanderbilt PRB 74, 195118 (2006)."
    }
   ]
  }
