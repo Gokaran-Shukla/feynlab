@@ -1,0 +1,1204 @@
+{
+ "results": [
+  {
+   "group": "matsubara",
+   "name": "tau->iw transform, max |error| (free level)",
+   "value": 5.4281081262048115e-06,
+   "reference": 0.0,
+   "error": 5.4281081262048115e-06,
+   "tol": 0.0001,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact 1/(iw - e)"
+  },
+  {
+   "group": "matsubara",
+   "name": "iw->tau transform, max |error| (free level)",
+   "value": 8.744958091000399e-09,
+   "reference": 0.0,
+   "error": 8.744958091000399e-09,
+   "tol": 1e-06,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact -e^{-e tau}/(1+e^{-beta e})"
+  },
+  {
+   "group": "diagrams",
+   "name": "# connected G diagrams, order 1",
+   "value": 2.0,
+   "reference": 2.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022; Molinari PRB 71, 113102 (2005)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# proper self-energy diagrams, order 1",
+   "value": 2.0,
+   "reference": 2.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022"
+  },
+  {
+   "group": "diagrams",
+   "name": "# improper diagrams, order 1",
+   "value": 0.0,
+   "reference": 0.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022"
+  },
+  {
+   "group": "diagrams",
+   "name": "# connected G diagrams, order 2",
+   "value": 10.0,
+   "reference": 10.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022; Molinari PRB 71, 113102 (2005)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# proper self-energy diagrams, order 2",
+   "value": 6.0,
+   "reference": 6.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022"
+  },
+  {
+   "group": "diagrams",
+   "name": "# improper diagrams, order 2",
+   "value": 4.0,
+   "reference": 4.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022"
+  },
+  {
+   "group": "diagrams",
+   "name": "# connected G diagrams, order 3",
+   "value": 74.0,
+   "reference": 74.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022; Molinari PRB 71, 113102 (2005)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# proper self-energy diagrams, order 3",
+   "value": 42.0,
+   "reference": 42.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022"
+  },
+  {
+   "group": "diagrams",
+   "name": "# improper diagrams, order 3",
+   "value": 32.0,
+   "reference": 32.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Sigma diagrams (Hartree G), order 2, 0 loops",
+   "value": 2.0,
+   "reference": 2.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Molinari PRB 71, 113102 (2005), Eq. (11)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Sigma diagrams (Hartree G), order 2, 1 loops",
+   "value": 1.0,
+   "reference": 1.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Molinari PRB 71, 113102 (2005), Eq. (11)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Sigma diagrams (Hartree G), order 3, 0 loops",
+   "value": 10.0,
+   "reference": 10.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Molinari PRB 71, 113102 (2005), Eq. (11)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Sigma diagrams (Hartree G), order 3, 1 loops",
+   "value": 9.0,
+   "reference": 9.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Molinari PRB 71, 113102 (2005), Eq. (11)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Sigma diagrams (Hartree G), order 3, 2 loops",
+   "value": 1.0,
+   "reference": 1.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Molinari PRB 71, 113102 (2005), Eq. (11)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Sigma diagrams (Hartree G), order 4, 0 loops",
+   "value": 74.0,
+   "reference": 74.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Molinari PRB 71, 113102 (2005), Eq. (11)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Sigma diagrams (Hartree G), order 4, 1 loops",
+   "value": 91.0,
+   "reference": 91.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Molinari PRB 71, 113102 (2005), Eq. (11)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Sigma diagrams (Hartree G), order 4, 2 loops",
+   "value": 23.0,
+   "reference": 23.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Molinari PRB 71, 113102 (2005), Eq. (11)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Sigma diagrams (Hartree G), order 4, 3 loops",
+   "value": 1.0,
+   "reference": 1.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Molinari PRB 71, 113102 (2005), Eq. (11)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# connected G diagrams, order 4",
+   "value": 706.0,
+   "reference": 706.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mohr, physics/0512022"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Hubbard Sigma diagrams (HF-shifted G0), order 2",
+   "value": 1.0,
+   "reference": 1.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "standard (e.g. Yamada 1975: 1, 2, 12)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Hubbard Sigma diagrams (HF-shifted G0), order 3",
+   "value": 2.0,
+   "reference": 2.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "standard (e.g. Yamada 1975: 1, 2, 12)"
+  },
+  {
+   "group": "diagrams",
+   "name": "# Hubbard Sigma diagrams (HF-shifted G0), order 4",
+   "value": 12.0,
+   "reference": 12.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "standard (e.g. Yamada 1975: 1, 2, 12)"
+  },
+  {
+   "group": "diagMC",
+   "name": "Hubbard atom: sum of 3rd-order Sigma diagrams (Im, iw0)",
+   "value": -0.002968692459314415,
+   "reference": 0.0,
+   "error": 0.002968692459314415,
+   "tol": 0.01524351651762064,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact atom: Sigma = U/2 + U^2/(4iw) (orders>2 cancel)"
+  },
+  {
+   "group": "diagMC",
+   "name": "Hubbard atom: sum of 4th-order Sigma diagrams (Im, iw0)",
+   "value": 0.027477745569121304,
+   "reference": 0.0,
+   "error": 0.027477745569121304,
+   "tol": 0.11234304739885335,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact atom"
+  },
+  {
+   "group": "diagMC",
+   "name": "Hubbard atom: 2nd-order Sigma(iw0) Im",
+   "value": -0.7958370316598277,
+   "reference": -0.7957747154594768,
+   "error": 6.231620035090923e-05,
+   "tol": 0.004310784851171722,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact U^2/(4 i w0)"
+  },
+  {
+   "group": "diagMC",
+   "name": "Anderson U=1: Sigma series to 4th order, Im Sigma(iw0)",
+   "value": -0.017371603300979793,
+   "reference": -0.017310489106511895,
+   "error": 6.111419446789765e-05,
+   "tol": 0.0043236224954750005,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact diagonalization (this package)"
+  },
+  {
+   "group": "diagMC",
+   "name": "Anderson U=1: Sigma series to 4th order, Im Sigma(iw1)",
+   "value": -0.04073751248800425,
+   "reference": -0.040578489698798625,
+   "error": 0.00015902278920562618,
+   "tol": 0.004313643893007426,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact diagonalization (this package)"
+  },
+  {
+   "group": "diagMC",
+   "name": "Anderson U=1: Sigma series to 4th order, Im Sigma(iw2)",
+   "value": -0.05066363673514934,
+   "reference": -0.05046550163410135,
+   "error": 0.00019813510104799148,
+   "tol": 0.00430812063201171,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact diagonalization (this package)"
+  },
+  {
+   "group": "CT-INT",
+   "name": "Anderson U=3 (no p-h symm.): Im Sigma(iw0) vs ED",
+   "value": -0.38520299580772677,
+   "reference": -0.38669748240109003,
+   "error": 0.0014944865933632645,
+   "tol": 0.017888158486667683,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact diagonalization"
+  },
+  {
+   "group": "CT-INT",
+   "name": "Anderson U=3 (no p-h symm.): Im Sigma(iw1) vs ED",
+   "value": -0.6044512848972037,
+   "reference": -0.6045960426459827,
+   "error": 0.00014475774877897862,
+   "tol": 0.017679311995941638,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact diagonalization"
+  },
+  {
+   "group": "CT-INT",
+   "name": "Anderson U=3 (no p-h symm.): Im Sigma(iw2) vs ED",
+   "value": -0.6219256440877681,
+   "reference": -0.6209375163564528,
+   "error": 0.0009881277313152914,
+   "tol": 0.019830603875186155,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact diagonalization"
+  },
+  {
+   "group": "CT-INT",
+   "name": "Anderson U=3 (no p-h symm.): Im Sigma(iw3) vs ED",
+   "value": -0.587355476791819,
+   "reference": -0.5840538127817596,
+   "error": 0.0033016640100593797,
+   "tol": 0.02187133078479841,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact diagonalization"
+  },
+  {
+   "group": "CT-INT",
+   "name": "average sign (repulsive U, delta=0.51)",
+   "value": 1.0,
+   "reference": 1.0,
+   "error": 0.0,
+   "tol": 1e-09,
+   "kind": "abs",
+   "passed": true,
+   "source": "Gull et al. RMP 83, 349 (2011)"
+  },
+  {
+   "group": "weak",
+   "name": "Yamada-Yosida: 1/Z - 1 from 2nd-order Sigma, U/Gamma=0.5",
+   "value": 0.013659434411372295,
+   "reference": 0.013490887731753335,
+   "error": 0.01249337204269028,
+   "tol": 0.03,
+   "kind": "rel",
+   "passed": true,
+   "source": "Yamada, Prog. Theor. Phys. 53, 970 (1975)"
+  },
+  {
+   "group": "weak",
+   "name": "Yamada-Yosida: 1/Z - 1 from 2nd-order Sigma, U/Gamma=1.0",
+   "value": 0.05463773764548874,
+   "reference": 0.05396355092701334,
+   "error": 0.01249337204268205,
+   "tol": 0.03,
+   "kind": "rel",
+   "passed": true,
+   "source": "Yamada, Prog. Theor. Phys. 53, 970 (1975)"
+  },
+  {
+   "group": "weak",
+   "name": "2D Hubbard 2nd-order Sigma tail coefficient U^2 n(1-n)",
+   "value": 0.25002618277960903,
+   "reference": 0.25,
+   "error": 2.6182779609029705e-05,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact moment sum rule"
+  },
+  {
+   "group": "weak",
+   "name": "spin-fluctuation (RPA/FLEX) -> 2nd order as U->0 (rel. diff, U=0.05)",
+   "value": 0.01391332833779599,
+   "reference": 0.0,
+   "error": 0.01391332833779599,
+   "tol": 0.02,
+   "kind": "abs",
+   "passed": true,
+   "source": "diagram expansion O(U^3)"
+  },
+  {
+   "group": "DMFT",
+   "name": "IPT Uc2 (metal disappears), beta=100 [IPT approximation; not a pass/fail check]",
+   "value": 3.3999999999999995,
+   "reference": 2.94,
+   "error": 0.15646258503401345,
+   "tol": 0,
+   "kind": "info",
+   "passed": null,
+   "source": "exact 2.92-3.0D; IPT is known to overestimate U_c2 -> use ED/CT-INT"
+  },
+  {
+   "group": "DMFT",
+   "name": "IPT Uc1 (insulator disappears), beta=100 [informational]",
+   "value": 2.5999999999999996,
+   "reference": 2.39,
+   "error": 0.08786610878661068,
+   "tol": 0,
+   "kind": "info",
+   "passed": null,
+   "source": "exact 2.39(2)D"
+  },
+  {
+   "group": "DMFT",
+   "name": "U=D, beta=10: Z(CT-INT DMFT) vs Z(IPT)",
+   "value": 0.7429328417157668,
+   "reference": 0.7501058451648339,
+   "error": 0.007173003449067128,
+   "tol": 0.03,
+   "kind": "abs",
+   "passed": true,
+   "source": "IPT exact to O(U^2); agreement expected at weak coupling"
+  },
+  {
+   "group": "DMFT",
+   "name": "U=6D Hubbard-I: Sigma(iw0) -> atomic U^2/(4 iw0)",
+   "value": -143.2394487493553,
+   "reference": -143.2394487827058,
+   "error": 2.3283053165953676e-10,
+   "tol": 0.01,
+   "kind": "rel",
+   "passed": true,
+   "source": "atomic limit (exact at t=0)"
+  },
+  {
+   "group": "e-gas",
+   "name": "RPA plasmon dispersion coefficient alpha in w^2=wp^2+alpha vF^2 q^2",
+   "value": 0.6016761136470162,
+   "reference": 0.6,
+   "error": 0.001676113647016253,
+   "tol": 0.01,
+   "kind": "abs",
+   "passed": true,
+   "source": "Mattuck Ex. 13.6 (3/5)"
+  },
+  {
+   "group": "e-gas",
+   "name": "RPA correlation energy slope d e_c / d ln rs (rs->0)",
+   "value": 0.03108082542993185,
+   "reference": 0.0310906908696549,
+   "error": 0.0003173116919276874,
+   "tol": 0.0005,
+   "kind": "rel",
+   "passed": true,
+   "source": "Gell-Mann & Brueckner, Phys. Rev. 106, 364 (1957)"
+  },
+  {
+   "group": "e-gas",
+   "name": "RPA correlation energy constant (Ha)",
+   "value": -0.07112540830693018,
+   "reference": -0.0711,
+   "error": 2.5408306930180258e-05,
+   "tol": 0.0005,
+   "kind": "abs",
+   "passed": true,
+   "source": "RPA high-density constant -0.0711 Ha"
+  },
+  {
+   "group": "BCS",
+   "name": "Delta(0)/Tc, lambda=0.2",
+   "value": 1.7639570723892042,
+   "reference": 1.7638769888620456,
+   "error": 4.540199099159886e-05,
+   "tol": 0.002,
+   "kind": "rel",
+   "passed": true,
+   "source": "BCS weak coupling pi e^-gamma = 1.7639"
+  },
+  {
+   "group": "BCS",
+   "name": "Delta(0)/Tc, lambda=0.25",
+   "value": 1.7644689022368665,
+   "reference": 1.7638769888620456,
+   "error": 0.0003355752008550014,
+   "tol": 0.002,
+   "kind": "rel",
+   "passed": true,
+   "source": "BCS weak coupling pi e^-gamma = 1.7639"
+  },
+  {
+   "group": "BCS",
+   "name": "Tc / (w_D e^{-1/lambda}), lambda=0.2",
+   "value": 1.1338659173111183,
+   "reference": 1.1338659173110976,
+   "error": 1.8212160664462543e-14,
+   "tol": 0.001,
+   "kind": "rel",
+   "passed": true,
+   "source": "BCS 2e^gamma/pi = 1.134"
+  },
+  {
+   "group": "Berry",
+   "name": "QWZ m=-2.5: |sigma_xy| (e^2/h) at mu=0",
+   "value": 4.087345896103865e-17,
+   "reference": 0.0,
+   "error": 4.087345896103865e-17,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "Qi, Wu, Zhang PRB 74, 085308 (2006): |C|=1 for 0<|m|<2, 0 otherwise"
+  },
+  {
+   "group": "Berry",
+   "name": "QWZ m=-2.5: Kubo sigma_xy = -C(lower band, FHS lattice method)",
+   "value": -4.087345896103865e-17,
+   "reference": 8.834874115176436e-18,
+   "error": 4.970833307621509e-17,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "TKNN; Fukui-Hatsugai-Suzuki JPSJ 74, 1674 (2005)"
+  },
+  {
+   "group": "Berry",
+   "name": "QWZ m=-1.0: |sigma_xy| (e^2/h) at mu=0",
+   "value": 0.9999999999999997,
+   "reference": 1.0,
+   "error": 3.3306690738754696e-16,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "Qi, Wu, Zhang PRB 74, 085308 (2006): |C|=1 for 0<|m|<2, 0 otherwise"
+  },
+  {
+   "group": "Berry",
+   "name": "QWZ m=-1.0: Kubo sigma_xy = -C(lower band, FHS lattice method)",
+   "value": -0.9999999999999997,
+   "reference": -1.0,
+   "error": 3.3306690738754696e-16,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "TKNN; Fukui-Hatsugai-Suzuki JPSJ 74, 1674 (2005)"
+  },
+  {
+   "group": "Berry",
+   "name": "QWZ m=1.0: |sigma_xy| (e^2/h) at mu=0",
+   "value": 0.9999999999999999,
+   "reference": 1.0,
+   "error": 1.1102230246251565e-16,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "Qi, Wu, Zhang PRB 74, 085308 (2006): |C|=1 for 0<|m|<2, 0 otherwise"
+  },
+  {
+   "group": "Berry",
+   "name": "QWZ m=1.0: Kubo sigma_xy = -C(lower band, FHS lattice method)",
+   "value": 0.9999999999999999,
+   "reference": 1.0,
+   "error": 1.1102230246251565e-16,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "TKNN; Fukui-Hatsugai-Suzuki JPSJ 74, 1674 (2005)"
+  },
+  {
+   "group": "Berry",
+   "name": "QWZ m=2.5: |sigma_xy| (e^2/h) at mu=0",
+   "value": 4.087345896103865e-17,
+   "reference": 0.0,
+   "error": 4.087345896103865e-17,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "Qi, Wu, Zhang PRB 74, 085308 (2006): |C|=1 for 0<|m|<2, 0 otherwise"
+  },
+  {
+   "group": "Berry",
+   "name": "QWZ m=2.5: Kubo sigma_xy = -C(lower band, FHS lattice method)",
+   "value": -4.087345896103865e-17,
+   "reference": -5.963540027744093e-17,
+   "error": 1.8761941316402284e-17,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "TKNN; Fukui-Hatsugai-Suzuki JPSJ 74, 1674 (2005)"
+  },
+  {
+   "group": "Berry",
+   "name": "Haldane (t2=0.1,phi=pi/2,M=0): |sigma_xy| (e^2/h)",
+   "value": 0.9999999999999999,
+   "reference": 1.0,
+   "error": 1.1102230246251565e-16,
+   "tol": 0.001,
+   "kind": "abs",
+   "passed": true,
+   "source": "Haldane PRL 61, 2015 (1988)"
+  },
+  {
+   "group": "Berry",
+   "name": "Haldane trivial (M=1): lowest band Chern number",
+   "value": 7.067899292141149e-17,
+   "reference": 0.0,
+   "error": 7.067899292141149e-17,
+   "tol": 1e-06,
+   "kind": "abs",
+   "passed": true,
+   "source": "Haldane PRL 61, 2015 (1988)"
+  },
+  {
+   "group": "Berry",
+   "name": "Rashba intrinsic SHC (e/2pi) mu=0.5",
+   "value": 0.25000115461614253,
+   "reference": 0.25,
+   "error": 1.1546161425290968e-06,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinova et al. PRL 92, 126603 (2004): e/8pi"
+  },
+  {
+   "group": "Berry",
+   "name": "Rashba intrinsic SHC (e/2pi) mu=1.0",
+   "value": 0.24999821519639595,
+   "reference": 0.25,
+   "error": 1.78480360404909e-06,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinova et al. PRL 92, 126603 (2004): e/8pi"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=0.7: intrinsic (e^2/h)",
+   "value": -0.35714285263447254,
+   "reference": -0.35714285714285715,
+   "error": 4.508384610080185e-09,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 58"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=0.7: side jump",
+   "value": -0.13824884792626727,
+   "reference": -0.13824884792626724,
+   "error": 2.7755575615628914e-17,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 65"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=0.7: anomalous distribution",
+   "value": -0.13824884792626724,
+   "reference": -0.13824884792626724,
+   "error": 0.0,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 67"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=0.7: Gaussian (intrinsic) skew",
+   "value": -0.040140332358587466,
+   "reference": -0.04013676230117435,
+   "error": 3.570057413117278e-06,
+   "tol": 0.003,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 72, 1st term"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=0.7: conventional skew (V1/V0=0.3)",
+   "value": -0.0071520061531043025,
+   "reference": -0.007152006153104305,
+   "error": 2.6020852139652106e-18,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 72, 2nd term"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=0.7: total, Gaussian disorder (NCA)",
+   "value": -0.6737808808455945,
+   "reference": -0.673777315296566,
+   "error": 3.5655490284725033e-06,
+   "tol": 0.003,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. B8"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=0.7: sigma_xx Boltzmann vs Drude (e^2/h)",
+   "value": 77.41935483870964,
+   "reference": 77.41935483870967,
+   "error": 3.6711374680938514e-16,
+   "tol": 0.001,
+   "kind": "rel",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 54 (tau_tr)"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=1.0: intrinsic (e^2/h)",
+   "value": -0.2499999869360125,
+   "reference": -0.25,
+   "error": 1.3063987502892616e-08,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 58"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=1.0: side jump",
+   "value": -0.21428571428571427,
+   "reference": -0.21428571428571425,
+   "error": 2.7755575615628914e-17,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 65"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=1.0: anomalous distribution",
+   "value": -0.21428571428571422,
+   "reference": -0.21428571428571425,
+   "error": 2.7755575615628914e-17,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 67"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=1.0: Gaussian (intrinsic) skew",
+   "value": -0.1377536226308754,
+   "reference": -0.13775510204081629,
+   "error": 1.4794099408854677e-06,
+   "tol": 0.003,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 72, 1st term"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=1.0: conventional skew (V1/V0=0.3)",
+   "value": -0.03506672404659816,
+   "reference": -0.03506672404659816,
+   "error": 0.0,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 72, 2nd term"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=1.0: total, Gaussian disorder (NCA)",
+   "value": -0.8163250381383165,
+   "reference": -0.8163265306122449,
+   "error": 1.4924739284438715e-06,
+   "tol": 0.003,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. B8"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=1.0: sigma_xx Boltzmann vs Drude (e^2/h)",
+   "value": 171.42857142857147,
+   "reference": 171.42857142857142,
+   "error": 3.315866100213801e-16,
+   "tol": 0.001,
+   "kind": "rel",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 54 (tau_tr)"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=2.0: intrinsic (e^2/h)",
+   "value": -0.12499999718951169,
+   "reference": -0.125,
+   "error": 2.8104883142976433e-09,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 58"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=2.0: side jump",
+   "value": -0.19736842105263153,
+   "reference": -0.1973684210526316,
+   "error": 8.326672684688674e-17,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 65"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=2.0: anomalous distribution",
+   "value": -0.19736842105263153,
+   "reference": -0.1973684210526316,
+   "error": 8.326672684688674e-17,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 67"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=2.0: Gaussian (intrinsic) skew",
+   "value": -0.23371593241464605,
+   "reference": -0.23372576177285326,
+   "error": 9.829358207202876e-06,
+   "tol": 0.003,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 72, 1st term"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=2.0: conventional skew (V1/V0=0.3)",
+   "value": -0.1189937311830547,
+   "reference": -0.11899373118305476,
+   "error": 5.551115123125783e-17,
+   "tol": 0.002,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 72, 2nd term"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=2.0: total, Gaussian disorder (NCA)",
+   "value": -0.7534527717094208,
+   "reference": -0.7534626038781164,
+   "error": 9.83216869554493e-06,
+   "tol": 0.003,
+   "kind": "abs",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. B8"
+  },
+  {
+   "group": "AHE",
+   "name": "Dirac mu=2.0: sigma_xx Boltzmann vs Drude (e^2/h)",
+   "value": 315.7894736842105,
+   "reference": 315.7894736842105,
+   "error": 0.0,
+   "tol": 0.001,
+   "kind": "rel",
+   "passed": true,
+   "source": "Sinitsyn et al. PRB 75, 045315 (2007) Eq. 54 (tau_tr)"
+  },
+  {
+   "group": "SHE",
+   "name": "Rashba SHC with ladder vertex, total (e/2pi), mu=0.5",
+   "value": -0.00011434599690584264,
+   "reference": 0.0,
+   "error": 0.00011434599690584264,
+   "tol": 0.015,
+   "kind": "abs",
+   "passed": true,
+   "source": "Inoue, Bauer, Molenkamp PRB 70, 041303(R) (2004): exact cancellation"
+  },
+  {
+   "group": "SHE",
+   "name": "Rashba SHC with ladder vertex, total (e/2pi), mu=1.0",
+   "value": -0.009681301066349346,
+   "reference": 0.0,
+   "error": 0.009681301066349346,
+   "tol": 0.015,
+   "kind": "abs",
+   "passed": true,
+   "source": "Inoue, Bauer, Molenkamp PRB 70, 041303(R) (2004): exact cancellation"
+  },
+  {
+   "group": "AHE-X",
+   "name": "Dirac eps=1: X diagram (e^2/h)",
+   "value": 0.4851293326462799,
+   "reference": 0.4897959183673469,
+   "error": 0.009527612513845207,
+   "tol": 0.015,
+   "kind": "rel",
+   "passed": true,
+   "source": "Ado, Dmitriev, Ostrovsky, Titov, EPL 111, 37004 (2015) Eq. 17"
+  },
+  {
+   "group": "AHE-X",
+   "name": "Dirac eps=1: Psi diagram (e^2/h)",
+   "value": 0.003196086850368125,
+   "reference": 0.0,
+   "error": 0.003196086850368125,
+   "tol": 0.01,
+   "kind": "abs",
+   "passed": true,
+   "source": "Ado, Dmitriev, Ostrovsky, Titov, EPL 111, 37004 (2015) Eq. 17 (Psi = 0)"
+  },
+  {
+   "group": "AHE-X",
+   "name": "Dirac eps=1: NCA total vs Ado Eq. 3",
+   "value": -0.8163250381383165,
+   "reference": -0.8163265306122449,
+   "error": 1.4924739284438715e-06,
+   "tol": 0.003,
+   "kind": "abs",
+   "passed": true,
+   "source": "Ado, Dmitriev, Ostrovsky, Titov, EPL 111, 37004 (2015) Eq. 3"
+  },
+  {
+   "group": "AHE-X",
+   "name": "Dirac eps=1: full sigma_xy (NCA + X + Psi)",
+   "value": -0.32799961864166843,
+   "reference": -0.32653061224489793,
+   "error": 0.0014690063967705003,
+   "tol": 0.01,
+   "kind": "abs",
+   "passed": true,
+   "source": "Ado, Dmitriev, Ostrovsky, Titov, EPL 111, 37004 (2015) Eq. 4"
+  },
+  {
+   "group": "polaron",
+   "name": "Feynman variational E0, alpha=1",
+   "value": -1.0130308353603317,
+   "reference": -1.0130308,
+   "error": 3.536033177375941e-08,
+   "tol": 2e-06,
+   "kind": "abs",
+   "passed": true,
+   "source": "Feynman, Phys. Rev. 97, 660 (1955); values from Hahn, Klimin, Tempere, Devreese, Franchini, PRB 97, 134305 (2018), Table I"
+  },
+  {
+   "group": "polaron",
+   "name": "Feynman variational E0, alpha=3",
+   "value": -3.133333544317099,
+   "reference": -3.1333335,
+   "error": 4.4317098879531613e-08,
+   "tol": 2e-06,
+   "kind": "abs",
+   "passed": true,
+   "source": "Feynman, Phys. Rev. 97, 660 (1955); values from Hahn, Klimin, Tempere, Devreese, Franchini, PRB 97, 134305 (2018), Table I"
+  },
+  {
+   "group": "polaron",
+   "name": "Feynman variational E0, alpha=5",
+   "value": -5.440144499420982,
+   "reference": -5.4401445,
+   "error": 5.790177226572268e-10,
+   "tol": 2e-06,
+   "kind": "abs",
+   "passed": true,
+   "source": "Feynman, Phys. Rev. 97, 660 (1955); values from Hahn, Klimin, Tempere, Devreese, Franchini, PRB 97, 134305 (2018), Table I"
+  },
+  {
+   "group": "polaron",
+   "name": "DiagMC E0 (bare series, all orders), alpha=0.5  [+-0.0007]",
+   "value": -0.5047384688028748,
+   "reference": -0.5040806642560001,
+   "error": 0.0006578045468746962,
+   "tol": 0.0022072035217101304,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact weak-coupling series (Smondyrev 1986)"
+  },
+  {
+   "group": "polaron",
+   "name": "DiagMC E0 (bare series, all orders), alpha=1.0  [+-0.0023]",
+   "value": -1.0174214190274264,
+   "reference": -1.01662,
+   "error": 0.0008014190274263644,
+   "tol": 0.006898769936916693,
+   "kind": "abs",
+   "passed": true,
+   "source": "Hahn, Klimin, Tempere, Devreese, Franchini, PRB 97, 134305 (2018), Table I"
+  },
+  {
+   "group": "polaron",
+   "name": "DiagMC E0 (bare series, all orders), alpha=2.0  [+-0.0042]",
+   "value": -2.0592609953339136,
+   "reference": -2.06957,
+   "error": 0.01030900466608653,
+   "tol": 0.012850490081108522,
+   "kind": "abs",
+   "passed": true,
+   "source": "Hahn, Klimin, Tempere, Devreese, Franchini, PRB 97, 134305 (2018), Table I"
+  },
+  {
+   "group": "polaron",
+   "name": "DiagMC E0 (bare series, all orders), alpha=3.0  [+-0.0081]",
+   "value": -3.172413094775274,
+   "reference": -3.16829,
+   "error": 0.004123094775274172,
+   "tol": 0.024504061395349698,
+   "kind": "abs",
+   "passed": true,
+   "source": "Hahn, Klimin, Tempere, Devreese, Franchini, PRB 97, 134305 (2018), Table I"
+  },
+  {
+   "group": "bold",
+   "name": "atom betaU=0.5: skeleton series(G_exact)/Sigma_exact",
+   "value": 0.9993140500509851,
+   "reference": 1.0,
+   "error": 0.0006859499490149412,
+   "tol": 0.005,
+   "kind": "abs",
+   "passed": true,
+   "source": "Kozik, Ferrero, Georges, PRL 114, 156402 (2015): physical branch at weak coupling"
+  },
+  {
+   "group": "bold",
+   "name": "atom betaU=6.0: skeleton series(G_exact) misses Sigma_exact (1-ratio > 0.5)",
+   "value": 1.0,
+   "reference": 1.0,
+   "error": 0.0,
+   "tol": 0,
+   "kind": "abs",
+   "passed": true,
+   "source": "Kozik, Ferrero, Georges, PRL 114, 156402 (2015): convergence to unphysical branch at strong coupling"
+  },
+  {
+   "group": "ED",
+   "name": "sector-resolved ED vs dense ED, max|dG|",
+   "value": 8.125104754560011e-13,
+   "reference": 0.0,
+   "error": 8.125104754560011e-13,
+   "tol": 1e-10,
+   "kind": "abs",
+   "passed": true,
+   "source": "exact"
+  },
+  {
+   "group": "DMFT-ED",
+   "name": "ED-DMFT (5 bath, T=0) U_c2 from Z -> 0",
+   "value": 3.123168385096719,
+   "reference": 2.96,
+   "error": 0.16316838509671916,
+   "tol": 0.1,
+   "kind": "abs",
+   "passed": false,
+   "source": "consensus U_c2 = 2.92-3.0D, U_c1 = 2.39(2)D: Karski, Raas, Uhrig PRB 72, 113110 (2005) and refs; Bulla PRL 83, 136 (1999)"
+  },
+  {
+   "group": "DMFT-ED",
+   "name": "ED-DMFT (5 bath, T=0) U_c1 (insulator disappears)",
+   "value": 2.525,
+   "reference": 2.39,
+   "error": 0.1349999999999998,
+   "tol": 0.15,
+   "kind": "abs",
+   "passed": true,
+   "source": "consensus U_c2 = 2.92-3.0D, U_c1 = 2.39(2)D: Karski, Raas, Uhrig PRB 72, 113110 (2005) and refs; Bulla PRL 83, 136 (1999); small baths overestimate U_c1"
+  },
+  {
+   "group": "DMFT",
+   "name": "LatticeDMFT(semicircle DOS) Z == BetheDMFT Z (U=2.5)",
+   "value": 0.1893157326117353,
+   "reference": 0.18931959514914007,
+   "error": 3.862537404780708e-06,
+   "tol": 0.0001,
+   "kind": "abs",
+   "passed": true,
+   "source": "identity"
+  },
+  {
+   "group": "MaxEnt",
+   "name": "two-peak spectrum: chi^2 per point",
+   "value": 0.9606719135010187,
+   "reference": 1.0,
+   "error": 0.03932808649898134,
+   "tol": 0.2,
+   "kind": "abs",
+   "passed": true,
+   "source": "Jarrell & Gubernatis Phys. Rep. 269, 133 (1996)"
+  },
+  {
+   "group": "MaxEnt",
+   "name": "two-peak spectrum: L1 error of A(w)",
+   "value": 0.21005248121725018,
+   "reference": 0.0,
+   "error": 0.21005248121725018,
+   "tol": 0.3,
+   "kind": "abs",
+   "passed": true,
+   "source": "synthetic test (noise 1e-4)"
+  }
+ ],
+ "dmft": {
+  "Uc1_ipt": 2.5999999999999996,
+  "Uc2_ipt": 3.3999999999999995,
+  "Uc2_ed": 3.123168385096719,
+  "Uc1_ed": 2.525,
+  "ed_metal": [
+   [
+    2.0,
+    0.2747858249181193
+   ],
+   [
+    2.4,
+    0.1363802925324964
+   ],
+   [
+    2.6,
+    0.08236355886369015
+   ],
+   [
+    2.7,
+    0.05986335301629632
+   ],
+   [
+    2.8,
+    0.04136624072029969
+   ],
+   [
+    2.9,
+    0.027925125359607197
+   ],
+   [
+    3.0,
+    0.01911289002360352
+   ]
+  ],
+  "ed_insulator": [
+   [
+    3.0,
+    0.0001783002822586767
+   ],
+   [
+    2.7,
+    0.00027511034089409503
+   ],
+   [
+    2.6,
+    0.00034015580641275653
+   ],
+   [
+    2.55,
+    0.00039398821054043996
+   ],
+   [
+    2.5,
+    0.1079997198005564
+   ],
+   [
+    2.45,
+    0.12186004160268762
+   ],
+   [
+    2.4,
+    0.13637982167439588
+   ]
+  ]
+ },
+ "runtime_s": 900.0631194114685
+}
