@@ -147,3 +147,26 @@ def test_maxent_normalisation():
     G = (A0[None] * (w[1] - w[0]) / (iw[:, None] - w[None])).sum(1)
     r = maxent(iw, G, 1e-3, w, alphas=np.logspace(2, -2, 12))
     assert abs(np.sum(r["A"]) * (w[1] - w[0]) - 1) < 0.02
+
+
+# ---------------------------------------------------------------- v0.3: T=0 Lanczos ED-DMFT
+def test_lanczos_matches_full_ed():
+    from feynlab.qmc.ed_sector import SectorED, LanczosED
+    args = (-1.5, 3.0, [-1.0, -0.2, 0.2, 1.0], [0.5, 0.3, 0.3, 0.5])
+    z = 1j * np.pi * (2 * np.arange(5) + 1) / 200
+    assert np.abs(SectorED(*args).green(z, 1e5) - LanczosED(*args).green(z)).max() < 1e-8
+
+
+def test_lanczos_ground_state_parity():
+    """odd n_bath -> even sites -> singlet in (h,h); even n_bath -> doublet (h,h+1),(h+1,h)."""
+    from feynlab.qmc.ed_sector import LanczosED
+    odd = LanczosED(-1.5, 3.0, [-1, -0.3, 0.0, 0.3, 1], [0.4, 0.3, 0.2, 0.3, 0.4])
+    even = LanczosED(-1.5, 3.0, [-1, -0.3, 0.3, 1], [0.4, 0.3, 0.3, 0.4])
+    assert len(odd.gs) == 1 and odd.gs[0][0] == (3, 3)
+    assert sorted(s for s, _ in even.gs) == [(2, 3), (3, 2)]
+
+
+def test_ed_dmft_metal_7bath_quick():
+    d = BetheDMFT(beta=200, U=2.0, n_iw=512)
+    r = d.solve("ed", n_iter=40, mix=0.5, tol=1e-5, ctint_kwargs=dict(n_bath=7))
+    assert 0.25 < r["Z"] < 0.31   # 7-bath T=0 value 0.279; NRG ~0.28-0.30

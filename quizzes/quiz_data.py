@@ -200,6 +200,14 @@ SOFTWARE = {
  ("Kozik–Ferrero–Georges showed that at strong coupling the skeleton series for Σ[G]…", ["diverges", "converges to an unphysical branch", "is exact at order 2", "vanishes"], 1, "Reproduced in feynlab for the Hubbard atom at βU = 6."),
  ("The polaron energy in DiagMC is extracted from…", ["the average order", "the exponential decay of G(p=0,τ)", "the Z factor only", "Feynman's variational bound"], 1, ""),
 ],
+"T9 — ED-DMFT and the Mott transition (T = 0)": [
+ ("Why can a T = 0 ED-DMFT solver use Lanczos instead of full diagonalization?", ["Lanczos is more accurate", "only the ground state and its ±1-electron excitations enter G(iω) at T = 0", "the Hamiltonian is diagonal", "for Monte Carlo sampling"], 1, ""),
+ ("With an EVEN number of bath sites at half filling, the cluster ground state is…", ["a singlet", "a spin doublet (odd number of sites)", "a triplet", "superconducting"], 1, "Odd number of electrons at half filling → doublet."),
+ ("Which bath parity should be used to locate U_c2 (where the metal disappears)?", ["even", "odd", "either", "neither"], 1, "Odd baths include a zero-energy level and a singlet ground state that carries the Kondo quasiparticle."),
+ ("Why does an odd-bath ED insulator disappear too late (spuriously)?", ["the fit diverges", "the zero-energy bath level forms a Kondo resonance with the local moment, resolved at T = 0", "the Lanczos method fails", "the sum rule is violated"], 1, ""),
+ ("Why is the bath sum rule Σ V_l² = ∫ε²ρ(ε)dε enforced?", ["for speed", "an under-weighted bath shrinks the effective bandwidth and pulls U_c down", "it is required by Wick's theorem", "to remove the sign problem"], 1, ""),
+ ("The consensus values for the Bethe-lattice Mott transition at T = 0 are…", ["U_c1 ≈ 2.39D, U_c2 ≈ 2.92–3.0D", "U_c1 ≈ 3.3D, U_c2 ≈ 2.6D", "U_c ≈ 1D", "U_c1 = U_c2 = 4D"], 0, ""),
+],
 "T7 — Benchmarks & limitations": [
  ("Which v0.1 limitation is only PARTIALLY resolved in v0.2?", ["X/Ψ diagrams", "MaxEnt", "the semiclassical rate-by-rate Gaussian skew decomposition", "polaron DiagMC"], 2, "The Kubo route gives it exactly; the w(4a) decomposition reproduces 1/2."),
  ("Which analytic continuation is implemented?", ["MaxEnt", "Padé", "stochastic optimisation", "none"], 1, ""),

@@ -55,3 +55,4 @@ Why the tail matters: G(iω) ~ 1/iω decays so slowly that a naive Matsubara sum
 * Tutorial 5 — Hall transport: intrinsic, side jump, skew
 * Tutorial 6 — electron gas, BCS and the book companions
 * Tutorial 7 — benchmarks, accuracy and known limitations
+* Tutorial 8 — the Mott transition with T = 0 Lanczos ED-DMFT (bath-size parity)

@@ -1,8 +1,8 @@
 # feynlab benchmark results
 
-100/101 checks passed, plus 2 informational rows  (runtime 900 s, full mode)
+102/102 checks passed, plus 2 informational rows  (runtime 1200 s, full mode)
 
-IPT coexistence (beta=100): U_c1 ~ 2.6D, U_c2 ~ 3.4D; ED-DMFT (5 bath sites, T=0): U_c1 ~ 2.52D, U_c2 ~ 3.12D (consensus 2.39D / 2.92-3.0D).
+IPT coexistence (beta=100): U_c1 ~ 2.6D, U_c2 ~ 3.4D; Lanczos ED-DMFT (6/7 bath sites, T=0): U_c1 ~ 2.38D, U_c2 ~ 2.96D (consensus 2.39D / 2.92-3.0D).
 
 | group | check | feynlab | reference | error | tol | pass | source |
 |---|---|---|---|---|---|---|---|
@@ -104,8 +104,9 @@ IPT coexistence (beta=100): U_c1 ~ 2.6D, U_c2 ~ 3.4D; ED-DMFT (5 bath sites, T=0
 | bold | atom betaU=0.5: skeleton series(G_exact)/Sigma_exact | 0.999314 | 1 | 6.86e-04 | 5.0e-03 | yes | Kozik, Ferrero, Georges, PRL 114, 156402 (2015): physical branch at weak coupling |
 | bold | atom betaU=6.0: skeleton series(G_exact) misses Sigma_exact (1-ratio > 0.5) | 1 | 1 | 0.00e+00 | 0.0e+00 | yes | Kozik, Ferrero, Georges, PRL 114, 156402 (2015): convergence to unphysical branch at strong coupling |
 | ED | sector-resolved ED vs dense ED, max|dG| | 8.1251e-13 | 0 | 8.13e-13 | 1.0e-10 | yes | exact |
-| DMFT-ED | ED-DMFT (5 bath, T=0) U_c2 from Z -> 0 | 3.12317 | 2.96 | 1.63e-01 | 1.0e-01 | **NO** | consensus U_c2 = 2.92-3.0D, U_c1 = 2.39(2)D: Karski, Raas, Uhrig PRB 72, 113110 (2005) and refs; Bulla PRL 83, 136 (1999) |
-| DMFT-ED | ED-DMFT (5 bath, T=0) U_c1 (insulator disappears) | 2.525 | 2.39 | 1.35e-01 | 1.5e-01 | yes | consensus U_c2 = 2.92-3.0D, U_c1 = 2.39(2)D: Karski, Raas, Uhrig PRB 72, 113110 (2005) and refs; Bulla PRL 83, 136 (1999); small baths overestimate U_c1 |
+| DMFT-ED | Lanczos ED-DMFT (7 bath = odd, T=0) U_c2, linear Z->0 (window 0.04<=Z<=0.15) | 2.95785 | 2.96 | 2.15e-03 | 4.0e-02 | yes | consensus U_c2 = 2.92-3.0D, U_c1 = 2.39(2)D: Karski, Raas, Uhrig PRB 72, 113110 (2005) and refs; Bulla PRL 83, 136 (1999) |
+| DMFT-ED | Lanczos ED-DMFT (6 bath = even, T=0) U_c1 (insulator lost) | 2.375 | 2.39 | 1.50e-02 | 5.0e-02 | yes | consensus U_c2 = 2.92-3.0D, U_c1 = 2.39(2)D: Karski, Raas, Uhrig PRB 72, 113110 (2005) and refs; Bulla PRL 83, 136 (1999) |
+| DMFT-ED | T=0 Lanczos ED vs full sector ED (4 bath), max|dG| | 1.11163e-10 | 0 | 1.11e-10 | 1.0e-08 | yes | exact |
 | DMFT | LatticeDMFT(semicircle DOS) Z == BetheDMFT Z (U=2.5) | 0.189316 | 0.18932 | 3.86e-06 | 1.0e-04 | yes | identity |
 | MaxEnt | two-peak spectrum: chi^2 per point | 0.960672 | 1 | 3.93e-02 | 2.0e-01 | yes | Jarrell & Gubernatis Phys. Rep. 269, 133 (1996) |
 | MaxEnt | two-peak spectrum: L1 error of A(w) | 0.210052 | 0 | 2.10e-01 | 3.0e-01 | yes | synthetic test (noise 1e-4) |

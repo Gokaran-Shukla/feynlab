@@ -1709,6 +1709,78 @@
  },
  {
   "group": "Software: feynlab",
+  "title": "T9 — ED-DMFT and the Mott transition (T = 0)",
+  "questions": [
+   {
+    "q": "Why can a T = 0 ED-DMFT solver use Lanczos instead of full diagonalization?",
+    "options": [
+     "Lanczos is more accurate",
+     "only the ground state and its ±1-electron excitations enter G(iω) at T = 0",
+     "the Hamiltonian is diagonal",
+     "for Monte Carlo sampling"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "With an EVEN number of bath sites at half filling, the cluster ground state is…",
+    "options": [
+     "a singlet",
+     "a spin doublet (odd number of sites)",
+     "a triplet",
+     "superconducting"
+    ],
+    "answer": 1,
+    "explanation": "Odd number of electrons at half filling → doublet."
+   },
+   {
+    "q": "Which bath parity should be used to locate U_c2 (where the metal disappears)?",
+    "options": [
+     "even",
+     "odd",
+     "either",
+     "neither"
+    ],
+    "answer": 1,
+    "explanation": "Odd baths include a zero-energy level and a singlet ground state that carries the Kondo quasiparticle."
+   },
+   {
+    "q": "Why does an odd-bath ED insulator disappear too late (spuriously)?",
+    "options": [
+     "the fit diverges",
+     "the zero-energy bath level forms a Kondo resonance with the local moment, resolved at T = 0",
+     "the Lanczos method fails",
+     "the sum rule is violated"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "Why is the bath sum rule Σ V_l² = ∫ε²ρ(ε)dε enforced?",
+    "options": [
+     "for speed",
+     "an under-weighted bath shrinks the effective bandwidth and pulls U_c down",
+     "it is required by Wick's theorem",
+     "to remove the sign problem"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "The consensus values for the Bethe-lattice Mott transition at T = 0 are…",
+    "options": [
+     "U_c1 ≈ 2.39D, U_c2 ≈ 2.92–3.0D",
+     "U_c1 ≈ 3.3D, U_c2 ≈ 2.6D",
+     "U_c ≈ 1D",
+     "U_c1 = U_c2 = 4D"
+    ],
+    "answer": 0,
+    "explanation": ""
+   }
+  ]
+ },
+ {
+  "group": "Software: feynlab",
   "title": "T7 — Benchmarks & limitations",
   "questions": [
    {

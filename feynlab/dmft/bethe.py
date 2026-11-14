@@ -103,7 +103,7 @@ class BetheDMFT:
                 sigma_new[:m] = sym
             elif solver == "ed":
                 from ..qmc.ed_sector import SectorED, fit_bath
-                kw = dict(n_bath=5, beta_fit=200.0, n_fit=200, beta_ed=1e4)
+                kw = dict(n_bath=5, beta_fit=200.0, n_fit=200, beta_ed=1e4, ed_method="auto")
                 kw.update(ctint_kwargs or {})
                 iwf = 1j * np.pi * (2 * np.arange(kw["n_fit"]) + 1) / kw["beta_fit"]
                 # hybridization on the fitting grid from the current lattice G
@@ -114,7 +114,9 @@ class BetheDMFT:
                                                     x0=getattr(self, "_bath_x", None),
                                                     symmetric=abs(self.mu - self.U / 2) < 1e-12,
                                                     sum_rule=self.second_moment)
-                ed = SectorED(-self.mu, self.U, eb, Vb)
+                from ..qmc.ed_sector import LanczosED
+                use_lanczos = kw["ed_method"] == "lanczos" or (kw["ed_method"] == "auto" and kw["beta_ed"] >= 1e4)
+                ed = LanczosED(-self.mu, self.U, eb, Vb) if use_lanczos else SectorED(-self.mu, self.U, eb, Vb)
                 self.ed_last = ed
                 self._beta_ed = kw["beta_ed"]   # cluster temperature (1e4 -> ground state, T=0 DMFT)
                 Gimp = ed.green(iw, self._beta_ed)

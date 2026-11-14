@@ -1,0 +1,42 @@
+[
+ {
+  "n_bath": 5,
+  "parity": "odd",
+  "Uc2_linear": 2.9563525623239397,
+  "slope": -0.2386451825396273,
+  "Uc2_collapse": 3.275,
+  "Uc1": 3.225
+ },
+ {
+  "n_bath": 6,
+  "parity": "even",
+  "Uc2_linear": 2.743358916443262,
+  "slope": -0.34883742187512345,
+  "Uc2_collapse": 2.625,
+  "Uc1": 2.375
+ },
+ {
+  "n_bath": 7,
+  "parity": "odd",
+  "Uc2_linear": 2.954878125129666,
+  "slope": -0.24570915317035286,
+  "Uc2_collapse": 3.275,
+  "Uc1": 3.225
+ },
+ {
+  "n_bath": 8,
+  "parity": "even",
+  "Uc2_linear": NaN,
+  "slope": NaN,
+  "Uc2_collapse": NaN,
+  "Uc1": 2.375
+ },
+ {
+  "n_bath": 9,
+  "parity": "odd",
+  "Uc2_linear": 2.9534103484574477,
+  "slope": -0.24699333333333398,
+  "Uc2_collapse": NaN,
+  "Uc1": NaN
+ }
+]

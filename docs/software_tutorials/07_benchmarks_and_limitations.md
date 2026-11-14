@@ -1,6 +1,6 @@
 # Tutorial 7 — Benchmarks, accuracy and limitations
 
-Run `python benchmarks/run_benchmarks.py` (≈20 min; `--quick` ≈8 min) →
+Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath-size study: `benchmarks/ed_dmft/` →
 `benchmarks/RESULTS.md`, `results.json`, figures.
 
 ## Published results reproduced
@@ -15,7 +15,7 @@ Run `python benchmarks/run_benchmarks.py` (≈20 min; `--quick` ≈8 min) →
 | **bold / skeleton series** | atom: physical branch at βU = 0.5, unphysical at βU = 6 | Kozik, Ferrero, Georges, **PRL** 114, 156402 (2015) |
 | CT-INT | Anderson impurity vs ED, sign = 1 | Gull et al., **RMP** 83, 349 (2011) (method) |
 | weak coupling | Yamada–Yosida 1/Z − 1; lattice tail U²n(1−n); RPA → 2nd order | Prog. Theor. Phys. 53, 970 (1975) |
-| **DMFT, Mott** | ED-DMFT (T = 0) U_c2, U_c1; IPT hysteresis | Bulla, **PRL** 83, 136 (1999); Karski et al. **PRB** 72, 113110 (2005); Georges et al. **RMP** 68, 13 (1996) |
+| **DMFT, Mott** | Lanczos ED-DMFT (T = 0, 6/7 bath) U_c2, U_c1; bath-size study 5–9; IPT hysteresis (informational) | Bulla, **PRL** 83, 136 (1999); Karski et al. **PRB** 72, 113110 (2005); Georges et al. **RMP** 68, 13 (1996) |
 | | LatticeDMFT(semicircle) ≡ BetheDMFT | identity |
 | MaxEnt | χ²/N ≈ 1, L1 error on a two-peak spectrum | Jarrell & Gubernatis, Phys. Rep. 269, 133 (1996) |
 | electron gas | plasmon 3/5; RPA e_c slope and constant | Mattuck Ex. 13.6; Gell-Mann & Brueckner, Phys. Rev. 106, 364 (1957) |
@@ -32,7 +32,7 @@ Run `python benchmarks/run_benchmarks.py` (≈20 min; `--quick` ≈8 min) →
 | crossed X/Ψ diagrams missing | **done** — `transport.crossed` (real-space FFT form, any continuum model); X within 1% of Ado et al., Ψ → 0 |
 | DMFT only Bethe; Padé only | **done** — `LatticeDMFT` (square, cubic, hypercubic, any ε_k or DOS) and `core.maxent` |
 | no bold-line / polaron DiagMC | **done** — `qmc.polaron` (Prokof'ev–Svistunov), `diagrams.bold` (skeleton series, self-consistent bold scheme) |
-| IPT overestimates U_c2 | **addressed** — new ED-DMFT solver (Caffarel–Krauth, sector-resolved ED, sum-rule-constrained bath fit) gives U_c2 ≈ 3.0D at T = 0 vs consensus 2.92–3.0D |
+| IPT overestimates U_c2 | **resolved (v0.3)** — T = 0 Lanczos ED-DMFT with 5–9 bath sites: U_c2 = 2.955 ± 0.002 D (odd baths) vs consensus 2.92–3.0 D; U_c1 = 2.375 ± 0.025 D (even baths) vs 2.39 ± 0.02 D. See Tutorial 8 for the bath-parity effect |
 | stand-alone Gaussian skew rate | **partially** — see below |
 
 ## Remaining limitations (honest list)
@@ -41,8 +41,9 @@ Run `python benchmarks/run_benchmarks.py` (≈20 min; `--quick` ≈8 min) →
    Sinitsyn's Eq. 71 and the |T₂|² interference exactly 1/6; the arc pairing, the crossed |T₂|² pairing and
    on-shell×on-shell terms do not have the sin(φ−φ′) form and do not supply the rest. The Gaussian skew term
    *is* computed (to 1e-5) by the Kubo route; only its semiclassical rate-by-rate decomposition is incomplete.
-2. **U_c1 from ED** converges slowly with bath size: 5 bath sites give ≈2.53D vs 2.39D; 6 sites are closer but
-   ~10× slower. Use CT-INT-DMFT at low T for quantitative U_c1.
+2. **ED-DMFT bath parity**: odd baths must be used for the metal (U_c2) and even baths for the insulator
+   (U_c1); the wrong parity gives artifacts (Tutorial 8). U_c2 from a finite bath depends on the estimator
+   (linear Z → 0 extrapolation vs. collapse point); the linear window 0.04 ≤ Z ≤ 0.15 is fixed in advance.
 3. **Polaron DiagMC precision** is ~0.2% (8 chains × 1.5·10⁸ updates); the reference (Hahn et al.) is ~0.05%.
    Improve with longer runs or the exact energy estimator of Mishchenko et al.
 4. **Bold scheme** evaluates skeleton diagrams up to order 4 by direct MC (no sampling over orders); the

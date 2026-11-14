@@ -309,7 +309,7 @@ z_ = 1j * np.pi * (2 * np.arange(5) + 1) / 10
 record("ED", "sector-resolved ED vs dense ED, max|dG|", np.abs(a_.green(z_, 10.) - b_.green(z_, 10.)).max(), 0.0, 1e-10, "exact")
 
 
-def _ed_branch(Ulist, insulating):
+def _ed_branch(Ulist, insulating, nb):
     x = S = Uo = None
     out = []
     for U in Ulist:
@@ -317,27 +317,32 @@ def _ed_branch(Ulist, insulating):
         d._ed_sigma_fn = None
         if x is not None:
             d._bath_x = x
-        r = d.solve("ed", n_iter=120, mix=0.5, tol=1e-6, ctint_kwargs=dict(n_bath=5),
+        r = d.solve("ed", n_iter=150, mix=0.5, tol=1e-6, ctint_kwargs=dict(n_bath=nb),
                     insulating_start=(insulating and S is None),
                     sigma_init=None if S is None else S - Uo / 2 + U / 2)
         x, S, Uo = d._bath_x, r["Sigma"], U
-        out.append((U, r["Z"]))
+        out.append((U, float(r["Z"]), r["iterations"]))
     return out
 
 
-met = _ed_branch([2.0, 2.4, 2.6, 2.7, 2.8, 2.9, 3.0], False)
-Um, Zm = np.array(met).T
-p_ = np.polyfit(Um[-4:], Zm[-4:], 1)
-uc2_ed = -p_[1] / p_[0]
-srcU = "consensus U_c2 = 2.92-3.0D, U_c1 = 2.39(2)D: Karski, Raas, Uhrig PRB 72, 113110 (2005) and refs; Bulla PRL 83, 136 (1999)"
-record("DMFT-ED", "ED-DMFT (5 bath, T=0) U_c2 from Z -> 0", uc2_ed, 2.96, 0.1, srcU)
-ins = _ed_branch([3.0, 2.7, 2.6, 2.55, 2.5, 2.45, 2.4], True)
-Ui, Zi = np.array(ins).T
-k_ = int(np.argmax(Zi > 0.05)) if np.any(Zi > 0.05) else len(Ui) - 1
-uc1_ed = float(0.5 * (Ui[k_] + Ui[k_ - 1]))   # midpoint: last insulating / first metallic U
-record("DMFT-ED", "ED-DMFT (5 bath, T=0) U_c1 (insulator disappears)", uc1_ed, 2.39, 0.15,
-       srcU + "; small baths overestimate U_c1")
-info_dmft.update(Uc2_ed=float(uc2_ed), Uc1_ed=float(uc1_ed), ed_metal=met, ed_insulator=ins)
+sys.path.insert(0, os.path.join(HERE, "ed_dmft"))
+from analyze import uc1 as _uc1, uc2_linear as _uc2lin  # noqa: E402
+srcU = ("consensus U_c2 = 2.92-3.0D, U_c1 = 2.39(2)D: Karski, Raas, Uhrig PRB 72, 113110 (2005) and refs; "
+        "Bulla PRL 83, 136 (1999)")
+met = _ed_branch(list(np.round(np.arange(2.0, 2.91, 0.1), 3)), False, 7)         # odd bath -> metal
+uc2_ed = float(_uc2lin(met)[0])
+record("DMFT-ED", "Lanczos ED-DMFT (7 bath = odd, T=0) U_c2, linear Z->0 (window 0.04<=Z<=0.15)", uc2_ed,
+       2.96, 0.04, srcU)
+ins = _ed_branch(list(np.round(np.arange(3.0, 2.24, -0.05), 3)), True, 6)        # even bath -> insulator
+uc1_ed = float(_uc1(ins))
+record("DMFT-ED", "Lanczos ED-DMFT (6 bath = even, T=0) U_c1 (insulator lost)", uc1_ed, 2.39, 0.05, srcU)
+info_dmft.update(Uc2_ed=uc2_ed, Uc1_ed=uc1_ed, ed_metal=met, ed_insulator=ins)
+z2 = [z for u, z, _ in met if abs(u - 2.0) < 1e-9][0]
+from feynlab.qmc.ed_sector import LanczosED as _LZ  # noqa: E402
+_args = (-1.5, 3.0, [-1.0, -0.2, 0.2, 1.0], [0.5, 0.3, 0.3, 0.5])
+_zz = 1j * np.pi * (2 * np.arange(6) + 1) / 200
+record("DMFT-ED", "T=0 Lanczos ED vs full sector ED (4 bath), max|dG|",
+       np.abs(_LZ(*_args).green(_zz) - SectorED(*_args).green(_zz, 1e5)).max(), 0.0, 1e-8, "exact")
 
 a1 = BetheDMFT(50, 2.5).solve("ipt")
 b1 = LatticeDMFT.semicircle(50, 2.5).solve("ipt")
@@ -426,7 +431,7 @@ with open(os.path.join(HERE, "results.json"), "w") as f:
 lines = ["# feynlab benchmark results", "",
          f"{npass}/{len(results) - ninfo} checks passed, plus {ninfo} informational rows  (runtime {time.time()-t0:.0f} s, {'quick' if QUICK else 'full'} mode)", "",
          f"IPT coexistence (beta=100): U_c1 ~ {info_dmft['Uc1_ipt']:.1f}D, U_c2 ~ {info_dmft['Uc2_ipt']:.1f}D; "
-         f"ED-DMFT (5 bath sites, T=0): U_c1 ~ {info_dmft.get('Uc1_ed', float('nan')):.2f}D, U_c2 ~ {info_dmft.get('Uc2_ed', float('nan')):.2f}D "
+         f"Lanczos ED-DMFT (6/7 bath sites, T=0): U_c1 ~ {info_dmft.get('Uc1_ed', float('nan')):.2f}D, U_c2 ~ {info_dmft.get('Uc2_ed', float('nan')):.2f}D "
          "(consensus 2.39D / 2.92-3.0D).", "",
          "| group | check | feynlab | reference | error | tol | pass | source |",
          "|---|---|---|---|---|---|---|---|"]

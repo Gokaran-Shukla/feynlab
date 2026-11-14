@@ -1064,6 +1064,50 @@
 
 </details>
 
+## T9 — ED-DMFT and the Mott transition (T = 0)
+
+1. Why can a T = 0 ED-DMFT solver use Lanczos instead of full diagonalization?
+   - A. Lanczos is more accurate
+   - B. only the ground state and its ±1-electron excitations enter G(iω) at T = 0
+   - C. the Hamiltonian is diagonal
+   - D. for Monte Carlo sampling
+2. With an EVEN number of bath sites at half filling, the cluster ground state is…
+   - A. a singlet
+   - B. a spin doublet (odd number of sites)
+   - C. a triplet
+   - D. superconducting
+3. Which bath parity should be used to locate U_c2 (where the metal disappears)?
+   - A. even
+   - B. odd
+   - C. either
+   - D. neither
+4. Why does an odd-bath ED insulator disappear too late (spuriously)?
+   - A. the fit diverges
+   - B. the zero-energy bath level forms a Kondo resonance with the local moment, resolved at T = 0
+   - C. the Lanczos method fails
+   - D. the sum rule is violated
+5. Why is the bath sum rule Σ V_l² = ∫ε²ρ(ε)dε enforced?
+   - A. for speed
+   - B. an under-weighted bath shrinks the effective bandwidth and pulls U_c down
+   - C. it is required by Wick's theorem
+   - D. to remove the sign problem
+6. The consensus values for the Bethe-lattice Mott transition at T = 0 are…
+   - A. U_c1 ≈ 2.39D, U_c2 ≈ 2.92–3.0D
+   - B. U_c1 ≈ 3.3D, U_c2 ≈ 2.6D
+   - C. U_c ≈ 1D
+   - D. U_c1 = U_c2 = 4D
+
+<details><summary>Answer key</summary>
+
+1. **B** — 
+2. **B** — Odd number of electrons at half filling → doublet.
+3. **B** — Odd baths include a zero-energy level and a singlet ground state that carries the Kondo quasiparticle.
+4. **B** — 
+5. **B** — 
+6. **A** — 
+
+</details>
+
 ## T7 — Benchmarks & limitations
 
 1. Which v0.1 limitation is only PARTIALLY resolved in v0.2?
