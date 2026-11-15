@@ -1515,3 +1515,59 @@
 7. **B** — Bonca-Trugman-Batistic; E0 = -2.46968472393287 at t = w = g = 1.
 
 </details>
+
+## T18 — Charge self-consistent DFT+DMFT with Quantum ESPRESSO
+
+1. Which QE input flag makes pw.x stop after the nscf step and later read a DMFT density correction?
+   - A. lda_plus_u
+   - B. dmft = .true.
+   - C. tqr
+   - D. noncolin
+2. What does feynlab write into dft_update/delta_N?
+   - A. the self-energy
+   - B. Delta N_ij(k) = N^DMFT_ij(k) - delta_ij f^DFT_i(k) in the Bloch band window, per spin
+   - C. the Wannier Hamiltonian
+   - D. the total energy
+3. How does QE turn f + Delta N into a new density?
+   - A. it ignores Delta N
+   - B. it diagonalises f + Delta N, rotates the Kohn-Sham states with the eigenvectors and occupies them with the eigenvalues
+   - C. it mixes potentials
+   - D. it reruns Wannier90
+4. Why should QE use Fermi-Dirac smearing with degauss = k_B T of the DMFT?
+   - A. speed
+   - B. so that with Sigma = 0 the DMFT occupations equal QE's and Delta N vanishes identically
+   - C. it is required by Wannier90
+   - D. to avoid negative occupations
+5. Why is the per-orbital t2g occupation a bad convergence criterion for SrVO3?
+   - A. it is noisy
+   - B. cubic symmetry pins it at n/3, so it cannot change
+   - C. QE does not print it
+   - D. it diverges
+6. In the QE DMFT step, which pw.x settings are used?
+   - A. from_scratch, many electron steps
+   - B. restart_mode='restart', startingwfc/pot='file', electron_maxstep=1, small mixing_beta
+   - C. nscf
+   - D. bands
+7. A fitted hybridisation Delta(iw) = sum_l V_l^2/(iw - e_l) is used in an ED impurity with chemical potential mu. In which frame are the e_l?
+   - A. absolute energies, so subtract mu once more
+   - B. already measured from mu: subtracting mu again empties or fills the bath as mu drifts
+   - C. measured from the Fermi level of QE
+   - D. it does not matter
+8. Why was ED with one bath site per t2g orbital replaced by Lanczos with two?
+   - A. speed
+   - B. one site per orbital is too coarse to fit Delta(iw) and drives a spurious Mott state (Z ~ 0.01)
+   - C. QE requires it
+   - D. to reduce the sign problem
+
+<details><summary>Answer key</summary>
+
+1. **B** — QE >= 7.0, with dmft_prefix naming the HDF5 archive.
+2. **B** — 
+3. **B** — PW/src/add_dmft_occ.f90 and sum_band.f90.
+4. **B** — feynlab: Delta N = 1.5e-7, energy unchanged to 1e-8 Ry.
+5. **B** — Use the scf accuracy, the total energy and the window charge.
+6. **B** — 
+7. **B** — This was the v1.2 bug fix in DFTDMFT: the bath emptied as mu drifted to about -1 eV.
+8. **B** — Two bath sites per orbital give 9 sites, handled by the sector Lanczos solver.
+
+</details>

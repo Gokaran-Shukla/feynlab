@@ -75,7 +75,7 @@
   \ifx\insertframesubtitle\@empty\else\\[-1pt]{\normalsize\color{muted}\insertframesubtitle}\fi
   \par\vspace*{-0.1cm}{\color{accent}\rule{1.6cm}{2pt}}}
 \setbeamertemplate{footline}{%
-  \leavevmode\hbox to\paperwidth{\hspace{0.4cm}{\color{muted}\tiny feynlab v1.1 \,|\, \insertsectionhead}\hfill{\color{muted}\tiny\insertframenumber/\inserttotalframenumber}\hspace{0.4cm}}\vspace{0.18cm}}
+  \leavevmode\hbox to\paperwidth{\hspace{0.4cm}{\color{muted}\tiny feynlab v1.2 \,|\, \insertsectionhead}\hfill{\color{muted}\tiny\insertframenumber/\inserttotalframenumber}\hspace{0.4cm}}\vspace{0.18cm}}
 \AtBeginSection[]{%
   \begin{frame}[plain]
   \begin{tikzpicture}[remember picture,overlay]
@@ -98,7 +98,7 @@
 \newcommand{\refcite}[1]{{\color{muted}\scriptsize[#1]}}
 \newcommand{\ok}{{\color{cH}\checkmark}}
 
-\title{\textbf{feynlab} v1.1}
+\title{\textbf{feynlab} v1.2}
 \subtitle{Feynman diagrams, quantum Monte Carlo, many-body self-energies\\and anomalous/spin/orbital Hall transport in one validated Python package}
 \author{Gokaran Shukla}
 \institute{KAUST \quad\textbullet\quad github.com/Gokaran-Shukla/feynlab}
@@ -111,7 +111,7 @@
 \begin{tikzpicture}[remember picture,overlay]
  \fill[brand] (current page.south west) rectangle (current page.north east);
  \fill[accent] ($(current page.south west)+(0,1.05)$) rectangle ($(current page.south east)+(0,1.12)$);
- \node[anchor=north west,text=white,font=\fontsize{40}{40}\selectfont\bfseries] at ($(current page.north west)+(1.0,-1.1)$) {feynlab \,\normalsize v1.1};
+ \node[anchor=north west,text=white,font=\fontsize{40}{40}\selectfont\bfseries] at ($(current page.north west)+(1.0,-1.1)$) {feynlab \,\normalsize v1.2};
  \node[anchor=north west,text=white!85!brand,text width=11.5cm,font=\large] at ($(current page.north west)+(1.05,-2.6)$)
    {Feynman diagrams, quantum Monte Carlo, many-body self-energies and anomalous / spin / orbital Hall transport \textemdash{} in one validated Python package};
  \node[anchor=south west,text=white,font=\normalsize] at ($(current page.south west)+(1.05,1.6)$) {\textbf{Gokaran Shukla}\quad KAUST, Thuwal};
@@ -149,6 +149,7 @@
  \item Orbitronics: OAM, BCD, Edelstein/SOT, 3D Wannier
  \item Robustness: errors, mixing, I/O, CLI, CI
  \item v1.1: closing every v1.0 limitation
+ \item v1.2: charge self-consistency with Quantum ESPRESSO
  \item Benchmarks, limitations, learning material
 \end{enumerate}
 \end{columns}
@@ -157,8 +158,8 @@
 \centering
 \small
 \begin{tabular}{ccc}
-\textbf{35+} modules & \textbf{16} software tutorials & \textbf{22} book-chapter tutorials\\
-\textbf{38} quizzes, \textbf{202} questions & \textbf{200+} benchmark rows & \textbf{52} unit tests
+\textbf{35+} modules & \textbf{17} software tutorials & \textbf{22} book-chapter tutorials\\
+\textbf{39} quizzes, \textbf{210} questions & \textbf{200+} benchmark rows & \textbf{57} unit tests
 \end{tabular}
 \end{block}
 \end{frame}
@@ -970,6 +971,51 @@ K(\mathbf q)&=\tfrac12F_d(\mathbf q)-\tfrac32F_m(\mathbf q)-\tfrac12F_d^{\rm loc
 \end{frame}
 
 % ======================================================================== 13
+\section{v1.2: first-principles charge self-consistency}
+\begin{frame}{DFT+DMFT with QE + Wannier90 \refcite{Beck et al., JPCM 34, 235601 (2022)}}
+\begin{columns}[T]
+\column{0.53\textwidth}
+\small
+\textbf{Cycle} (\texttt{feynlab.dft.qe\_csc.QEDMFT})
+\begin{enumerate}\footnotesize
+ \item \texttt{pw.x} scf $\to$ nscf (\texttt{dmft=.true.}) $\to$ Wannier90 $U(\mathbf k)$
+ \item $\Ham_W(\mathbf k)=V^\dagger\,\mathrm{diag}(\ek)\,V$, \;DMFT $\to\Sig$
+ \item window density matrix
+ \[N(\mathbf k)=\tfrac1{\bet}\textstyle\sum_n\big[\iw+\mu-\ek-V(\Sig-\Sig[dc])V^\dagger\big]^{-1}\]
+ \item $\Delta N=N-\mathrm{diag}(f^{\rm DFT})$ $\to$ HDF5; QE diagonalises $f+\Delta N$, rotates $\psi$, updates $\rho$
+\end{enumerate}
+\footnotesize Fermi--Dirac smearing with $k_BT=1/\bet$: $\Sig=0\Rightarrow\Delta N\equiv0$.
+\column{0.44\textwidth}
+\footnotesize
+\begin{tabular}{ll}
+\toprule
+check & result\\\midrule
+$\U=0$: $\max|\Delta N|$ & $1.5\times10^{-7}$\\
+$\U=0$: $E_{\rm QE}$ & unchanged to $10^{-8}$ Ry\\
+Lanczos vs full ED & $7\times10^{-12}$\\
+ED / Lanczos / CT-HYB $Z$ & 0.502 / 0.503 / 0.497\\
+\bottomrule
+\end{tabular}
+\vspace{0.2cm}
+
+New solver: multi-orbital Lanczos (sectors, continued fraction, finite-$T$), 3 orbitals $\times$ 2 bath sites.
+
+\vspace{0.1cm}
+Bug fixed: bath levels shifted by $-\mu$ twice.
+\end{columns}
+\end{frame}
+
+\begin{frame}{SrVO$_3$: converged CSC, $\U=5$ eV, $\J=0.75$ eV, $\bet=40$ eV$^{-1}$}
+\centering
+\includegraphics[width=\textwidth]{figures/qe_csc_srvo3.png}
+\vspace{0.1cm}
+\begin{itemize}\small
+ \item geometric convergence: scf accuracy $6\times10^{-7}$ Ry after 7 cycles; window charge $=1$ throughout
+ \item $Z$: 0.428 (one-shot) $\to$ 0.431 (CSC); $E_F$ shifts by $+12$ meV; small CSC effect, as for CaVO$_3$ (Beck 2022)
+ \item limits: nspin $=1$ (QE hook); DMFT total energy not yet assembled
+\end{itemize}
+\end{frame}
+
 \section{Benchmarks, limitations, learning}
 \begin{frame}{Benchmark philosophy}
 \begin{columns}[T]
@@ -1036,11 +1082,11 @@ Wannier3D & stacked Chern & 0.333333 & $1/3$ & Halperin 1987\\
 {\scriptsize Full tables: \texttt{benchmarks/RESULTS.md} and \texttt{benchmarks/RESULTS\_v1.md}}
 \end{frame}
 
-\begin{frame}{Known limitations after v1.1 (stated honestly)}
+\begin{frame}{Known limitations after v1.2 (stated honestly)}
 \begin{columns}[T]
 \column{0.5\textwidth}
 \begin{itemize}\small
- \item ab-initio CSC needs an external DFT code (we export $N(\mathbf k)$; model functional bundled)
+ \item QE CSC: nspin $=1$ only (QE hook); DMFT total energy not yet assembled
  \item ED vertex: small baths ($\le 256$ states); $1/N_\nu$ extrapolation needed
  \item ladder D$\Gamma$A without $\lambda$ (Moriya) correction
 \end{itemize}
@@ -1053,7 +1099,7 @@ Wannier3D & stacked Chern & 0.333333 & $1/3$ & Halperin 1987\\
 \end{columns}
 \vfill
 \begin{block}{Next}
-\small $\lambda$-corrected D$\Gamma$A, dual fermions, worm-sampled vertices, Krylov/sliding-window matrix CT-HYB for 5 orbitals, VASP/QE interface for ab-initio CSC
+\small $\lambda$-corrected D$\Gamma$A, dual fermions, worm-sampled vertices, Krylov/sliding-window matrix CT-HYB for 5 orbitals, Kubo--St\v{r}eda with finite-range disorder
 \end{block}
 \end{frame}
 
@@ -1074,12 +1120,12 @@ Wannier3D & stacked Chern & 0.333333 & $1/3$ & Halperin 1987\\
  \setcounter{enumi}{12}
  \item CDet, resummation, polaron \quad 14.\ Advanced transport
  \setcounter{enumi}{14}
- \item Matrix CT-HYB, cluster CT-INT, CSC, vertices \quad 16.\ v1.1 transport/continuation/polarons
+ \item Matrix CT-HYB, cluster CT-INT, CSC, vertices \quad 16.\ v1.1 transport/continuation/polarons\\ \quad 17.\ QE charge self-consistency
 \end{enumerate}
 \textbf{Book tutorials}: every chapter 0--19 + appendices of Mattuck, with runnable feynlab companions.
 \column{0.47\textwidth}
 \begin{block}{Quizzes}
-\small 38 quizzes, 202 questions with explanations: \texttt{quizzes/quiz.html} (self-contained, offline), \texttt{QUIZZES.md}, \texttt{quizzes.json}.
+\small 39 quizzes, 210 questions with explanations: \texttt{quizzes/quiz.html} (self-contained, offline), \texttt{QUIZZES.md}, \texttt{quizzes.json}.
 \end{block}
 \begin{block}{Slides}
 \small this deck: \texttt{docs/slides/feynlab\_slides.pdf} (source \texttt{.tex}, figures regenerated by \texttt{make\_figures.py})
@@ -1105,7 +1151,7 @@ print(r['Z'])
 \end{verbatim}
 \column{0.42\textwidth}
 \begin{block}{Cite}
-\small G.\ Shukla, \emph{feynlab: Feynman diagrams, QMC and Hall transport}, v1.1 (2026), github.com/Gokaran-Shukla/feynlab (see CITATION.cff)
+\small G.\ Shukla, \emph{feynlab: Feynman diagrams, QMC and Hall transport}, v1.2 (2026), github.com/Gokaran-Shukla/feynlab (see CITATION.cff)
 \end{block}
 \begin{block}{Roadmap}
 \small $\lambda$-corrected D$\Gamma$A, dual fermions, worm-sampled vertices, 5-orbital matrix CT-HYB, VASP/QE CSC interface

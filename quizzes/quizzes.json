@@ -2448,5 +2448,99 @@
     "explanation": "Bonca-Trugman-Batistic; E0 = -2.46968472393287 at t = w = g = 1."
    }
   ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T18 — Charge self-consistent DFT+DMFT with Quantum ESPRESSO",
+  "questions": [
+   {
+    "q": "Which QE input flag makes pw.x stop after the nscf step and later read a DMFT density correction?",
+    "options": [
+     "lda_plus_u",
+     "dmft = .true.",
+     "tqr",
+     "noncolin"
+    ],
+    "answer": 1,
+    "explanation": "QE >= 7.0, with dmft_prefix naming the HDF5 archive."
+   },
+   {
+    "q": "What does feynlab write into dft_update/delta_N?",
+    "options": [
+     "the self-energy",
+     "Delta N_ij(k) = N^DMFT_ij(k) - delta_ij f^DFT_i(k) in the Bloch band window, per spin",
+     "the Wannier Hamiltonian",
+     "the total energy"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "How does QE turn f + Delta N into a new density?",
+    "options": [
+     "it ignores Delta N",
+     "it diagonalises f + Delta N, rotates the Kohn-Sham states with the eigenvectors and occupies them with the eigenvalues",
+     "it mixes potentials",
+     "it reruns Wannier90"
+    ],
+    "answer": 1,
+    "explanation": "PW/src/add_dmft_occ.f90 and sum_band.f90."
+   },
+   {
+    "q": "Why should QE use Fermi-Dirac smearing with degauss = k_B T of the DMFT?",
+    "options": [
+     "speed",
+     "so that with Sigma = 0 the DMFT occupations equal QE's and Delta N vanishes identically",
+     "it is required by Wannier90",
+     "to avoid negative occupations"
+    ],
+    "answer": 1,
+    "explanation": "feynlab: Delta N = 1.5e-7, energy unchanged to 1e-8 Ry."
+   },
+   {
+    "q": "Why is the per-orbital t2g occupation a bad convergence criterion for SrVO3?",
+    "options": [
+     "it is noisy",
+     "cubic symmetry pins it at n/3, so it cannot change",
+     "QE does not print it",
+     "it diverges"
+    ],
+    "answer": 1,
+    "explanation": "Use the scf accuracy, the total energy and the window charge."
+   },
+   {
+    "q": "In the QE DMFT step, which pw.x settings are used?",
+    "options": [
+     "from_scratch, many electron steps",
+     "restart_mode='restart', startingwfc/pot='file', electron_maxstep=1, small mixing_beta",
+     "nscf",
+     "bands"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "A fitted hybridisation Delta(iw) = sum_l V_l^2/(iw - e_l) is used in an ED impurity with chemical potential mu. In which frame are the e_l?",
+    "options": [
+     "absolute energies, so subtract mu once more",
+     "already measured from mu: subtracting mu again empties or fills the bath as mu drifts",
+     "measured from the Fermi level of QE",
+     "it does not matter"
+    ],
+    "answer": 1,
+    "explanation": "This was the v1.2 bug fix in DFTDMFT: the bath emptied as mu drifted to about -1 eV."
+   },
+   {
+    "q": "Why was ED with one bath site per t2g orbital replaced by Lanczos with two?",
+    "options": [
+     "speed",
+     "one site per orbital is too coarse to fit Delta(iw) and drives a spurious Mott state (Z ~ 0.01)",
+     "QE requires it",
+     "to reduce the sign problem"
+    ],
+    "answer": 1,
+    "explanation": "Two bath sites per orbital give 9 sites, handled by the sector Lanczos solver."
+   }
+  ]
  }
 ]

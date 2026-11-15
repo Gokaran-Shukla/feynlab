@@ -438,3 +438,76 @@ def test_parallel_backends_identical():
     a = s.solve(ed.hybridization(g.iw), 1.0, n_meas=40000, n_chains=2, parallel="serial")
     b = s.solve(ed.hybridization(g.iw), 1.0, n_meas=40000, n_chains=2, parallel="process")
     assert abs(a["docc"] - b["docc"]) < 1e-12
+
+
+# ============================================================================ v1.2: QE charge self-consistency
+def test_qe_dmft_h5_layout(tmp_path):
+    """The archive must match QE's add_dmft_occ.f90: Fortran delta_n(2, nb, nb, nk) <-> h5py (nk, nb, nb, 2) with
+    D[k, i, j] = Delta N_ij (QE transposes on read), band_window (1, nk, 2)."""
+    import h5py
+    from feynlab.dft.qe_csc import write_dmft_h5
+    rng = np.random.default_rng(0)
+    dN = rng.standard_normal((5, 3, 3)) + 1j * rng.standard_normal((5, 3, 3))
+    p = str(tmp_path / "x_dmft.h5")
+    write_dmft_h5(p, (21, 23), dN)
+    with h5py.File(p) as h:
+        bw = h["dft_misc_input/band_window"][...]
+        d = h["dft_update/delta_N"][...]
+    assert bw.shape == (1, 5, 2) and bw[0, 0, 0] == 21 and bw[0, 0, 1] == 23
+    F = np.transpose(d, (3, 2, 1, 0))                     # what Fortran sees: delta_n(re/im, i, j, k)
+    n_dmft = F[0] + 1j * F[1]                              # n_dmft(i, j, k)
+    assert np.allclose(np.transpose(n_dmft, (1, 0, 2)), np.transpose(dN, (1, 2, 0)))   # after QE's TRANSPOSE
+
+
+def test_qe_window_density_noninteracting():
+    """Sigma = 0: N^DMFT(k) = diag(f(eps_k - mu)), so Delta N = 0 when QE uses Fermi-Dirac smearing at the same T."""
+    from feynlab.dft.qe_csc import window_density_matrix, find_mu_window
+    from feynlab.core.matsubara import fermi
+    rng = np.random.default_rng(1)
+    eps = np.sort(rng.uniform(-1, 1, (40, 3)), axis=1)
+    V = np.array([np.linalg.qr(rng.standard_normal((3, 3)) + 1j * rng.standard_normal((3, 3)))[0] for _ in range(40)])
+    sig = np.zeros((3, 512), complex)
+    mu = find_mu_window(eps, V, sig, 40.0, 512, 1.0)
+    N = window_density_matrix(eps, V, sig, mu, 40.0, 512)
+    f = fermi(eps - mu, 40.0)
+    assert np.abs(N - np.einsum("km,mn->kmn", f, np.eye(3))).max() < 1e-5
+    assert abs(2 * np.real(np.trace(N, axis1=1, axis2=2)).mean() - 1.0) < 1e-6
+
+
+def test_w90_u_matrix_reader(tmp_path):
+    from feynlab.dft.qe_csc import read_u_matrix
+    U = np.array([[[1 + 2j, 3 + 4j], [5 + 6j, 7 + 8j]]])
+    lines = ["header", "1 2 2", "", " 0.0 0.0 0.0"]
+    for n in range(2):                 # Wannier90 writes ((u(i, n), i = 1, num_bands), n = 1, num_wann)
+        for i in range(2):
+            lines.append(f"{U[0, i, n].real} {U[0, i, n].imag}")
+    p = tmp_path / "s_u.mat"
+    p.write_text("\n".join(lines) + "\n")
+    assert np.allclose(read_u_matrix(str(p)), U)
+
+
+def test_dftdmft_bath_levels_measured_from_mu(tmp_path):
+    """Regression (v1.2): fitted bath levels are already measured from mu; shifting them again by -mu emptied the
+    bath away from mu = 0.  At n = 0.8 the ED and Lanczos solvers must agree with each other and with matrix
+    CT-HYB (no bath fit, Z = 0.497 +- 0.005 from benchmarks/qe_csc)."""
+    from feynlab.dmft.dftdmft import DFTDMFT, write_hr
+    f = str(tmp_path / "one_hr.dat")
+    write_hr(f, np.array([(0, 0, 0), (1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0)]), np.array([[[0j]]] + [[[-0.25 + 0j]]] * 4))
+    Z = []
+    for solver in ("ed", "lanczos"):
+        m = DFTDMFT(f, U=2.0, J=0.0, n_elec=0.8, beta=10.0, nk=(16, 16, 1), n_iw=256)
+        Z.append(m.solve(solver, n_iter=40, mix=0.5, n_bath=3, tol=1e-6)["Z"][0])
+    assert abs(Z[0] - Z[1]) < 2e-3
+    assert abs(Z[0] - 0.497) < 0.02
+
+
+def test_multiorbital_lanczos_matches_full_ed():
+    from feynlab.qmc.multiorbital_lanczos import MultiOrbitalLanczos
+    from feynlab.qmc.multiorbital import MultiOrbitalED
+    U, J = 2.5, 0.4
+    e = [-(3 * U - 5 * J) / 2 + 0.2, -(3 * U - 5 * J) / 2 + 0.5]
+    eb, Vb = [[-0.5, 0.6], [-0.4, 0.7]], [[0.5, 0.4], [0.45, 0.5]]
+    z = 1j * np.pi * (2 * np.arange(3) + 1) / 20.0
+    a = MultiOrbitalED(2, U, J, e, eb, Vb).green(z, 20.0, a=0)
+    b = MultiOrbitalLanczos(2, U, J, e, eb, Vb, beta=20.0, n_eig=40).green(z, a=0)
+    assert np.abs(a - b).max() < 1e-5

@@ -282,4 +282,14 @@ SOFTWARE = {
  ("The momentum-fluctuation estimator gives m*/m from…", ["finite p differences", "m/m* = 1 - lim <X^2>/(3 tau), X = sum q (t2 - t1) over phonon arcs", "Z", "the average order"], 1, "alpha = 0.2: 1.0340 +- 0.0002 vs 1.0343."),
  ("Variational ED for the Holstein polaron builds its basis by…", ["random sampling", "repeated application of H to |electron, no phonons> in a translation-invariant frame", "Lanczos only", "DMRG"], 1, "Bonca-Trugman-Batistic; E0 = -2.46968472393287 at t = w = g = 1."),
 ],
+"T18 — Charge self-consistent DFT+DMFT with Quantum ESPRESSO": [
+ ("Which QE input flag makes pw.x stop after the nscf step and later read a DMFT density correction?", ["lda_plus_u", "dmft = .true.", "tqr", "noncolin"], 1, "QE >= 7.0, with dmft_prefix naming the HDF5 archive."),
+ ("What does feynlab write into dft_update/delta_N?", ["the self-energy", "Delta N_ij(k) = N^DMFT_ij(k) - delta_ij f^DFT_i(k) in the Bloch band window, per spin", "the Wannier Hamiltonian", "the total energy"], 1, ""),
+ ("How does QE turn f + Delta N into a new density?", ["it ignores Delta N", "it diagonalises f + Delta N, rotates the Kohn-Sham states with the eigenvectors and occupies them with the eigenvalues", "it mixes potentials", "it reruns Wannier90"], 1, "PW/src/add_dmft_occ.f90 and sum_band.f90."),
+ ("Why should QE use Fermi-Dirac smearing with degauss = k_B T of the DMFT?", ["speed", "so that with Sigma = 0 the DMFT occupations equal QE's and Delta N vanishes identically", "it is required by Wannier90", "to avoid negative occupations"], 1, "feynlab: Delta N = 1.5e-7, energy unchanged to 1e-8 Ry."),
+ ("Why is the per-orbital t2g occupation a bad convergence criterion for SrVO3?", ["it is noisy", "cubic symmetry pins it at n/3, so it cannot change", "QE does not print it", "it diverges"], 1, "Use the scf accuracy, the total energy and the window charge."),
+ ("In the QE DMFT step, which pw.x settings are used?", ["from_scratch, many electron steps", "restart_mode='restart', startingwfc/pot='file', electron_maxstep=1, small mixing_beta", "nscf", "bands"], 1, ""),
+ ("A fitted hybridisation Delta(iw) = sum_l V_l^2/(iw - e_l) is used in an ED impurity with chemical potential mu. In which frame are the e_l?", ["absolute energies, so subtract mu once more", "already measured from mu: subtracting mu again empties or fills the bath as mu drifts", "measured from the Fermi level of QE", "it does not matter"], 1, "This was the v1.2 bug fix in DFTDMFT: the bath emptied as mu drifted to about -1 eV."),
+ ("Why was ED with one bath site per t2g orbital replaced by Lanczos with two?", ["speed", "one site per orbital is too coarse to fit Delta(iw) and drives a spurious Mott state (Z ~ 0.01)", "QE requires it", "to reduce the sign problem"], 1, "Two bath sites per orbital give 9 sites, handled by the sector Lanczos solver."),
+],
 }

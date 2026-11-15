@@ -1,5 +1,7 @@
 # feynlab roadmap — what would make it powerful and robust
 
+> **v1.2:** fully charge self-consistent DFT+DMFT with Quantum ESPRESSO + Wannier90 (`feynlab.dft.qe_csc`) and a multi-orbital Lanczos solver. Next: λ-corrected DΓA, CT-HYB worm vertex for large baths, Krylov/tree CT-HYB for 5 orbitals, finite-range Kubo–Středa.
+>
 > **v1.1 status:** all 22 items below are implemented, including the parts that were partial in v1.0
 > (vertex ladders / DΓA / TPSC, full-Kanamori matrix CT-HYB, cluster CT-INT, charge self-consistency, Holstein/SSH
 > polarons, finite-range disorder, crossed diagrams for any 2D/3D Wannier lattice, MPI chains).

@@ -142,7 +142,9 @@ class DFTDMFT:
     # --------------------------------------------------------------
     def solve(self, solver="hubbard1", n_iter=20, mix=0.5, n_bath=1, tol=1e-5, verbose=False, cthyb_kwargs=None,
               sigma0=None):
-        """solver: 'hubbard1' | 'ed' (bath fit, n_bath per orbital) | 'cthyb' (matrix CT-HYB, full Kanamori)."""
+        """solver: 'hubbard1' | 'ed' (finite-T full ED, bath fit, n_bath per orbital, <= 8 sites) |
+        'lanczos' (T = 0 sector Lanczos ED, full Kanamori, <= 11 sites, e.g. 3 orbitals x 2 bath sites) |
+        'cthyb' (matrix CT-HYB, full Kanamori)."""
         iw = self.grid.iw
         sig = np.zeros((self.nc, len(iw)), complex) if sigma0 is None else np.array(sigma0, complex)
         self.mu = self.find_mu(sig)
@@ -179,9 +181,28 @@ class DFTDMFT:
                 for i in range(self.nc):
                     delta = iw + self.mu - self.eps_loc[i] - (sig[i] - 0) - 1.0 / Gc[i]
                     e_, v_, _, _ = fit_bath(iw[:120], delta[:120], n_bath, symmetric=False)
-                    eb.append(e_ - self.mu); Vb.append(v_)
+                    eb.append(e_); Vb.append(v_)   # fitted levels are already measured from mu
                 ed = MultiOrbitalED(self.nc, self.U, self.J, eps - self.mu, eb, Vb)
                 sig_new = np.array([iw - (eps[i] - self.mu) - ed.hybridization(iw, i) - 1.0 / ed.green(iw, self.grid.beta, i)
+                                    for i in range(self.nc)])
+            elif solver == "lanczos":
+                from ..qmc.multiorbital_lanczos import MultiOrbitalLanczos
+                eb, Vb = [], []
+                prevb = getattr(self, "_lanczos_bath", None)
+                for i in range(self.nc):
+                    delta = iw + self.mu - self.eps_loc[i] - sig[i] - 1.0 / Gc[i]
+                    nfit = min(len(iw), 200)
+                    x0 = None
+                    if prevb is not None:          # warm start: keeps the bath on the same branch between iterations
+                        pe, pv = prevb[i]
+                        x0 = np.concatenate([np.arctanh(np.clip(pe / 3.0, -0.999, 0.999)), pv])
+                    e_, v_, _, _ = fit_bath(iw[:nfit], delta[:nfit], n_bath, symmetric=False, x0=x0,
+                                            n_starts=1 if x0 is not None else 8)
+                    eb.append(e_); Vb.append(v_)   # fitted levels are already measured from mu
+                self._lanczos_bath = list(zip(eb, Vb))
+                ed = MultiOrbitalLanczos(self.nc, self.U, self.J, eps - self.mu, eb, Vb, beta=self.grid.beta, n_eig=10)
+                self.lanczos_last = ed
+                sig_new = np.array([iw - (eps[i] - self.mu) - ed.hybridization(iw, i) - 1.0 / ed.green(iw, i)
                                     for i in range(self.nc)])
             elif solver == "cthyb":
                 from ..qmc.cthyb_matrix import MatrixCTHYB
@@ -217,7 +238,7 @@ class DFTDMFT:
             else:
                 raise ValueError(solver)
             sig_new = sig_new - vdc          # Sigma_imp - Sigma_dc enters the lattice G
-            diff = float(np.max(np.abs(sig_new - sig)))
+            diff = float(np.max(np.abs(sig_new - sig)[:, :min(64, len(iw))]))   # low-frequency convergence
             sig = mix * sig_new + (1 - mix) * sig
             self.mu = self.find_mu(sig)
             hist.append(diff)

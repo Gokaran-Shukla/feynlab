@@ -5,6 +5,7 @@
     feynlab polaron input.toml    # Froehlich polaron DiagMC
     feynlab bench [--quick]       # benchmark suite
     feynlab nrg   input.toml      # NRG impurity thermodynamics, Kondo temperature
+    feynlab qe-csc input.toml     # charge self-consistent DFT+DMFT with Quantum ESPRESSO + Wannier90
     feynlab bench --suite core|v1|all
     feynlab example dmft|hall|polaron|nrg   # print an example input file
     (without an input file the example input is used)
@@ -124,10 +125,54 @@ file = "nrg.h5"
 """
 
 
+def run_qe_csc(cfg):
+    """Charge self-consistent DFT+DMFT with Quantum ESPRESSO + Wannier90 (feynlab.dft.qe_csc)."""
+    from ..dft.qe_csc import QEDMFT
+    q, d, c = cfg["qe"], cfg["dmft"], cfg.get("csc", {})
+    lat = np.array(q["lattice_A"], float)
+    atoms = [(a[0], tuple(a[1:])) for a in q["atoms_frac"]]
+    drv = QEDMFT(q.get("workdir", "."), open(q["scf_input"]).read(), tuple(q["kmesh"]), tuple(q["band_window"]),
+                 q["projections"], U=d["U"], J=d.get("J", 0.0), beta=d["beta"], nbnd=q.get("nbnd"),
+                 solver=d.get("solver", "ed"), dc=d.get("dc", "FLL"), n_iw=d.get("n_iw", 1024),
+                 solver_kwargs=d.get("solver_kwargs", {}), pw_cmd=q.get("pw_cmd", "pw.x"),
+                 w90_cmd=q.get("w90_cmd", "wannier90.x"), pw2wan_cmd=q.get("pw2wan_cmd", "pw2wannier90.x"),
+                 mixing_beta=c.get("mixing_beta", 0.3), dis=q.get("dis_windows"))
+    h = drv.cycle(n_csc=c.get("n_csc", 10), n_dmft_first=c.get("n_dmft_first", 15), n_dmft_per=c.get("n_dmft_per", 5),
+                  tol_occ=c.get("tol_occ", 2e-4), lattice_rows_A=lat, atoms_frac=atoms, skip_scf=c.get("skip_scf", False))
+    return dict(n_wannier=np.array([x["n_wannier"] for x in h]), Z=np.array([x["Z"] for x in h]),
+                etot_Ry=np.array([x["scf_etot_Ry"] for x in h]), n_window=np.array([x["n_window"] for x in h]))
+
+
+EXAMPLES["qe-csc"] = """# charge self-consistent DFT+DMFT for SrVO3 (QE >= 7.0 built with HDF5, Wannier90)
+[qe]
+workdir = "svo"
+scf_input = "scf.in"          # pw.x scf input: smearing='fermi-dirac', degauss = 1/beta in Ry
+kmesh = [8, 8, 8]
+band_window = [21, 23]        # 1-based QE band indices of the t2g bands
+nbnd = 30
+projections = ["V:dxz;dyz;dxy"]
+lattice_A = [[3.8425, 0, 0], [0, 3.8425, 0], [0, 0, 3.8425]]
+atoms_frac = [["Sr", 0, 0, 0], ["V", 0.5, 0.5, 0.5], ["O", 0.5, 0.5, 0], ["O", 0.5, 0, 0.5], ["O", 0, 0.5, 0.5]]
+pw_cmd = "mpirun -np 4 pw.x -nk 4"
+pw2wan_cmd = "mpirun -np 4 pw2wannier90.x"
+[dmft]
+U = 5.0
+J = 0.75
+beta = 40.0
+solver = "ed"
+solver_kwargs = {n_bath = 1}
+[csc]
+n_csc = 10
+mixing_beta = 0.3
+[output]
+file = "qe_csc.h5"
+"""
+
+
 def build_parser():
     p = argparse.ArgumentParser(prog="feynlab", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="command", required=True)
-    for name in ("dmft", "hall", "polaron", "nrg"):
+    for name in ("dmft", "hall", "polaron", "nrg", "qe-csc"):
         sp = sub.add_parser(name)
         sp.add_argument("input", nargs="?", default=None)
         sp.add_argument("--model", default=None, help="(hall) shortcut: dirac | rashba | qwz")
@@ -165,7 +210,7 @@ def main(argv=None):
     else:
         with open(a.input, "rb") as f:
             cfg = tomllib.load(f)
-    res = {"dmft": run_dmft, "hall": run_hall, "polaron": run_polaron, "nrg": run_nrg}[a.cmd](cfg)
+    res = {"dmft": run_dmft, "hall": run_hall, "polaron": run_polaron, "nrg": run_nrg, "qe-csc": run_qe_csc}[a.cmd](cfg)
     from ..utils.io import save
     out = cfg.get("output", {}).get("file", "feynlab_out.h5")
     save(out, {k: v for k, v in res.items()} | {"input_json": json.dumps(cfg, default=str)})

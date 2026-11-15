@@ -3,9 +3,9 @@
 Companion software to R. D. Mattuck, *A Guide to Feynman Diagrams in the Many-Body Problem* (2nd ed.),
 extended to research-level tools for correlated electrons and Hall transport.
 
-**Status v1.1.0** — every check in `benchmarks/RESULTS.md` (102 core rows), `benchmarks/RESULTS_v1.md` (54 rows) and `benchmarks/RESULTS_v11.md` (43 rows, 43/43 pass) compares against an exact result, an independent solver or a published formula (PRL, PRB, RMP, EPL, Phys. Rep.).
+**Status v1.2.0** — every check in `benchmarks/RESULTS.md` (102 core rows), `benchmarks/RESULTS_v1.md` (54 rows), `benchmarks/RESULTS_v11.md` (43 rows, 43/43 pass) and `benchmarks/qe_csc/RESULTS.md` (first-principles CSC) compares against an exact result, an independent solver or a published formula (PRL, PRB, RMP, EPL, Phys. Rep.).
 
-📑 **Slides:** [`docs/slides/feynlab_slides.pdf`](docs/slides/feynlab_slides.pdf) — a 46-page Beamer deck covering every module, equation (colour-coded by physical quantity), benchmark and limitation.
+📑 **Slides:** [`docs/slides/feynlab_slides.pdf`](docs/slides/feynlab_slides.pdf) — a 56-page Beamer deck covering every module, equation (colour-coded by physical quantity), benchmark and limitation.
 
 ## What it does
 
@@ -23,6 +23,13 @@ extended to research-level tools for correlated electrons and Hall transport.
 | Superconductivity | BCS gap equation, T_c | 1.764, 1.134 |
 | **Hall transport** (charge, spin, orbital, orbital-quadrupole) | Berry / operator curvature; Kubo–Středa NCA (Born Σ + ladder + V₁³ skew vertex); **crossed X/Ψ diagrams** (v0.2); Boltzmann (side jump, anomalous distribution, skew) | Sinitsyn et al. PRB 75, 045315 (all 6 mechanism terms, ≤1e-5); Ado et al. EPL 111, 37004 (X, Ψ, full σ_xy); Inoue–Bauer–Molenkamp; QWZ/Haldane Chern; Rashba e/8π |
 | Models | massive Dirac (+tilt, +quadratic mass), Rashba(+exchange), QWZ, Haldane, p-orbital square lattice with SOC/orbital Rashba/exchange, **Wannier90 hr.dat (2D and 3D)** | — |
+
+### New in v1.2 (first-principles charge self-consistency)
+| capability | module | validated against |
+|---|---|---|
+| **Fully charge self-consistent DFT+DMFT with Quantum ESPRESSO + Wannier90** (QE ≥ 7.0 DMFT hook, ΔN(k) HDF5 archive) | `dft.qe_csc.QEDMFT`, `feynlab qe-csc` | U = 0: ΔN ≤ 1.5e-7, QE energy unchanged to 1e-8 Ry; SrVO₃ CSC run |
+| **Multi-orbital Lanczos ED** (9+ sites, finite T) as DFT+DMFT solver | `qmc.multiorbital_lanczos`, `DFTDMFT(solver='lanczos')` | full ED 7e-12; CT-HYB Z within 1% |
+| Bug fix: ED bath levels in `DFTDMFT` were shifted by −μ twice | `dmft.dftdmft` | regression test |
 
 ### New in v1.1 (every v1.0 limitation closed)
 | capability | module | validated against |

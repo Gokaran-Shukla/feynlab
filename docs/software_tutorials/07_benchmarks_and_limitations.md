@@ -95,11 +95,19 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 | Holstein / SSH polarons | **resolved**: variational ED (`qmc.lattice_polaron`) | Holstein E₀ = −2.46968472393287 (published 21-digit value) |
 | adaptive 3D refinement not cost-optimal | **improved**: velocity-based Fermi-surface criterion; hot spots opt-in | 0.1% at 263k points vs 0.2% for a uniform 216k mesh |
 
-## Remaining limitations after v1.1 (honest list)
+## v1.2: first-principles charge self-consistency (Quantum ESPRESSO)
 
-* **Charge self-consistency** is implemented at the level of the Wannier Hamiltonian, with a model functional
-  (`hartree_functional`) or through a user callback. A full ab-initio cycle needs an external DFT code fed with
-  `write_density_matrix`; no DFT code is bundled.
+| v1.1 limitation | v1.2 status | check |
+|---|---|---|
+| CSC only at the Wannier level (model functional) | **resolved**: `feynlab.dft.qe_csc.QEDMFT` drives pw.x (QE ≥ 7.0 DMFT hook) + Wannier90; ΔN(k) archive written by feynlab, density updated by QE | U = 0: ΔN ≤ 1.5e-7, E_QE unchanged to 1e-8 Ry; SrVO₃ U = 5, J = 0.75 converged (`benchmarks/qe_csc/RESULTS.md`) |
+| ED-DMFT for t₂g limited to 1 bath site/orbital | **resolved**: `qmc.multiorbital_lanczos` (sectors, continued fraction, finite-T Boltzmann average), 2 bath sites per orbital = 9 sites | full ED 7e-12 (T→0), 3e-6 (β = 20) |
+| **bug fix**: `DFTDMFT` ED solver shifted bath levels by −μ twice | fixed; results of the `ed` solver before v1.2 are wrong whenever μ ≠ 0 | ED vs Lanczos vs CT-HYB at n = 0.8: Z = 0.5024 / 0.5025 / 0.497 |
+
+## Remaining limitations after v1.2 (honest list)
+
+* **QE charge self-consistency** is restricted to nspin = 1 (a QE limitation of the DMFT hook). The DMFT total
+  energy (Galitskii–Migdal + double-counting correction) is not assembled; QE's printed energy is the DFT
+  functional at the interacting density.
 * **ED vertex**: the impurity must be small (atom plus ≤ 3 bath sites, at most 256 states). Frequency sums
   converge as 1/N_ν, so use the 1/N extrapolation as shown in the tutorials. CT-HYB worm sampling of the vertex
   for continuous baths is not implemented.
