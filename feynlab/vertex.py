@@ -97,6 +97,19 @@ def _dd4(y0, y1, y2, y3, beta):
 
 
 @njit(cache=True)
+def _dd4f(y0, y1, y2, y3, beta, M, E, T, P):
+    """Divided difference of exp(beta z): closed Lagrange form sum_i e^{beta y_i} / prod_{j!=i} (y_i - y_j) when all
+    nodes are separated by more than 0.5/beta (at most ~2 digits of cancellation), otherwise the stable
+    bidiagonal matrix exponential (_dd4w). Re(y) <= 0, so no overflow."""
+    d01 = y0 - y1; d02 = y0 - y2; d03 = y0 - y3; d12 = y1 - y2; d13 = y1 - y3; d23 = y2 - y3
+    mn = min(abs(d01), abs(d02), abs(d03), abs(d12), abs(d13), abs(d23))
+    if mn * beta < 0.5:
+        return _dd4w(y0, y1, y2, y3, beta, M, E, T, P)
+    return (np.exp(beta * y0) / (d01 * d02 * d03) - np.exp(beta * y1) / (d01 * d12 * d13)
+            + np.exp(beta * y2) / (d02 * d12 * d23) - np.exp(beta * y3) / (d03 * d13 * d23))
+
+
+@njit(cache=True)
 def _g2_kernel(chains, amps, E, phis, beta, nu, nup, om, out_shape):
     """chains: (nc, 4) state indices (i,j,k,l) for one ordering, amps: products of matrix elements,
     phis: (3, nnu, nnup, nom) phases of the ordered operators (a, b, c).  Returns sum over chains."""
@@ -113,7 +126,7 @@ def _g2_kernel(chains, amps, E, phis, beta, nu, nup, om, out_shape):
                     pa = phis[0, x, y, z]
                     pb = phis[1, x, y, z]
                     pc = phis[2, x, y, z]
-                    res[x, y, z] += a * _dd4w(-E[i] + 0j, -E[j] + 1j * pa, -E[k] + 1j * (pa + pb),
+                    res[x, y, z] += a * _dd4f(-E[i] + 0j, -E[j] + 1j * pa, -E[k] + 1j * (pa + pb),
                                               -E[l] + 1j * (pa + pb + pc), beta, M, Ew, T, P)
     return res
 
@@ -354,6 +367,138 @@ def ladder_dga_sigma(eps_k, mu, sigma_dmft_of, vert, gs, beta, U, n_total, q_str
         gg = Gf(nus) * Gf(nus + w)
         Sloc -= (U / beta**2) * ((-Floc_m[iw]) @ gg) * Gf(nus + w)
     return S - Sloc[None, None, :] + sigma_dmft_of(nus)[None, None, :]
+
+
+# =============================================================================== lambda-corrected ladder DGA
+def _bubble_tail(Gk_of, nus, oms, beta, q, n_tail):
+    """(1/beta^2) sum over fermionic nu OUTSIDE the box (|n| < n_tail) of the lattice bubble chi0(q)_nu, per w:
+    the leading asymptotic correction of the physical susceptibility (vertex -> 0 outside the box)."""
+    if n_tail <= 0:
+        return np.zeros(len(oms))
+    n_all = max(n_tail, len(nus) // 2)
+    ext = (2 * np.arange(-n_all, n_all) + 1) * np.pi / beta
+    ext = ext[np.abs(ext) > nus.max() + 1e-9]
+    return np.real(lattice_bubble(Gk_of, ext, oms, beta, q).sum(axis=1)) / beta**2
+
+
+def _ladder_q(eps_k, mu, sigma_dmft_of, vert, gs, beta, U, q_stride, n_tail=0):
+    """Per transfer momentum q: bubble chi0(q), physical chi_r(q,w) and triangular vertices gamma_r(nu; q,w)
+        sum_nu' chi_r(q)_{nu nu'} = chi0(q)_nu gamma_r(nu; q) [1 - s_r U chi_r(q, w)],   s_d = +1, s_m = -1
+    (Katanin, Toschi, Held PRB 80, 075104 (2009), Eq. (8)); gamma_r = 1 in RPA.
+    tail(q,w): bubble outside the frequency box (identical for d and m), returned separately (n_tail > 0)."""
+    nus, oms = gs["nu"], gs["om"]
+    N = eps_k.shape[0]
+
+    def Gk_of(x):
+        return 1.0 / (1j * x[None, None, :] + mu - eps_k[..., None] - sigma_dmft_of(x)[None, None, :])
+    qs = [(a, b) for a in range(0, N, q_stride) for b in range(0, N, q_stride)]
+    out = dict(qs=qs, Gk_of=Gk_of, c0=[], chi_d=[], chi_m=[], gam_d=[], gam_m=[], tail=[])
+    for (a, b) in qs:
+        c0q = lattice_bubble(Gk_of, nus, oms, beta, (a, b))
+        out["tail"].append(_bubble_tail(Gk_of, nus, oms, beta, (a, b), n_tail))
+        out["c0"].append(c0q)
+        for r, s in (("d", 1.0), ("m", -1.0)):
+            chi = lattice_susceptibility(vert["Gamma_" + r], c0q, beta)
+            chi3 = chi.sum(axis=-1)
+            cph = chi.sum(axis=(-1, -2)) / beta**2
+            out["chi_" + r].append(cph)
+            out["gam_" + r].append(chi3 / (c0q * (1.0 - s * U * cph[:, None])))
+    for key in ("c0", "chi_d", "chi_m", "gam_d", "gam_m", "tail"):
+        out[key] = np.array(out[key])
+    return out
+
+
+def _lambda_chi(chi, lam):
+    return 1.0 / (1.0 / chi + lam)
+
+
+def solve_lambda(chi_q, target, beta):
+    """Moriya lambda correction: chi^lambda(q,w) = [chi(q,w)^{-1} + lambda]^{-1} with lambda fixed by the sum rule
+        (1/beta) sum_w (1/N_q) sum_q chi^lambda(q,w) = target.
+    chi_q: (n_q, n_w) physical susceptibilities on the bosonic box. lambda > -min_q 1/chi(q, w=0) keeps
+    chi^lambda positive (no divergence: Mermin-Wagner in 2D). Returns (lambda, lambda_min)."""
+    from scipy.optimize import brentq
+    nw = chi_q.shape[1]
+    w0 = nw // 2
+    lam_min = float(np.max(-1.0 / np.real(chi_q[:, w0])))
+
+    def f(lam):
+        return float(np.real(_lambda_chi(chi_q, lam).mean(axis=0).sum()) / beta - target)
+    scale = max(1.0, abs(lam_min))
+    lo = lam_min + 1e-12 * scale
+    while f(lo) < 0 and lo < lam_min + scale:            # sum rule already over-satisfied near the pole
+        lo = lam_min + 10 * (lo - lam_min)
+    hi = lam_min + scale
+    while f(hi) > 0:
+        hi = lam_min + 2 * (hi - lam_min)
+    if f(lo) < 0:                                         # target unreachable from above: no positive solution
+        raise ValueError("lambda sum rule has no solution above the pole")
+    return brentq(f, lo, hi, xtol=1e-14 * scale, rtol=1e-13), lam_min
+
+
+def lambda_dga(eps_k, mu, sigma_dmft_of, vert, gs, beta, U, n_total, q_stride=1, G_loc_of=None, lambda_mode="m",
+               target_m=None, lam_m=None, n_tail=0, docc=None):
+    """Ladder DGA with Moriya lambda correction in the magnetic channel (lambda_m-DGA):
+    Katanin, Toschi, Held PRB 80, 075104 (2009); Rohringer et al. RMP 90, 025003 (2018), Sec. III.B.
+
+    Self-energy (identical to `ladder_dga_sigma` for lambda = 0):
+        Sigma(k,nu) = Sigma_DMFT(nu) - Sigma_EOM^loc(nu) + (U/beta) sum_{q w}/N_q G(k+q, nu+w)
+                      x { 1/2 [1 - gamma_d (1 - U chi_d)] - 3/2 [1 - gamma_m (1 + U chi_m^lambda)] }
+                      - (U/beta^2) sum_{q w nu'} (F_m^loc - F_d^loc)/2 G(k',nu') G(k'+q,nu'+w) G(k+q,nu+w)
+    chi_m^lambda = [chi_m^-1 + lambda_m]^-1, lambda_m fixed by the local sum rule
+        (1/beta) sum_{q w} chi_m^lambda(q,w) = (1/beta) sum_w chi_m^loc(w)      (DMFT impurity, same frequency box),
+    so the lattice spin fluctuations cannot exceed the local moment the impurity model sets. The ladder without
+    lambda violates it and diverges at the DMFT Neel temperature; with lambda the 2D chi_m(Q) stays finite
+    (Mermin-Wagner). lambda_mode: 'm' (sum rule), None (lambda = 0, plain ladder) or 'fixed' (use lam_m).
+    Finite frequency box: with n_tail > 0 the bubble outside the box (|n| < n_tail) is added to every physical
+    susceptibility, chi_full = chi_box + tail; lambda acts on chi_full and the self-energy uses chi_full^lambda - tail
+    (so lambda = 0 still reproduces the plain ladder exactly); the local target gets the q-averaged tail.
+    With docc given, the exact target (n_total - 2 docc)/2 is used instead ((1/beta) sum_w chi_m^loc(w) =
+    <n_up> - <n_up n_dn> for chi_m = chi_uu - chi_ud).
+    Returns dict(Sigma[kx,ky,nu], lam_m, lam_min, chi_m, chi_m_lambda, chi_d (tail-corrected), sum_lattice,
+    sum_target, qs, tail)."""
+    nus, oms = gs["nu"], gs["om"]
+    N = eps_k.shape[0]
+    L = _ladder_q(eps_k, mu, sigma_dmft_of, vert, gs, beta, U, q_stride, n_tail)
+    w0 = len(oms) // 2
+    tail = L["tail"]
+    chi_full = L["chi_m"] + tail
+    chi_loc = physical_susceptibility(vert["chi_m"], beta) if "chi_m" in vert else None
+    if target_m is None:
+        if docc is not None:
+            target_m = 0.5 * n_total - docc
+        elif chi_loc is not None:
+            target_m = float(np.sum(chi_loc + tail.mean(axis=0)) / beta)
+    lam_min = float(np.max(-1.0 / np.real(chi_full[:, w0])))
+    if lambda_mode == "m":
+        lam, lam_min = solve_lambda(chi_full, target_m, beta)
+    elif lambda_mode == "fixed":
+        lam = float(lam_m)
+    else:
+        lam = 0.0
+    chi_full_l = _lambda_chi(chi_full, lam) if lam != 0.0 else chi_full
+    chi_m_l = chi_full_l - tail if lam != 0.0 else L["chi_m"]
+    Fdl, Fml = vert["F_d"], vert["F_m"]
+    Kloc = 0.5 * (Fml - Fdl)
+    S = np.zeros((N, N, len(nus)), complex)
+    wq = 1.0 / len(L["qs"])
+    Gk_shift = {w: L["Gk_of"](nus + w) for w in oms}
+    for iq, (a, b) in enumerate(L["qs"]):
+        c0q = L["c0"][iq]
+        for iw, w in enumerate(oms):
+            Ad = -beta * (1.0 - L["gam_d"][iq, iw] * (1.0 - U * L["chi_d"][iq, iw]))
+            Am = -beta * (1.0 - L["gam_m"][iq, iw] * (1.0 + U * chi_m_l[iq, iw]))
+            vec = 0.5 * Ad - 1.5 * Am + Kloc[iw] @ (-c0q[iw] / beta)
+            Gkq = np.roll(Gk_shift[w], shift=[-a, -b], axis=(0, 1))
+            S -= (U / beta**2) * wq * vec[None, None, :] * Gkq
+    Gf = gs["G_of"] if G_loc_of is None else G_loc_of
+    Sloc = np.zeros(len(nus), complex)
+    for iw, w in enumerate(oms):
+        Sloc -= (U / beta**2) * ((-Fml[iw]) @ (Gf(nus) * Gf(nus + w))) * Gf(nus + w)
+    Sigma = S - Sloc[None, None, :] + sigma_dmft_of(nus)[None, None, :]
+    return dict(Sigma=Sigma, lam_m=lam, lam_min=lam_min, chi_m=chi_full, chi_m_lambda=chi_full_l,
+                chi_d=L["chi_d"] + tail, sum_lattice=float(np.real(chi_full_l.mean(axis=0).sum()) / beta),
+                sum_target=target_m, qs=L["qs"], chi_m_loc=chi_loc, tail=tail)
 
 
 # =============================================================================== TPSC

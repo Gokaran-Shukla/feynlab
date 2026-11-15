@@ -24,6 +24,11 @@ extended to research-level tools for correlated electrons and Hall transport.
 | **Hall transport** (charge, spin, orbital, orbital-quadrupole) | Berry / operator curvature; Kubo–Středa NCA (Born Σ + ladder + V₁³ skew vertex); **crossed X/Ψ diagrams** (v0.2); Boltzmann (side jump, anomalous distribution, skew) | Sinitsyn et al. PRB 75, 045315 (all 6 mechanism terms, ≤1e-5); Ado et al. EPL 111, 37004 (X, Ψ, full σ_xy); Inoue–Bauer–Molenkamp; QWZ/Haldane Chern; Rashba e/8π |
 | Models | massive Dirac (+tilt, +quadratic mass), Rashba(+exchange), QWZ, Haldane, p-orbital square lattice with SOC/orbital Rashba/exchange, **Wannier90 hr.dat (2D and 3D)** | — |
 
+### New in v1.3 (closing the v1.2 list)
+| capability | module | validated against |
+|---|---|---|
+| **λ-corrected ladder DΓA** (Moriya λ_m, triangular vertices, bubble tail, exact or box sum rule) | `vertex.lambda_dga` | λ = 0 → plain ladder 4e-15; sum rule exact; Mermin–Wagner below T_N^DMFT; TPSC within 25% at U = 4t |
+
 ### New in v1.2 (first-principles charge self-consistency)
 | capability | module | validated against |
 |---|---|---|
@@ -94,7 +99,7 @@ print(anomalous_hall_mechanisms(MassiveDirac(1.0, 0.5), mu=1.0, band=1, V1_over_
 ## Known limitations
 All v1.0 limitations are addressed in v1.1 (`docs/software_tutorials/07_benchmarks_and_limitations.md`). What remains:
 ab-initio CSC needs an external DFT code (an N(k) export is provided); the ED vertex is limited to small baths;
-ladder DΓA has no λ correction; the matrix CT-HYB trace is recomputed from scratch (2–3 orbitals); the cluster CT-INT
+ladder DΓA now has the λ_m correction (v1.3; λ_dm is not implemented); the matrix CT-HYB trace is recomputed from scratch (2–3 orbitals); the cluster CT-INT
 has the usual sign problem away from half filling; finite-range disorder is semiclassical only.
 
 ## Citation

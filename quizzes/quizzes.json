@@ -2542,5 +2542,77 @@
     "explanation": "Two bath sites per orbital give 9 sites, handled by the sector Lanczos solver."
    }
   ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T19 — lambda-corrected ladder DGA",
+  "questions": [
+   {
+    "q": "Which physical defect of the plain ladder DGA does the Moriya lambda correction remove?",
+    "options": [
+     "the Luttinger theorem violation",
+     "the divergence of chi_m(Q) at the DMFT Neel temperature (no Mermin-Wagner) and the violated local spin sum rule",
+     "the sign problem",
+     "the high-frequency tail of Sigma"
+    ],
+    "answer": 1,
+    "explanation": "Katanin, Toschi, Held PRB 80, 075104 (2009)."
+   },
+   {
+    "q": "How is chi_m modified?",
+    "options": [
+     "chi -> chi + lambda",
+     "chi^lambda = 1/(1/chi + lambda)",
+     "chi -> lambda chi",
+     "only chi(Q) is changed"
+    ],
+    "answer": 1,
+    "explanation": "A mass term in the Ornstein-Zernike form, same for all q and w."
+   },
+   {
+    "q": "Which condition fixes lambda_m?",
+    "options": [
+     "Luttinger count",
+     "(1/beta) sum_{q,w} chi_m^lambda(q,w) equals the local DMFT spin sum (1/beta) sum_w chi_m^loc(w)",
+     "chi(Q) = 1",
+     "Sigma(k) local part = Sigma_DMFT"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "Below the DMFT Neel temperature the plain ladder gives chi_m(Q,0) < 0. What must lambda_m satisfy?",
+    "options": [
+     "lambda < 0",
+     "lambda > -1/chi_m(Q,0) > 0",
+     "lambda = 0",
+     "lambda = U"
+    ],
+    "answer": 1,
+    "explanation": "At U = 8t, T = 0.31t: lambda_m = 0.124 > lambda_min = 0.089; chi_m(Q) = 29 instead of -11."
+   },
+   {
+    "q": "Why does feynlab write the ladder self-energy with triangular vertices gamma_r?",
+    "options": [
+     "for speed only",
+     "lambda enters only through the physical chi_r(q,w) inside [1 - gamma_r(1 -+ U chi_r)]; at lambda = 0 it equals the F(q) form to machine precision",
+     "to avoid the local subtraction",
+     "because F(q) is unknown"
+    ],
+    "answer": 1,
+    "explanation": "Sum_nu' chi_r(q)_{nu nu'} = chi0_nu gamma_r (1 - s_r U chi_r)."
+   },
+   {
+    "q": "Why is the default sum-rule target the DMFT local chi_m summed over the same frequency box (plus the bubble tail) rather than (n - 2d)/2?",
+    "options": [
+     "it is cheaper",
+     "truncation errors of the vertex then cancel between lattice and local sides; the exact target applied to a truncated lattice chi is inconsistent",
+     "(n - 2d)/2 is wrong",
+     "TPSC requires it"
+    ],
+    "answer": 1,
+    "explanation": "The spread between the two targets measures the box error."
+   }
+  ]
  }
 ]

@@ -103,6 +103,13 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 | ED-DMFT for t₂g limited to 1 bath site/orbital | **resolved**: `qmc.multiorbital_lanczos` (sectors, continued fraction, finite-T Boltzmann average), 2 bath sites per orbital = 9 sites | full ED 7e-12 (T→0), 3e-6 (β = 20) |
 | **bug fix**: `DFTDMFT` ED solver shifted bath levels by −μ twice | fixed; results of the `ed` solver before v1.2 are wrong whenever μ ≠ 0 | ED vs Lanczos vs CT-HYB at n = 0.8: Z = 0.5024 / 0.5025 / 0.497 |
 
+## v1.3 (in progress): closing the v1.2 list one by one
+
+| v1.2 limitation | status | check |
+|---|---|---|
+| ladder DΓA without λ correction | **resolved**: `vertex.lambda_dga` (Moriya λ_m, γ-vertex form, bubble tail, box or exact target) | λ = 0 equals the plain ladder to 4e-15; sum rule exact; below T_N^DMFT χ_m(Q) = 29 > 0 where the plain ladder gives −11 (`benchmarks/lambda_dga`) |
+| ED vertex slow (matrix exponential per frequency) | partly: closed-form divided differences with a near-degenerate fallback, 3.5–4.5× faster | 5e-11 relative vs the matrix exponential |
+
 ## Remaining limitations after v1.2 (honest list)
 
 * **QE charge self-consistency** is restricted to nspin = 1 (a QE limitation of the DMFT hook). The DMFT total
@@ -111,8 +118,9 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 * **ED vertex**: the impurity must be small (atom plus ≤ 3 bath sites, at most 256 states). Frequency sums
   converge as 1/N_ν, so use the 1/N extrapolation as shown in the tutorials. CT-HYB worm sampling of the vertex
   for continuous baths is not implemented.
-* **Ladder DΓA** has no λ correction (Moriya). Close to the antiferromagnetic instability in 2D, χ_m(Q) can
-  diverge at finite T in plain ladder DΓA.
+* **λ-DΓA** (v1.3, `vertex.lambda_dga`): only the Moriya λ_m is applied, with no λ_dm and no self-consistency.
+  With the small ED box the result depends on the sum-rule target by up to a factor 2 in Im Σ
+  (`benchmarks/lambda_dga/RESULTS.md`).
 * **Cluster CT-INT** away from half filling has a sign problem for N_c ≥ 4, as all CT-INT codes do. The cost grows
   as N_c³⟨k⟩³.
 * **Matrix CT-HYB** recomputes the trace from scratch, at cost O(K·4^{n_orb}) per move. It is practical for

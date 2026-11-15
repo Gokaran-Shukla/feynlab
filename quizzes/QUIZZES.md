@@ -1571,3 +1571,47 @@
 8. **B** — Two bath sites per orbital give 9 sites, handled by the sector Lanczos solver.
 
 </details>
+
+## T19 — lambda-corrected ladder DGA
+
+1. Which physical defect of the plain ladder DGA does the Moriya lambda correction remove?
+   - A. the Luttinger theorem violation
+   - B. the divergence of chi_m(Q) at the DMFT Neel temperature (no Mermin-Wagner) and the violated local spin sum rule
+   - C. the sign problem
+   - D. the high-frequency tail of Sigma
+2. How is chi_m modified?
+   - A. chi -> chi + lambda
+   - B. chi^lambda = 1/(1/chi + lambda)
+   - C. chi -> lambda chi
+   - D. only chi(Q) is changed
+3. Which condition fixes lambda_m?
+   - A. Luttinger count
+   - B. (1/beta) sum_{q,w} chi_m^lambda(q,w) equals the local DMFT spin sum (1/beta) sum_w chi_m^loc(w)
+   - C. chi(Q) = 1
+   - D. Sigma(k) local part = Sigma_DMFT
+4. Below the DMFT Neel temperature the plain ladder gives chi_m(Q,0) < 0. What must lambda_m satisfy?
+   - A. lambda < 0
+   - B. lambda > -1/chi_m(Q,0) > 0
+   - C. lambda = 0
+   - D. lambda = U
+5. Why does feynlab write the ladder self-energy with triangular vertices gamma_r?
+   - A. for speed only
+   - B. lambda enters only through the physical chi_r(q,w) inside [1 - gamma_r(1 -+ U chi_r)]; at lambda = 0 it equals the F(q) form to machine precision
+   - C. to avoid the local subtraction
+   - D. because F(q) is unknown
+6. Why is the default sum-rule target the DMFT local chi_m summed over the same frequency box (plus the bubble tail) rather than (n - 2d)/2?
+   - A. it is cheaper
+   - B. truncation errors of the vertex then cancel between lattice and local sides; the exact target applied to a truncated lattice chi is inconsistent
+   - C. (n - 2d)/2 is wrong
+   - D. TPSC requires it
+
+<details><summary>Answer key</summary>
+
+1. **B** — Katanin, Toschi, Held PRB 80, 075104 (2009).
+2. **B** — A mass term in the Ornstein-Zernike form, same for all q and w.
+3. **B** — 
+4. **B** — At U = 8t, T = 0.31t: lambda_m = 0.124 > lambda_min = 0.089; chi_m(Q) = 29 instead of -11.
+5. **B** — Sum_nu' chi_r(q)_{nu nu'} = chi0_nu gamma_r (1 - s_r U chi_r).
+6. **B** — The spread between the two targets measures the box error.
+
+</details>

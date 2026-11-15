@@ -511,3 +511,33 @@ def test_multiorbital_lanczos_matches_full_ed():
     a = MultiOrbitalED(2, U, J, e, eb, Vb).green(z, 20.0, a=0)
     b = MultiOrbitalLanczos(2, U, J, e, eb, Vb, beta=20.0, n_eig=40).green(z, a=0)
     assert np.abs(a - b).max() < 1e-5
+
+
+def _rpa_vertex_setup(U=0.6, beta=4.0, nn=6, N=8):
+    from feynlab.core.lattice import square_lattice_eps
+    eps = square_lattice_eps(N, 0.25)
+    nus = (2 * np.arange(-nn, nn) + 1) * np.pi / beta
+    oms = 2 * np.arange(-nn + 1, nn) * np.pi / beta
+    nO, nF = len(oms), len(nus)
+    v = dict(F_d=np.full((nO, nF, nF), U + 0j), F_m=np.full((nO, nF, nF), -U + 0j),
+             Gamma_d=np.full((nO, nF, nF), U + 0j), Gamma_m=np.full((nO, nF, nF), -U + 0j))
+    sd = lambda x: np.full(len(x), U / 2 + 0j)
+    Gl = lambda x: np.mean(1 / (1j * x[None, None, :] - eps[..., None]), axis=(0, 1))
+    return eps, v, dict(nu=nus, om=oms, G_of=Gl), sd
+
+
+def test_lambda_dga_reduces_to_ladder_and_fulfils_sum_rule():
+    from feynlab.vertex import ladder_dga_sigma, lambda_dga
+    U, beta = 0.6, 4.0
+    eps, v, gs, sd = _rpa_vertex_setup(U, beta)
+    S0 = ladder_dga_sigma(eps, U / 2, sd, v, gs, beta, U, 1.0)
+    r0 = lambda_dga(eps, U / 2, sd, v, gs, beta, U, 1.0, lambda_mode=None)
+    assert np.abs(r0["Sigma"] - S0).max() < 1e-12
+    # gamma = 1 for a constant (RPA) vertex
+    target = 0.8 * r0["sum_lattice"]
+    r = lambda_dga(eps, U / 2, sd, v, gs, beta, U, 1.0, lambda_mode="m", target_m=target)
+    assert r["lam_m"] > 0 and abs(r["sum_lattice"] - target) < 1e-10
+    w0 = len(gs["om"]) // 2
+    assert np.allclose(r["chi_m_lambda"][:, w0], 1 / (1 / r["chi_m"][:, w0] + r["lam_m"]))
+    rf = lambda_dga(eps, U / 2, sd, v, gs, beta, U, 1.0, lambda_mode="fixed", lam_m=r["lam_m"])
+    assert np.abs(rf["Sigma"] - r["Sigma"]).max() < 1e-12
