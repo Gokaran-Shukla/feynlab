@@ -48,10 +48,11 @@ def _continued_fraction(H, v0, z, sign, E0, n_lanczos=200):
 
 class MultiOrbitalLanczos:
     def __init__(self, n_orb, U, J, eps_d, eps_bath, V_bath, Up=None, n_lanczos=200, degeneracy_tol=1e-7,
-                 n_eig=6, beta=None, boltzmann_cut=1e-5):
+                 n_eig=6, beta=None, boltzmann_cut=1e-5, sz_max=2):
         """beta=None: T = 0 (degenerate ground-state manifold).  beta given: low-temperature Lanczos, all states
         with Boltzmann weight > boltzmann_cut among the n_eig lowest of every sector are included (continuous in
-        the bath parameters, which stabilises DMFT loops with degenerate orbitals)."""
+        the bath parameters, which stabilises DMFT loops with degenerate orbitals).
+        sz_max: only sectors with |N_up - N_dn| <= sz_max are searched (raise it for high-spin Hund's atoms)."""
         self.beta, self.bcut = beta, boltzmann_cut
         self.n_orb = n_orb
         eb = [np.atleast_1d(np.asarray(e, float)) for e in eps_bath]
@@ -88,6 +89,7 @@ class MultiOrbitalLanczos:
         self.nup, self.ndn = nup, ndn
         self.n_lanczos = n_lanczos
         self.eb, self.Vb = eb, Vb
+        self.sz_max = sz_max
         self._ground_state(degeneracy_tol, n_eig)
 
     def _sector(self, nu, nd):
@@ -98,7 +100,7 @@ class MultiOrbitalLanczos:
         best = []
         for nu in range(ns + 1):
             for nd in range(ns + 1):
-                if abs(nu - nd) > 2:
+                if abs(nu - nd) > self.sz_max:
                     continue
                 sel = self._sector(nu, nd)
                 Hs = self.H[sel][:, sel]

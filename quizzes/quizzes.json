@@ -2614,5 +2614,77 @@
     "explanation": "The spread between the two targets measures the box error."
    }
   ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T20 — 5-orbital CT-HYB with a sector-blocked trace",
+  "questions": [
+   {
+    "q": "Why does the dense matrix CT-HYB fail for a full d shell?",
+    "options": [
+     "sign problem",
+     "every operator in the trace is a dense 1024 x 1024 product",
+     "the determinant is too large",
+     "the hybridization is complex"
+    ],
+    "answer": 1,
+    "explanation": "4^5 = 1024 atomic states."
+   },
+   {
+    "q": "Which quantum numbers block the Kanamori H_loc exactly (spin flip and pair hopping included)?",
+    "options": [
+     "N only",
+     "N_up and N_dn",
+     "each orbital occupation",
+     "S^2 and L^2"
+    ],
+    "answer": 1,
+    "explanation": "Spin flip and pair hopping move electrons between orbitals but keep N_up and N_dn."
+   },
+   {
+    "q": "For a given operator string, what determines the sequence of blocks?",
+    "options": [
+     "nothing; all blocks mix",
+     "the starting block at tau = 0: each c_f / c+_f maps one block to exactly one other block",
+     "the random number",
+     "the bath"
+    ],
+    "answer": 1,
+    "explanation": "Strings that annihilate a block are discarded with integer look-ups."
+   },
+   {
+    "q": "What is the lazy trace evaluation?",
+    "options": [
+     "skipping measurements",
+     "rejecting a move when even an upper bound of |Tr| cannot pass the Metropolis test, before the exact trace is computed",
+     "computing the trace in single precision",
+     "truncating the expansion order"
+    ],
+    "answer": 1,
+    "explanation": "Semon et al. PRB 90, 075149 (2014); exact, not an approximation."
+   },
+   {
+    "q": "Why can only a few outer eigenstates of a block be propagated?",
+    "options": [
+     "they are degenerate",
+     "their contribution carries e^{-l E_n} with l the wrap-around interval; a rigorous bound tells which are negligible, turning matrix-matrix into matrix-vector products",
+     "QMC ignores them",
+     "they have zero norm"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "In the 5-orbital ED benchmark, why are n, docc and Sz^2 accurate while G(iw) is noisy at e_b = -2, V = 0.5?",
+    "options": [
+     "a bug in the trace",
+     "the M = F^-1 estimator has heavy tails when the order is low and |Delta(tau)| varies by e^20; local observables come from the trace and are unaffected",
+     "ED is wrong",
+     "the bath is too large"
+    ],
+    "answer": 1,
+    "explanation": "Worm sampling or improved estimators are the cure."
+   }
+  ]
  }
 ]

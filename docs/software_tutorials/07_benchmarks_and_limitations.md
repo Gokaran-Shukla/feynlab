@@ -108,6 +108,7 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 | v1.2 limitation | status | check |
 |---|---|---|
 | ladder DΓA without λ correction | **resolved**: `vertex.lambda_dga` (Moriya λ_m, γ-vertex form, bubble tail, box or exact target) | λ = 0 equals the plain ladder to 4e-15; sum rule exact; below T_N^DMFT χ_m(Q) = 29 > 0 where the plain ladder gives −11 (`benchmarks/lambda_dga`) |
+| matrix CT-HYB practical only for 2–3 orbitals | **resolved**: `qmc.cthyb_sector.SectorCTHYB` — (N↑,N↓) blocks, bound screening, outer-state matrix–vector propagation, lazy trace, optional Haule truncation | trace = dense to 1e-10; 5 orbitals vs exact ED (2²⁰ states): ⟨S_z²⟩ 1.936 ± 0.008 vs 1.933; 15× faster at 3 orbitals (`benchmarks/cthyb_5orb`) |
 | ED vertex slow (matrix exponential per frequency) | partly: closed-form divided differences with a near-degenerate fallback, 3.5–4.5× faster | 5e-11 relative vs the matrix exponential |
 
 ## Remaining limitations after v1.2 (honest list)
@@ -123,7 +124,9 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
   (`benchmarks/lambda_dga/RESULTS.md`).
 * **Cluster CT-INT** away from half filling has a sign problem for N_c ≥ 4, as all CT-INT codes do. The cost grows
   as N_c³⟨k⟩³.
-* **Matrix CT-HYB** recomputes the trace from scratch, at cost O(K·4^{n_orb}) per move. It is practical for
-  2–3 orbitals; tree/sliding-window acceleration and Krylov traces are not implemented.
+* **Sector CT-HYB** (v1.3) handles 5 orbitals at about 1 ms per step. The trace is still recomputed per move
+  (no tree or skip-list caching), H_loc must conserve (N↑, N↓), and Δ must be diagonal in flavour. The
+  M-matrix G estimator is noisy at low expansion order with a strongly asymmetric Δ(τ); worm sampling is not
+  implemented.
 * The finite-range-disorder **Kubo–Středa** (diagrammatic) route remains δ-correlated; finite range is
   available in the semiclassical solver.

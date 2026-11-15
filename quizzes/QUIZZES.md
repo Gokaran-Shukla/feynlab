@@ -1615,3 +1615,47 @@
 6. **B** — The spread between the two targets measures the box error.
 
 </details>
+
+## T20 — 5-orbital CT-HYB with a sector-blocked trace
+
+1. Why does the dense matrix CT-HYB fail for a full d shell?
+   - A. sign problem
+   - B. every operator in the trace is a dense 1024 x 1024 product
+   - C. the determinant is too large
+   - D. the hybridization is complex
+2. Which quantum numbers block the Kanamori H_loc exactly (spin flip and pair hopping included)?
+   - A. N only
+   - B. N_up and N_dn
+   - C. each orbital occupation
+   - D. S^2 and L^2
+3. For a given operator string, what determines the sequence of blocks?
+   - A. nothing; all blocks mix
+   - B. the starting block at tau = 0: each c_f / c+_f maps one block to exactly one other block
+   - C. the random number
+   - D. the bath
+4. What is the lazy trace evaluation?
+   - A. skipping measurements
+   - B. rejecting a move when even an upper bound of |Tr| cannot pass the Metropolis test, before the exact trace is computed
+   - C. computing the trace in single precision
+   - D. truncating the expansion order
+5. Why can only a few outer eigenstates of a block be propagated?
+   - A. they are degenerate
+   - B. their contribution carries e^{-l E_n} with l the wrap-around interval; a rigorous bound tells which are negligible, turning matrix-matrix into matrix-vector products
+   - C. QMC ignores them
+   - D. they have zero norm
+6. In the 5-orbital ED benchmark, why are n, docc and Sz^2 accurate while G(iw) is noisy at e_b = -2, V = 0.5?
+   - A. a bug in the trace
+   - B. the M = F^-1 estimator has heavy tails when the order is low and |Delta(tau)| varies by e^20; local observables come from the trace and are unaffected
+   - C. ED is wrong
+   - D. the bath is too large
+
+<details><summary>Answer key</summary>
+
+1. **B** — 4^5 = 1024 atomic states.
+2. **B** — Spin flip and pair hopping move electrons between orbitals but keep N_up and N_dn.
+3. **B** — Strings that annihilate a block are discarded with integer look-ups.
+4. **B** — Semon et al. PRB 90, 075149 (2014); exact, not an approximation.
+5. **B** — 
+6. **B** — Worm sampling or improved estimators are the cure.
+
+</details>

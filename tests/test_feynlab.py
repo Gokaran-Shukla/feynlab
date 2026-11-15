@@ -541,3 +541,27 @@ def test_lambda_dga_reduces_to_ladder_and_fulfils_sum_rule():
     assert np.allclose(r["chi_m_lambda"][:, w0], 1 / (1 / r["chi_m"][:, w0] + r["lam_m"]))
     rf = lambda_dga(eps, U / 2, sd, v, gs, beta, U, 1.0, lambda_mode="fixed", lam_m=r["lam_m"])
     assert np.abs(rf["Sigma"] - r["Sigma"]).max() < 1e-12
+
+
+def test_sector_trace_equals_dense_trace():
+    from feynlab.core.matsubara import MatsubaraGrid
+    from feynlab.qmc.cthyb_matrix import MatrixCTHYB, _trace, _collect
+    from feynlab.qmc.cthyb_sector import SectorCTHYB, _trace_sec
+    g = MatsubaraGrid(8.0, 64)
+    n_orb, U, J, mu = 3, 2.5, 0.5, 3.0
+    d = MatrixCTHYB(g, n_orb, U, J, mu=mu)
+    s = SectorCTHYB(g, n_orb, U, J, mu=mu).S
+    rng = np.random.default_rng(1)
+    nf = 2 * n_orb
+    dummy = np.zeros(1)
+    for trial in range(20):
+        K = rng.integers(0, 3, nf)
+        TS = rng.uniform(0, 8.0, (nf, 4)); TE = rng.uniform(0, 8.0, (nf, 4))
+        times, kinds, flav = _collect(TS, TE, K, nf)
+        a = _trace(times, kinds, flav, d.E, d.Cop, d.Cdag, 8.0, np.zeros((0, 0)))
+        b = _trace_sec(times, kinds, flav, 8.0, s.E, s.e_off, s.dims, s.Emin, s.tgt, s.boff, s.bnorm, s.blocks,
+                       dummy, s.o_off, False, False, 0.0)
+        bd = _trace_sec(times, kinds, flav, 8.0, s.E, s.e_off, s.dims, s.Emin, s.tgt, s.boff, s.bnorm, s.blocks,
+                        dummy, s.o_off, False, True, 0.0)
+        assert abs(a - b) <= 1e-10 * max(1.0, abs(a))
+        assert abs(a) <= bd * (1 + 1e-12) + 1e-12
