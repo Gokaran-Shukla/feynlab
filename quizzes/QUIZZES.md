@@ -1659,3 +1659,47 @@
 6. **B** — Worm sampling or improved estimators are the cure.
 
 </details>
+
+## T21 — Two-particle vertex from CT-HYB
+
+1. Why is the Lehmann-ED vertex limited to small baths?
+   - A. sign problem
+   - B. the number of 4-state chains grows like (number of states)^4 before pruning; 256 states already exhaust memory
+   - C. it needs a Fourier transform
+   - D. ED has no frequencies
+2. What is the CT-HYB removal estimator for G2_{ss'}(nu, nu', w)?
+   - A. <M>^2
+   - B. (1/beta)<Mh_s(nu+w,nu) Mh_s'(nu',nu'+w) - delta_ss' Mh_s(nu+w,nu'+w) Mh_s(nu',nu)>
+   - C. the derivative of G with respect to Delta
+   - D. a ladder sum
+3. Check of the estimator at U = 0?
+   - A. chi_ud = chi0
+   - B. connected part vanishes: chi_ud = 0, chi_uu = chi0 delta_{nu nu'}
+   - C. G2 = 0
+   - D. chi_m diverges
+4. How can one check a measured vertex without any reference solver?
+   - A. compare with TPSC
+   - B. the Schwinger-Dyson equation: Sigma from F_ud must equal Sigma from Dyson's equation
+   - C. the sign
+   - D. the order histogram
+5. Why did a larger frequency box (only affordable with CT-HYB) matter for lambda-DGA?
+   - A. it changed U
+   - B. the box local spin sum approaches the exact (n - 2d)/2, and the two sum-rule variants of lambda-DGA converge (spread factor 2.2 -> 1.4)
+   - C. it removes the need for lambda
+   - D. for speed
+6. What changed in the lattice DMFT susceptibility when the 2-site ED bath was replaced by the continuous CT-HYB bath at the same box?
+   - A. nothing
+   - B. the plain DMFT chi_m(Q) moved from 6.4 to 8.0: the bath discretization error
+   - C. lambda became negative
+   - D. Sigma changed sign
+
+<details><summary>Answer key</summary>
+
+1. **B** — Two bath sites take minutes; three run out of memory.
+2. **B** — Removing two rows and two columns of the hybridization matrix gives a 2x2 minor of M.
+3. **B** — This is a unit test.
+4. **B** — 1-2% at U = 4t in the benchmark.
+5. **B** — 
+6. **B** — 
+
+</details>

@@ -131,7 +131,44 @@ def _rem(M, p, k):
 
 
 @njit(cache=True)
-def _run(beta, U, mu_up, mu_dn, Ftab_up, Ftab_dn, w, n_warm, n_meas, meas_every, seed, kmax):
+def _mhat(M, ts, te, k, beta, N):
+    """Mhat(a, b) = sum_ij M_ji e^{i nu_a te_i} e^{-i nu_b ts_j} on fermionic nu_m = (2m+1) pi/beta, m in [-N, N)."""
+    nu = (2.0 * np.arange(-N, N) + 1.0) * np.pi / beta
+    A = np.empty((2 * N, k), dtype=np.complex128)
+    B = np.empty((k, 2 * N), dtype=np.complex128)
+    for a in range(2 * N):
+        for i in range(k):
+            A[a, i] = np.exp(1j * nu[a] * te[i])
+            B[i, a] = np.exp(-1j * nu[a] * ts[i])
+    Mt = np.empty((k, k), dtype=np.complex128)
+    for i in range(k):
+        for j in range(k):
+            Mt[i, j] = M[j, i]
+    return A @ Mt @ B
+
+
+@njit(cache=True)
+def _g2_accumulate(Mh, n_nu, n_om, N, beta, acc_uu, acc_ud):
+    """G2_{s s'}(nu, nu', w) = (1/beta) < Mh_s(nu+w, nu) Mh_s'(nu', nu'+w) - delta_ss' Mh_s(nu+w, nu'+w) Mh_s(nu', nu) >
+    (removal estimator, Gull et al. RMP 83, 349 (2011); Hafermann et al. PRB 85, 205106 (2012)), for (s, s') =
+    (up, up) and (up, dn), averaged with (dn, dn) and (dn, up)."""
+    for l in range(2 * n_om + 1):
+        wl = l - n_om
+        for x in range(2 * n_nu):
+            n = x - n_nu
+            a = n + wl + N; b = n + N
+            for y in range(2 * n_nu):
+                m = y - n_nu
+                c = m + N; d = m + wl + N
+                for s in range(2):
+                    o = 1 - s
+                    t1 = Mh[s, a, b] * Mh[s, c, d]
+                    acc_uu[l, x, y] += 0.5 * (t1 - Mh[s, a, d] * Mh[s, c, b]) / beta
+                    acc_ud[l, x, y] += 0.5 * (Mh[s, a, b] * Mh[o, c, d]) / beta
+
+
+@njit(cache=True)
+def _run(beta, U, mu_up, mu_dn, Ftab_up, Ftab_dn, w, n_warm, n_meas, meas_every, seed, kmax, n_nu2, n_om2):
     np.random.seed(seed)
     ntab = Ftab_up.shape[0]
     nw = w.shape[0]
@@ -146,6 +183,10 @@ def _run(beta, U, mu_up, mu_dn, Ftab_up, Ftab_dn, w, n_warm, n_meas, meas_every,
     nmeas = 0
     Q = np.zeros(kmax); R = np.zeros(kmax)
     mus = np.array([mu_up, mu_dn])
+    Nx = n_nu2 + n_om2
+    g2uu = np.zeros((2 * n_om2 + 1, 2 * n_nu2, 2 * n_nu2), dtype=np.complex128)
+    g2ud = np.zeros((2 * n_om2 + 1, 2 * n_nu2, 2 * n_nu2), dtype=np.complex128)
+    Mh = np.zeros((2, 2 * Nx, 2 * Nx), dtype=np.complex128)
     for step in range(n_warm + n_meas):
         s = 0 if np.random.random() < 0.5 else 1
         o = 1 - s
@@ -304,7 +345,15 @@ def _run(beta, U, mu_up, mu_dn, Ftab_up, Ftab_dn, w, n_warm, n_meas, meas_every,
                             acc += Ms[ss, j, i] * np.exp(1j * w[iw] * dt)
                     Gacc[ss, iw] += acc / beta   # sign: F = Delta(beta - tau) convention
             dacc += _overlap_total(TS, TE, K, FULL, beta) / beta
-    return Gacc / nmeas, nacc / nmeas, dacc / nmeas, hist / max(nmeas, 1)
+            if n_nu2 > 0:
+                for ss in range(2):
+                    if K[ss] > 0:
+                        Mh[ss] = _mhat(Ms[ss], TS[ss], TE[ss], K[ss], beta, Nx)
+                    else:
+                        Mh[ss] = 0.0
+                _g2_accumulate(Mh, n_nu2, n_om2, Nx, beta, g2uu, g2ud)
+    nm = max(nmeas, 1)
+    return Gacc / nmeas, nacc / nmeas, dacc / nmeas, hist / nm, g2uu / nm, g2ud / nm
 
 
 @njit(cache=True)
@@ -351,7 +400,12 @@ class CTHYBSolver:
         return dtau[::-1].copy()
 
     def solve(self, delta_iw, mu, delta_dn=None, n_warm=20000, n_meas=2_000_000, meas_every=20,
-              n_chains=4, seed=7, kmax=300, parallel="serial"):
+              n_chains=4, seed=7, kmax=300, parallel="serial", g2=None):
+        """g2 = (n_nu, n_om): also measure the two-particle Green function G2_{uu}, G2_{ud}(w, nu, nu') on
+        nu = (2n+1)pi/beta, n in [-n_nu, n_nu), w = 2 m pi/beta, |m| <= n_om, with the removal estimator; the
+        result then contains 'gs', a generalized-susceptibility dict in the format of
+        vertex.ImpurityED.generalized_susceptibilities (input of vertex.vertices / lambda_dga) -- a vertex for a
+        continuous bath."""
         g = self.grid
         Fu = self._Ftab(delta_iw)
         Fd = self._Ftab(delta_iw if delta_dn is None else delta_dn)
@@ -359,9 +413,15 @@ class CTHYBSolver:
         Gs, ns, ds = [], [], []
         hist = 0
         from ..utils.parallel import map_chains
-        args = [(g.beta, self.U, mu, mu, Fu, Fd, w, n_warm, n_meas, meas_every, seed + 977 * c, kmax) for c in range(n_chains)]
-        for G, n, d, h in map_chains(_run, args, backend=parallel):
+        n_nu2, n_om2 = (0, 0) if g2 is None else (int(g2[0]), int(g2[1]))
+        if g2 is not None and self.n_iw_meas < n_nu2 + n_om2:
+            raise ValueError("n_iw_meas must be >= n_nu + n_om for the G2 measurement")
+        args = [(g.beta, self.U, mu, mu, Fu, Fd, w, n_warm, n_meas, meas_every, seed + 977 * c, kmax, n_nu2, n_om2)
+                for c in range(n_chains)]
+        G2u, G2d = [], []
+        for G, n, d, h, gu, gd in map_chains(_run, args, backend=parallel):
             Gs.append(G); ns.append(n); ds.append(d); hist = hist + h
+            G2u.append(gu); G2d.append(gd)
         Gs = np.array(Gs)
         G = Gs.mean(0)
         iw = g.iw[: self.n_iw_meas]
@@ -371,5 +431,28 @@ class CTHYBSolver:
         sig_chains = G0inv[None, :] - 1.0 / (0.5 * (Gs[:, 0] + Gs[:, 1]))
         err = (sig_chains.real.std(0, ddof=1) + 1j * sig_chains.imag.std(0, ddof=1)) / np.sqrt(n_chains) \
             if n_chains > 1 else np.full(len(iw), np.nan)
-        return dict(iw=iw, G=Gsym, G_up=G[0], G_dn=G[1], Sigma=G0inv - 1.0 / Gsym, err_Sigma=err,
-                    n=np.mean(ns, 0), docc=float(np.mean(ds)), order_histogram=hist / n_chains)
+        out = dict(iw=iw, G=Gsym, G_up=G[0], G_dn=G[1], Sigma=G0inv - 1.0 / Gsym, err_Sigma=err,
+                   n=np.mean(ns, 0), docc=float(np.mean(ds)), order_histogram=hist / n_chains)
+        if g2 is not None:
+            out["gs"] = self._generalized_susceptibilities(np.array(G2u), np.array(G2d), Gsym, n_nu2, n_om2)
+        return out
+
+    def _generalized_susceptibilities(self, G2u, G2d, Gsym, n_nu, n_om):
+        """chi_ss'(w, nu, nu') = G2_ss' - beta G(nu) G(nu') delta_{w0}; chi0 = -beta G(nu) G(nu+w); chain errors."""
+        beta = self.grid.beta
+        nus = (2 * np.arange(-n_nu, n_nu) + 1) * np.pi / beta
+        oms = 2 * np.arange(-n_om, n_om + 1) * np.pi / beta
+        nmax = n_nu + n_om
+        allnu = (2 * np.arange(-nmax, nmax) + 1) * np.pi / beta
+        Gp = Gsym[:nmax]
+        Gall = np.concatenate([np.conj(Gp[::-1]), Gp])
+        Gf = lambda x: Gall[np.searchsorted(allnu, np.asarray(x) - 1e-9)]
+        Gnu = Gf(nus)
+        i0 = n_om
+        se = lambda x: (x.real.std(0, ddof=1) + 1j * x.imag.std(0, ddof=1)) / np.sqrt(len(x)) if len(x) > 1 else 0 * x[0]
+        chi_uu, chi_ud = G2u.mean(0).copy(), G2d.mean(0).copy()
+        chi_uu[i0] -= beta * np.outer(Gnu, Gnu)
+        chi_ud[i0] -= beta * np.outer(Gnu, Gnu)
+        chi0 = np.array([-beta * Gnu * Gf(nus + w) for w in oms])
+        return dict(chi_uu=chi_uu, chi_ud=chi_ud, chi0=chi0, nu=nus, om=oms, G=Gnu, G_of=Gf,
+                    chi_uu_err=se(G2u), chi_ud_err=se(G2d))

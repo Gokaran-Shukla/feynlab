@@ -308,4 +308,12 @@ SOFTWARE = {
  ("Why can only a few outer eigenstates of a block be propagated?", ["they are degenerate", "their contribution carries e^{-l E_n} with l the wrap-around interval; a rigorous bound tells which are negligible, turning matrix-matrix into matrix-vector products", "QMC ignores them", "they have zero norm"], 1, ""),
  ("In the 5-orbital ED benchmark, why are n, docc and Sz^2 accurate while G(iw) is noisy at e_b = -2, V = 0.5?", ["a bug in the trace", "the M = F^-1 estimator has heavy tails when the order is low and |Delta(tau)| varies by e^20; local observables come from the trace and are unaffected", "ED is wrong", "the bath is too large"], 1, "Worm sampling or improved estimators are the cure."),
 ],
+"T21 — Two-particle vertex from CT-HYB": [
+ ("Why is the Lehmann-ED vertex limited to small baths?", ["sign problem", "the number of 4-state chains grows like (number of states)^4 before pruning; 256 states already exhaust memory", "it needs a Fourier transform", "ED has no frequencies"], 1, "Two bath sites take minutes; three run out of memory."),
+ ("What is the CT-HYB removal estimator for G2_{ss'}(nu, nu', w)?", ["<M>^2", "(1/beta)<Mh_s(nu+w,nu) Mh_s'(nu',nu'+w) - delta_ss' Mh_s(nu+w,nu'+w) Mh_s(nu',nu)>", "the derivative of G with respect to Delta", "a ladder sum"], 1, "Removing two rows and two columns of the hybridization matrix gives a 2x2 minor of M."),
+ ("Check of the estimator at U = 0?", ["chi_ud = chi0", "connected part vanishes: chi_ud = 0, chi_uu = chi0 delta_{nu nu'}", "G2 = 0", "chi_m diverges"], 1, "This is a unit test."),
+ ("How can one check a measured vertex without any reference solver?", ["compare with TPSC", "the Schwinger-Dyson equation: Sigma from F_ud must equal Sigma from Dyson's equation", "the sign", "the order histogram"], 1, "1-2% at U = 4t in the benchmark."),
+ ("Why did a larger frequency box (only affordable with CT-HYB) matter for lambda-DGA?", ["it changed U", "the box local spin sum approaches the exact (n - 2d)/2, and the two sum-rule variants of lambda-DGA converge (spread factor 2.2 -> 1.4)", "it removes the need for lambda", "for speed"], 1, ""),
+ ("What changed in the lattice DMFT susceptibility when the 2-site ED bath was replaced by the continuous CT-HYB bath at the same box?", ["nothing", "the plain DMFT chi_m(Q) moved from 6.4 to 8.0: the bath discretization error", "lambda became negative", "Sigma changed sign"], 1, ""),
+],
 }

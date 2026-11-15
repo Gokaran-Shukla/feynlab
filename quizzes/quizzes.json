@@ -2686,5 +2686,77 @@
     "explanation": "Worm sampling or improved estimators are the cure."
    }
   ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T21 — Two-particle vertex from CT-HYB",
+  "questions": [
+   {
+    "q": "Why is the Lehmann-ED vertex limited to small baths?",
+    "options": [
+     "sign problem",
+     "the number of 4-state chains grows like (number of states)^4 before pruning; 256 states already exhaust memory",
+     "it needs a Fourier transform",
+     "ED has no frequencies"
+    ],
+    "answer": 1,
+    "explanation": "Two bath sites take minutes; three run out of memory."
+   },
+   {
+    "q": "What is the CT-HYB removal estimator for G2_{ss'}(nu, nu', w)?",
+    "options": [
+     "<M>^2",
+     "(1/beta)<Mh_s(nu+w,nu) Mh_s'(nu',nu'+w) - delta_ss' Mh_s(nu+w,nu'+w) Mh_s(nu',nu)>",
+     "the derivative of G with respect to Delta",
+     "a ladder sum"
+    ],
+    "answer": 1,
+    "explanation": "Removing two rows and two columns of the hybridization matrix gives a 2x2 minor of M."
+   },
+   {
+    "q": "Check of the estimator at U = 0?",
+    "options": [
+     "chi_ud = chi0",
+     "connected part vanishes: chi_ud = 0, chi_uu = chi0 delta_{nu nu'}",
+     "G2 = 0",
+     "chi_m diverges"
+    ],
+    "answer": 1,
+    "explanation": "This is a unit test."
+   },
+   {
+    "q": "How can one check a measured vertex without any reference solver?",
+    "options": [
+     "compare with TPSC",
+     "the Schwinger-Dyson equation: Sigma from F_ud must equal Sigma from Dyson's equation",
+     "the sign",
+     "the order histogram"
+    ],
+    "answer": 1,
+    "explanation": "1-2% at U = 4t in the benchmark."
+   },
+   {
+    "q": "Why did a larger frequency box (only affordable with CT-HYB) matter for lambda-DGA?",
+    "options": [
+     "it changed U",
+     "the box local spin sum approaches the exact (n - 2d)/2, and the two sum-rule variants of lambda-DGA converge (spread factor 2.2 -> 1.4)",
+     "it removes the need for lambda",
+     "for speed"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "What changed in the lattice DMFT susceptibility when the 2-site ED bath was replaced by the continuous CT-HYB bath at the same box?",
+    "options": [
+     "nothing",
+     "the plain DMFT chi_m(Q) moved from 6.4 to 8.0: the bath discretization error",
+     "lambda became negative",
+     "Sigma changed sign"
+    ],
+    "answer": 1,
+    "explanation": ""
+   }
+  ]
  }
 ]

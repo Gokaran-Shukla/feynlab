@@ -109,6 +109,7 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 |---|---|---|
 | ladder DΓA without λ correction | **resolved**: `vertex.lambda_dga` (Moriya λ_m, γ-vertex form, bubble tail, box or exact target) | λ = 0 equals the plain ladder to 4e-15; sum rule exact; below T_N^DMFT χ_m(Q) = 29 > 0 where the plain ladder gives −11 (`benchmarks/lambda_dga`) |
 | matrix CT-HYB practical only for 2–3 orbitals | **resolved**: `qmc.cthyb_sector.SectorCTHYB` — (N↑,N↓) blocks, bound screening, outer-state matrix–vector propagation, lazy trace, optional Haule truncation | trace = dense to 1e-10; 5 orbitals vs exact ED (2²⁰ states): ⟨S_z²⟩ 1.936 ± 0.008 vs 1.933; 15× faster at 3 orbitals (`benchmarks/cthyb_5orb`) |
+| exact vertex only for small ED baths | **resolved**: two-particle G2 from segment CT-HYB (removal estimator, `solve(..., g2=(n_nu, n_om))`), any continuous Δ | vs ED: deviations at the statistical level (16 s vs 292 s); Schwinger–Dyson 1–2%; λ-DΓA box 32 (`benchmarks/vertex_cthyb`) |
 | ED vertex slow (matrix exponential per frequency) | partly: closed-form divided differences with a near-degenerate fallback, 3.5–4.5× faster | 5e-11 relative vs the matrix exponential |
 
 ## Remaining limitations after v1.2 (honest list)
@@ -116,9 +117,9 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 * **QE charge self-consistency** is restricted to nspin = 1 (a QE limitation of the DMFT hook). The DMFT total
   energy (Galitskii–Migdal + double-counting correction) is not assembled; QE's printed energy is the DFT
   functional at the interacting density.
-* **ED vertex**: the impurity must be small (atom plus ≤ 3 bath sites, at most 256 states). Frequency sums
-  converge as 1/N_ν, so use the 1/N extrapolation as shown in the tutorials. CT-HYB worm sampling of the vertex
-  for continuous baths is not implemented.
+* **Vertex**: the ED (Lehmann) vertex is practical up to 2 bath sites. The CT-HYB vertex (v1.3) handles any bath,
+  but it is single-orbital and paramagnetic, and uses the removal estimator (no worm sampling or improved
+  estimators). The multi-orbital `SectorCTHYB` has no G2 measurement yet.
 * **λ-DΓA** (v1.3, `vertex.lambda_dga`): only the Moriya λ_m is applied, with no λ_dm and no self-consistency.
   With the small ED box the result depends on the sum-rule target by up to a factor 2 in Im Σ
   (`benchmarks/lambda_dga/RESULTS.md`).

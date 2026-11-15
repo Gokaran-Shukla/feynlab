@@ -565,3 +565,18 @@ def test_sector_trace_equals_dense_trace():
                         dummy, s.o_off, False, True, 0.0)
         assert abs(a - b) <= 1e-10 * max(1.0, abs(a))
         assert abs(a) <= bd * (1 + 1e-12) + 1e-12
+
+
+def test_cthyb_g2_wick_at_U0():
+    """Removal estimator for G2 in segment CT-HYB: at U = 0 the connected part must vanish,
+    chi_ud = 0 and chi_uu = chi0 delta_{nu nu'}."""
+    from feynlab.core.matsubara import MatsubaraGrid
+    from feynlab.qmc.cthyb import CTHYBSolver
+    beta = 4.0
+    g = MatsubaraGrid(beta, 512)
+    D = 0.36 / (g.iw - 0.8) + 0.36 / (g.iw + 0.8)
+    r = CTHYBSolver(g, 0.0, n_iw_meas=16).solve(D, 0.0, n_meas=200_000, meas_every=5, n_chains=2, g2=(3, 2))
+    gs = r["gs"]
+    chi0 = np.array([np.diag(c) for c in gs["chi0"]])
+    assert np.abs(gs["chi_ud"]).max() < 0.05 * np.abs(chi0).max()
+    assert np.abs(gs["chi_uu"] - chi0).max() < 0.05 * np.abs(chi0).max()
