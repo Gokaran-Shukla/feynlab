@@ -223,12 +223,12 @@
   {
    "group": "vertex",
    "name": "DMFT chi_m(q=0) from Bethe-Salpeter (1/N extrapolated) vs dm/dh",
-   "value": 2.9881370709744295,
-   "reference": 3.12858110175495,
-   "error": 0.044890647297504783,
+   "value": 2.905195508663108,
+   "reference": 2.910199342322714,
+   "error": 0.0017194126831230746,
    "tol": 0.005,
    "kind": "rel",
-   "passed": false,
+   "passed": true,
    "source": "thermodynamic consistency of DMFT (Baym-Kadanoff; Georges et al. RMP 68, 13 (1996))"
   },
   {
@@ -465,9 +465,9 @@
   {
    "group": "lattice pol.",
    "name": "1D Holstein t=w=g=1: E0 (VED)",
-   "value": -2.4696847239328266,
+   "value": -2.469684723932838,
    "reference": -2.46968472393287,
-   "error": 4.3520742565306136e-14,
+   "error": 3.197442310920451e-14,
    "tol": 1e-10,
    "kind": "abs",
    "passed": true,
@@ -476,9 +476,9 @@
   {
    "group": "lattice pol.",
    "name": "1D Holstein g=0.1: E0 vs second-order perturbation theory",
-   "value": -2.0044741255470395,
+   "value": -2.0044741255470337,
    "reference": -2.0044721359549995,
-   "error": 1.989592040008148e-06,
+   "error": 1.989592034234988e-06,
    "tol": 5e-06,
    "kind": "abs",
    "passed": true,
@@ -487,9 +487,9 @@
   {
    "group": "lattice pol.",
    "name": "1D SSH g=0.1: E0 vs second-order perturbation theory",
-   "value": -2.0076690684314893,
+   "value": -2.007669068431494,
    "reference": -2.0076393202250022,
-   "error": 2.9748206487045792e-05,
+   "error": 2.9748206491930773e-05,
    "tol": 0.0001,
    "kind": "abs",
    "passed": true,
@@ -498,14 +498,14 @@
   {
    "group": "lattice pol.",
    "name": "1D Holstein t=w=g=1: effective mass m*/m",
-   "value": 1.3504898035298902,
+   "value": 1.3504898034731945,
    "reference": 0.0,
-   "error": 1.3504898035298902e+300,
+   "error": 1.3504898034731944e+300,
    "tol": 0,
    "kind": "info",
    "passed": null,
    "source": "informational"
   }
  ],
- "runtime_s": 476.06583523750305
+ "runtime_s": 1935.3414011001587
 }

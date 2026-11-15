@@ -179,9 +179,9 @@
   {
    "group": "DFT+DMFT",
    "name": "U=0: total occupation (target 2)",
-   "value": 1.9999994090985256,
+   "value": 2.000000310335196,
    "reference": 2.0,
-   "error": 5.909014744176488e-07,
+   "error": 3.103351962074896e-07,
    "tol": 0.002,
    "kind": "abs",
    "passed": true,
@@ -201,9 +201,9 @@
   {
    "group": "DFT+DMFT",
    "name": "U=4 J=0.5 half filling, Hubbard-I: max Z (Mott)",
-   "value": 0.0017093700927755296,
+   "value": 0.0017093700928062817,
    "reference": 0.0,
-   "error": 0.0017093700927755296,
+   "error": 0.0017093700928062817,
    "tol": 0.02,
    "kind": "abs",
    "passed": true,
@@ -344,9 +344,9 @@
   {
    "group": "continuation",
    "name": "stochastic continuation: normalisation",
-   "value": 1.0000000000000016,
+   "value": 0.9999999999957858,
    "reference": 1.0,
-   "error": 1.5543122344752192e-15,
+   "error": 4.214184556872169e-12,
    "tol": 0.02,
    "kind": "abs",
    "passed": true,
@@ -597,14 +597,14 @@
   {
    "group": "Wannier3D",
    "name": "metal mu=-0.9: adaptive 40^3 vs converged 200x200x160",
-   "value": 0.21006108236013055,
+   "value": 0.2100608975143871,
    "reference": 0.2103965718940075,
-   "error": 0.0015945579856974854,
+   "error": 0.001595436544420044,
    "tol": 0.005,
    "kind": "rel",
    "passed": true,
    "source": "Wang, Yates, Souza, Vanderbilt PRB 74, 195118 (2006)"
   }
  ],
- "runtime_s": 594.4177553653717
+ "runtime_s": 649.4271748065948
 }

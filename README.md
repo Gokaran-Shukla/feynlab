@@ -3,7 +3,7 @@
 Companion software to R. D. Mattuck, *A Guide to Feynman Diagrams in the Many-Body Problem* (2nd ed.),
 extended to research-level tools for correlated electrons and Hall transport.
 
-**Status v1.1.0** — every check in `benchmarks/RESULTS.md` (102 core rows), `benchmarks/RESULTS_v1.md` (54 rows) and `benchmarks/RESULTS_v11.md` (v1.1 rows) compares against an exact result, an independent solver or a published formula (PRL, PRB, RMP, EPL, Phys. Rep.).
+**Status v1.1.0** — every check in `benchmarks/RESULTS.md` (102 core rows), `benchmarks/RESULTS_v1.md` (54 rows) and `benchmarks/RESULTS_v11.md` (43 rows, 43/43 pass) compares against an exact result, an independent solver or a published formula (PRL, PRB, RMP, EPL, Phys. Rep.).
 
 📑 **Slides:** [`docs/slides/feynlab_slides.pdf`](docs/slides/feynlab_slides.pdf) — a 46-page Beamer deck covering every module, equation (colour-coded by physical quantity), benchmark and limitation.
 

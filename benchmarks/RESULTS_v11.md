@@ -1,6 +1,6 @@
 # feynlab v1.1 benchmark results (closing the v1.0 limitations)
 
-42/43 checks passed, plus 3 informational rows (runtime 476 s)
+43/43 checks passed, plus 3 informational rows (runtime 1935 s)
 
 | group | check | feynlab | reference | error | tol | pass | source |
 |---|---|---|---|---|---|---|---|
@@ -24,7 +24,7 @@
 | DCA | N_c = 4 CT-INT: Z(pi,0) | 0.35338358 | 0 | 3.53e+299 | 0.0e+00 | info | informational |
 | vertex | U = 0: chi_uu = -beta G G delta (Wick), max error | 3.9461359e-15 | 0 | 3.95e-15 | 1.0e-12 | yes | Wick's theorem |
 | vertex | Schwinger-Dyson Sigma(i nu_0) from the ED vertex vs ED Sigma | -0.40453059 | -0.40425842 | 2.72e-04 | 2.0e-03 | yes | Rohringer et al. RMP 90, 025003 (2018) |
-| vertex | DMFT chi_m(q=0) from Bethe-Salpeter (1/N extrapolated) vs dm/dh | 2.9881371 | 3.1285811 | 4.49e-02 | 5.0e-03 (rel) | **NO** | thermodynamic consistency of DMFT (Baym-Kadanoff; Georges et al. RMP 68, 13 (1996)) |
+| vertex | DMFT chi_m(q=0) from Bethe-Salpeter (1/N extrapolated) vs dm/dh | 2.9051955 | 2.9101993 | 1.72e-03 | 5.0e-03 (rel) | yes | thermodynamic consistency of DMFT (Baym-Kadanoff; Georges et al. RMP 68, 13 (1996)) |
 | DGA | ladder DGA / 2nd-order non-local Sigma(pi,0), U=0.05 (weak-coupling limit) | 1.0657829 | 1 | 6.58e-02 | 1.0e-01 | yes | Katanin, Toschi, Held PRB 80, 075104 (2009): DGA -> 2nd order as U -> 0 |
 | DGA | (ratio - 1) scales linearly in U: [r(0.1)-1]/[r(0.05)-1] | 2.2358591 | 2 | 2.36e-01 | 3.0e-01 | yes | ladder resummation is O(U^3) |
 | TPSC | U=4t: local spin sum rule | 0.7543534 | 0.7543534 | 1.15e-10 | 1.0e-08 | yes | Vilk & Tremblay J. Phys. I 7, 1309 (1997) |
@@ -46,7 +46,7 @@
 | continuation | Nevanlinna + Hardy optimisation, 40 points: L1 error | 0.062869272 | 0 | 6.29e-02 | 1.0e-01 | yes | Fei, Yeh, Gull PRL 126, 056402 (2021) |
 | polaron | Froehlich alpha=0.2: m*/m (momentum-fluctuation estimator) | 1.033997 | 1.0342784 | 2.81e-04 | 2.0e-03 | yes | Roseler 1968; Smondyrev 1986 |
 | polaron | Froehlich alpha=0.5: m*/m (momentum-fluctuation estimator) | 1.0888688 | 1.0892402 | 3.71e-04 | 5.0e-03 | yes | Roseler 1968; Smondyrev 1986 |
-| lattice pol. | 1D Holstein t=w=g=1: E0 (VED) | -2.4696847 | -2.4696847 | 4.35e-14 | 1.0e-10 | yes | Bonca, Trugman, Batistic PRB 60, 1633 (1999); Ku, Trugman, Bonca PRB 65, 174306 (2002) |
+| lattice pol. | 1D Holstein t=w=g=1: E0 (VED) | -2.4696847 | -2.4696847 | 3.20e-14 | 1.0e-10 | yes | Bonca, Trugman, Batistic PRB 60, 1633 (1999); Ku, Trugman, Bonca PRB 65, 174306 (2002) |
 | lattice pol. | 1D Holstein g=0.1: E0 vs second-order perturbation theory | -2.0044741 | -2.0044721 | 1.99e-06 | 5.0e-06 | yes | Rayleigh-Schroedinger |
 | lattice pol. | 1D SSH g=0.1: E0 vs second-order perturbation theory | -2.0076691 | -2.0076393 | 2.97e-05 | 1.0e-04 | yes | Marchand et al. PRL 105, 266605 (2010) model |
 | lattice pol. | 1D Holstein t=w=g=1: effective mass m*/m | 1.3504898 | 0 | 1.35e+300 | 0.0e+00 | info | informational |

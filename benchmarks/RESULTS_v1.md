@@ -1,6 +1,6 @@
 # feynlab v1.0 benchmark results (ROADMAP modules)
 
-54/54 checks passed, plus 1 informational rows (runtime 594 s)
+54/54 checks passed, plus 1 informational rows (runtime 649 s)
 
 | group | check | feynlab | reference | error | tol | pass | source |
 |---|---|---|---|---|---|---|---|
@@ -20,7 +20,7 @@
 | Kanamori | t2g^3 ground-state degeneracy (S=3/2) | 4 | 4 | 0.00e+00 | 0.0e+00 | yes | Hund's rule |
 | Kanamori | MultiOrbitalED one-orbital limit, max|G - G_ED| | 1.99437e-14 | 0 | 1.99e-14 | 1.0e-10 | yes | single-orbital AndersonED |
 | DFT+DMFT | hr.dat write/read round trip, sum|H_R| | 1.7 | 1.7 | 0.00e+00 | 1.0e-05 | yes | Wannier90 format |
-| DFT+DMFT | U=0: total occupation (target 2) | 2 | 2 | 5.91e-07 | 2.0e-03 | yes | electron count |
+| DFT+DMFT | U=0: total occupation (target 2) | 2 | 2 | 3.10e-07 | 2.0e-03 | yes | electron count |
 | DFT+DMFT | U=0: Z of orbital 1 | 1 | 1 | 0.00e+00 | 1.0e-03 | yes | non-interacting |
 | DFT+DMFT | U=4 J=0.5 half filling, Hubbard-I: max Z (Mott) | 0.00170937 | 0 | 1.71e-03 | 2.0e-02 | yes | Mott insulator (Lichtenstein & Katsnelson PRB 57, 6884 (1998)) |
 | DCA | N_c = 1 DCA = single-site DMFT (Z) | 0.486644 | 0.486638 | 5.91e-06 | 1.0e-04 | yes | Hettler et al. PRB 61, 12739 (2000) |
@@ -35,7 +35,7 @@
 | continuation | Nevanlinna interpolant reproduces input, max|dG| | 1.11022e-16 | 0 | 1.11e-16 | 1.0e-10 | yes | Fei, Yeh, Gull PRL 126, 056402 (2021) |
 | continuation | Nevanlinna G(2i) vs exact (analytic continuation off axis) | 5.67181e-17 | 0 | 5.67e-17 | 1.0e-04 | yes | Fei, Yeh, Gull (2021) |
 | continuation | Nevanlinna spectral normalisation | 0.995504 | 1 | 4.50e-03 | 3.0e-02 | yes | sum rule |
-| continuation | stochastic continuation: normalisation | 1 | 1 | 1.55e-15 | 2.0e-02 | yes | Mishchenko et al. PRB 62, 6317 (2000); Sandvik PRB 57, 10287 (1998) |
+| continuation | stochastic continuation: normalisation | 1 | 1 | 4.21e-12 | 2.0e-02 | yes | Mishchenko et al. PRB 62, 6317 (2000); Sandvik PRB 57, 10287 (1998) |
 | CDet | Hubbard atom a_1 (double occupancy series) vs exact | -0.3125 | -0.3125 | 0.00e+00 | 1.0e-06 | yes | Rossi PRL 119, 045701 (2017); exact -(1/4) tanh(beta U/4) |
 | CDet | Hubbard atom a_3 vs exact | 0.16276 | 0.16276 | 0.00e+00 | 1.0e-06 | yes | exact |
 | CDet | Anderson model a_1 vs ED Taylor fit | -0.0681258 | -0.067919 | 2.07e-04 | 1.0e-03 | yes | exact diagonalization |
@@ -58,6 +58,6 @@
 | finite-T | Dirac sigma_int(mu=1, T=0.05): Fermi-sea vs Bastin convolution | -0.25213 | -0.252131 | 5.53e-07 | 2.0e-05 | yes | Sommerfeld/Bastin; Sinitsyn et al. Eq. (58) at T=0 |
 | finite-T | Dirac sigma_int(mu=1, T=0.1): Fermi-sea vs Bastin convolution | -0.258741 | -0.258742 | 9.75e-07 | 2.0e-05 | yes | Sommerfeld/Bastin; Sinitsyn et al. Eq. (58) at T=0 |
 | Wannier3D | stacked Chern layers: sigma_xy = C e^2/(h c) | 0.333333 | 0.333333 | 8.02e-08 | 1.0e-04 | yes | Halperin, Jpn. J. Appl. Phys. 26, 1913 (1987) |
-| Wannier3D | metal mu=-0.9: adaptive 40^3 vs converged 200x200x160 | 0.210061 | 0.210397 | 1.59e-03 | 5.0e-03 (rel) | yes | Wang, Yates, Souza, Vanderbilt PRB 74, 195118 (2006) |
+| Wannier3D | metal mu=-0.9: adaptive 40^3 vs converged 200x200x160 | 0.210061 | 0.210397 | 1.60e-03 | 5.0e-03 (rel) | yes | Wang, Yates, Souza, Vanderbilt PRB 74, 195118 (2006) |
 
 Figures: figures/nrg_kondo.png, figures/continuation.png
