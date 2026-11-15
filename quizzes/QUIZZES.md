@@ -1703,3 +1703,47 @@
 6. **B** — 
 
 </details>
+
+## T22 — Finite-range disorder in the Kubo-Streda formalism
+
+1. What changes in the Born self-energy when impurities have a range d?
+   - A. nothing
+   - B. it becomes k-dependent: Sigma(k) = int W(k-k') M G(k') M^+ with W = n V0^2 |u(q)|^2
+   - C. it becomes Hermitian
+   - D. it vanishes
+2. How does feynlab evaluate int_k' W(k - k') f(k') efficiently?
+   - A. Monte Carlo
+   - B. zero-padded FFT convolution on a Cartesian k grid (exact linear convolution on the truncated domain)
+   - C. polar quadrature only on the Fermi surface
+   - D. it ignores k'
+3. Which exact check ties the new code to the delta-correlated one?
+   - A. d -> infinity
+   - B. d = 0 reproduces DisorderedHall on the same grid to 1e-9
+   - C. Gamma -> 0
+   - D. mu -> Delta
+4. For Gaussian impurities, what does the transport rate weight scattering by?
+   - A. |u(q)|^2 = exp(-q^2 d^2 / 2): forward scattering dominates, sigma_xx grows
+   - B. q^2
+   - C. a constant
+   - D. exp(+q^2 d^2)
+5. What does smooth disorder do to the anomalous Hall mechanisms of the massive Dirac model?
+   - A. nothing
+   - B. the Gaussian skew is suppressed much faster (-0.138 -> -0.017) than side jump + anomalous distribution (-0.43 -> -0.21)
+   - C. it reverses the intrinsic term
+   - D. it enhances skew
+6. Which diagrams remain delta-correlated in feynlab v1.3?
+   - A. the ladder
+   - B. the third-order V1^3 skew vertex and the crossed X/Psi diagrams
+   - C. the Born self-energy
+   - D. the bare bubble
+
+<details><summary>Answer key</summary>
+
+1. **B** — 
+2. **B** — O(N^2 log N) per application; the ladder is solved with GMRES.
+3. **B** — 
+4. **A** — sigma_xx grows from 86 to 3400 e^2/h from d = 0 to d = 3 at fixed n V0^2.
+5. **B** — Kubo and semiclassical routes agree within 0.6%.
+6. **B** — 
+
+</details>

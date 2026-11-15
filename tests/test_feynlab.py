@@ -580,3 +580,15 @@ def test_cthyb_g2_wick_at_U0():
     chi0 = np.array([np.diag(c) for c in gs["chi0"]])
     assert np.abs(gs["chi_ud"]).max() < 0.05 * np.abs(chi0).max()
     assert np.abs(gs["chi_uu"] - chi0).max() < 0.05 * np.abs(chi0).max()
+
+
+def test_finite_range_kubo_reduces_to_delta_disorder():
+    from feynlab.transport.models import MassiveDirac
+    from feynlab.transport.kubo_streda import DisorderedHall
+    from feynlab.transport.finite_range import FiniteRangeHall
+    dm = MassiveDirac(1.0, 0.5)
+    fr = FiniteRangeHall(dm, 1.0, n_i=1.0, V0=np.sqrt(0.05), d=0.0, K=2.0, N=96)
+    dh = DisorderedHall(dm, 1.0, n_i=1.0, V0=np.sqrt(0.05), grid=(fr.kx, fr.ky, np.full(fr.kx.shape, fr.wk)))
+    assert np.abs(fr.sigma_R - dh.sigma_R[None, None]).max() < 1e-9
+    assert abs(fr.sigma_I() - dh.sigma_I()) < 1e-7
+    assert abs(fr.sigma_xx() - dh.sigma_xx()) < 1e-6 * abs(dh.sigma_xx())

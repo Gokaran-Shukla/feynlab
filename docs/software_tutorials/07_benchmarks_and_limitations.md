@@ -110,6 +110,7 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 | ladder DΓA without λ correction | **resolved**: `vertex.lambda_dga` (Moriya λ_m, γ-vertex form, bubble tail, box or exact target) | λ = 0 equals the plain ladder to 4e-15; sum rule exact; below T_N^DMFT χ_m(Q) = 29 > 0 where the plain ladder gives −11 (`benchmarks/lambda_dga`) |
 | matrix CT-HYB practical only for 2–3 orbitals | **resolved**: `qmc.cthyb_sector.SectorCTHYB` — (N↑,N↓) blocks, bound screening, outer-state matrix–vector propagation, lazy trace, optional Haule truncation | trace = dense to 1e-10; 5 orbitals vs exact ED (2²⁰ states): ⟨S_z²⟩ 1.936 ± 0.008 vs 1.933; 15× faster at 3 orbitals (`benchmarks/cthyb_5orb`) |
 | exact vertex only for small ED baths | **resolved**: two-particle G2 from segment CT-HYB (removal estimator, `solve(..., g2=(n_nu, n_om))`), any continuous Δ | vs ED: deviations at the statistical level (16 s vs 292 s); Schwinger–Dyson 1–2%; λ-DΓA box 32 (`benchmarks/vertex_cthyb`) |
+| finite-range disorder only semiclassical | **resolved**: `transport.finite_range.FiniteRangeHall` — k-dependent SCBA and ladder vertex by FFT convolution + GMRES | d = 0 equals DisorderedHall to 1e-9; σ_xx vs Bessel Boltzmann ≤ 0.4%; extrinsic AHE vs semiclassical ≤ 0.6% for k_F d ≤ 2.6 (`benchmarks/finite_range_kubo`) |
 | ED vertex slow (matrix exponential per frequency) | partly: closed-form divided differences with a near-degenerate fallback, 3.5–4.5× faster | 5e-11 relative vs the matrix exponential |
 
 ## Remaining limitations after v1.2 (honest list)
@@ -129,5 +130,5 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
   (no tree or skip-list caching), H_loc must conserve (N↑, N↓), and Δ must be diagonal in flavour. The
   M-matrix G estimator is noisy at low expansion order with a strongly asymmetric Δ(τ); worm sampling is not
   implemented.
-* The finite-range-disorder **Kubo–Středa** (diagrammatic) route remains δ-correlated; finite range is
-  available in the semiclassical solver.
+* **Finite-range Kubo–Středa** (v1.3) covers Gaussian (NCA) disorder only. The V1³ skew vertex and the crossed
+  X/Ψ diagrams remain δ-correlated, and the model must be 2D.

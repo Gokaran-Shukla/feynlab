@@ -316,4 +316,12 @@ SOFTWARE = {
  ("Why did a larger frequency box (only affordable with CT-HYB) matter for lambda-DGA?", ["it changed U", "the box local spin sum approaches the exact (n - 2d)/2, and the two sum-rule variants of lambda-DGA converge (spread factor 2.2 -> 1.4)", "it removes the need for lambda", "for speed"], 1, ""),
  ("What changed in the lattice DMFT susceptibility when the 2-site ED bath was replaced by the continuous CT-HYB bath at the same box?", ["nothing", "the plain DMFT chi_m(Q) moved from 6.4 to 8.0: the bath discretization error", "lambda became negative", "Sigma changed sign"], 1, ""),
 ],
+"T22 — Finite-range disorder in the Kubo-Streda formalism": [
+ ("What changes in the Born self-energy when impurities have a range d?", ["nothing", "it becomes k-dependent: Sigma(k) = int W(k-k') M G(k') M^+ with W = n V0^2 |u(q)|^2", "it becomes Hermitian", "it vanishes"], 1, ""),
+ ("How does feynlab evaluate int_k' W(k - k') f(k') efficiently?", ["Monte Carlo", "zero-padded FFT convolution on a Cartesian k grid (exact linear convolution on the truncated domain)", "polar quadrature only on the Fermi surface", "it ignores k'"], 1, "O(N^2 log N) per application; the ladder is solved with GMRES."),
+ ("Which exact check ties the new code to the delta-correlated one?", ["d -> infinity", "d = 0 reproduces DisorderedHall on the same grid to 1e-9", "Gamma -> 0", "mu -> Delta"], 1, ""),
+ ("For Gaussian impurities, what does the transport rate weight scattering by?", ["|u(q)|^2 = exp(-q^2 d^2 / 2): forward scattering dominates, sigma_xx grows", "q^2", "a constant", "exp(+q^2 d^2)"], 0, "sigma_xx grows from 86 to 3400 e^2/h from d = 0 to d = 3 at fixed n V0^2."),
+ ("What does smooth disorder do to the anomalous Hall mechanisms of the massive Dirac model?", ["nothing", "the Gaussian skew is suppressed much faster (-0.138 -> -0.017) than side jump + anomalous distribution (-0.43 -> -0.21)", "it reverses the intrinsic term", "it enhances skew"], 1, "Kubo and semiclassical routes agree within 0.6%."),
+ ("Which diagrams remain delta-correlated in feynlab v1.3?", ["the ladder", "the third-order V1^3 skew vertex and the crossed X/Psi diagrams", "the Born self-energy", "the bare bubble"], 1, ""),
+],
 }

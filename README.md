@@ -27,6 +27,7 @@ extended to research-level tools for correlated electrons and Hall transport.
 ### New in v1.3 (closing the v1.2 list)
 | capability | module | validated against |
 |---|---|---|
+| **Finite-range disorder in Kubo–Středa** (k-dependent SCBA + ladder via FFT convolution, GMRES) | `transport.finite_range.FiniteRangeHall` | δ limit = DisorderedHall 1e-9; σ_xx vs Boltzmann ≤ 0.4%; extrinsic AHE vs semiclassical ≤ 0.6% |
 | **Vertex for continuous baths**: G2 from segment CT-HYB (removal estimator) → F, Γ, λ-DΓA | `CTHYBSolver.solve(g2=...)` | vs ED at the statistical level; Schwinger–Dyson 1–2%; box-32 λ-DΓA |
 | **5-orbital full-Kanamori CT-HYB** (sector-blocked, bound-screened, lazy trace, optional truncation) | `qmc.cthyb_sector.SectorCTHYB` | trace = dense to 1e-10; vs exact ED (2²⁰ states) ⟨S_z²⟩ 0.2%; 15× faster at 3 orbitals |
 | **λ-corrected ladder DΓA** (Moriya λ_m, triangular vertices, bubble tail, exact or box sum rule) | `vertex.lambda_dga` | λ = 0 → plain ladder 4e-15; sum rule exact; Mermin–Wagner below T_N^DMFT; TPSC within 25% at U = 4t |
@@ -102,7 +103,7 @@ print(anomalous_hall_mechanisms(MassiveDirac(1.0, 0.5), mu=1.0, band=1, V1_over_
 All v1.0 limitations are addressed in v1.1 (`docs/software_tutorials/07_benchmarks_and_limitations.md`). What remains:
 ab-initio CSC needs an external DFT code (an N(k) export is provided); the vertex for continuous baths comes from CT-HYB (v1.3; single orbital);
 ladder DΓA now has the λ_m correction (v1.3; λ_dm is not implemented); 5-orbital CT-HYB via `SectorCTHYB` (v1.3; no tree caching, G estimator noisy at low order); the cluster CT-INT
-has the usual sign problem away from half filling; finite-range disorder is semiclassical only.
+has the usual sign problem away from half filling; finite-range disorder in Kubo–Středa covers the Gaussian (NCA) diagrams (v1.3).
 
 ## Citation
 If you use feynlab, please cite the original papers of the methods you use (listed in each module docstring).
