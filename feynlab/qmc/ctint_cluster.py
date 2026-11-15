@@ -11,6 +11,9 @@ with the cluster-translation-invariant Weiss field G0~(r, tau) = (1/N_c) sum_K e
     G(K, iw) = G0~(K) - G0~(K)^2 S(K, iw) / beta,
     S(K, iw) = (1/N_c) < s sum_pq e^{iw tau_p - iK.r_p} M_pq e^{-iw tau_q + iK.r_q} >,   M = D^{-1}.
 Numerically exact (no truncation); the sign problem appears away from half filling for N_c >= 4.
+The sign problem cannot be removed in general (it is NP-hard, Troyer & Wiese PRL 94, 170201 (2005)); this module
+measures and manages it: pooled sign-reweighted estimators with jackknife errors over bins (`solve`), a pilot-run
+optimisation of the auxiliary shift delta (`optimize_delta`), and an exponential cost model (`sign_cost_model`).
 """
 from __future__ import annotations
 
@@ -22,7 +25,7 @@ from .ctint import _g0_interp, _ins_update, _rem_update
 
 
 @njit(cache=True)
-def _run(beta, U, delta, gt, n0, diffidx, Nc, w, phase, n_warm, n_meas, meas_every, seed, kmax):
+def _run(beta, U, delta, gt, n0, diffidx, Nc, w, phase, n_warm, n_meas, meas_every, seed, kmax, n_bins):
     """gt: (Nr, ntab) tables of G0~(r, tau) (spin symmetric); phase[K, site] = e^{-iK.r_site}."""
     np.random.seed(seed)
     ntab = gt.shape[1]
@@ -39,6 +42,10 @@ def _run(beta, U, delta, gt, n0, diffidx, Nc, w, phase, n_warm, n_meas, meas_eve
     sign = 1.0
     sign_acc = 0.0
     nmeas = 0
+    n_tot = n_meas // meas_every + 1
+    Sb = np.zeros((n_bins, 2, nK, nw), dtype=np.complex128)
+    sb = np.zeros(n_bins)
+    cb = np.zeros(n_bins)
     Qu = np.zeros(kmax); Ru = np.zeros(kmax); Qd = np.zeros(kmax); Rd = np.zeros(kmax)
     for step in range(n_warm + n_meas):
         if np.random.random() < 0.5:
@@ -92,6 +99,9 @@ def _run(beta, U, delta, gt, n0, diffidx, Nc, w, phase, n_warm, n_meas, meas_eve
             nmeas += 1
             sign_acc += sign
             hist[k] += 1.0
+            ib = min((nmeas - 1) * n_bins // n_tot, n_bins - 1)
+            sb[ib] += sign
+            cb[ib] += 1.0
             if k > 0:
                 # X[i, (K, w)] = e^{i w tau_i} e^{-iK.r_i};  S = sum_ij X_i M_ij conj(X_j)  (vectorised)
                 X = np.empty((k, nK * nw), dtype=np.complex128)
@@ -115,7 +125,9 @@ def _run(beta, U, delta, gt, n0, diffidx, Nc, w, phase, n_warm, n_meas, meas_eve
                             sd += X[i, col] * Bd[i, col]
                         S[0, KK, iwi] += sign * su / Nc
                         S[1, KK, iwi] += sign * sd / Nc
-    return S, hist, sign_acc, nmeas
+                        Sb[ib, 0, KK, iwi] += sign * su / Nc
+                        Sb[ib, 1, KK, iwi] += sign * sd / Nc
+    return S, hist, sign_acc, nmeas, Sb, sb, cb
 
 
 class ClusterCTINT:
@@ -149,29 +161,77 @@ class ClusterCTINT:
             tabs.append(g.iw_to_tau(Gr[i], c1, float(np.real(cf[1])), float(np.real(cf[2])), tau=tau))
         return np.array(tabs)
 
-    def solve(self, G0_K, n_warm=20000, n_meas=400000, meas_every=20, seed=99, n_chains=4, kmax=600, parallel="serial"):
+    def solve(self, G0_K, n_warm=20000, n_meas=400000, meas_every=20, seed=99, n_chains=4, kmax=600, parallel="serial",
+              n_bins=10):
+        """Sign-aware estimate: G = G0~ - G0~^2 <s S>/<s> / beta with <s S> and <s> pooled over all chains, and
+        jackknife errors over n_bins x n_chains bins of the ratio (the sign fluctuations and their correlation with
+        S are propagated; per-chain ratios would be biased when <s> is small)."""
         g = self.grid
         U = self.U
         G0t = 1.0 / (1.0 / np.asarray(G0_K) - U / 2.0)
         gt = self._tables(G0t)
         n0 = -gt[0, -1]
         w = g.iw[: self.n_iw_meas].imag.copy()
-        Gs, hist, signs = [], 0, []
+        hist = 0
         m = self.n_iw_meas
         from ..utils.parallel import map_chains
         args = [(g.beta, U, self.delta, gt, n0, self.diffidx, self.Nc, w, self.phase, n_warm, n_meas, meas_every,
-                 seed + 7919 * c, kmax) for c in range(n_chains)]
-        for S, h, sa, nm in map_chains(_run, args, backend=parallel):
-            Sm = 0.5 * (S[0] + S[1]) / sa
-            Gs.append(G0t[:, :m] - G0t[:, :m] ** 2 * Sm / g.beta)
+                 seed + 7919 * c, kmax, n_bins) for c in range(n_chains)]
+        Sbins, sbins, cbins = [], [], []
+        for S, h, sa, nm, Sb, sb, cb in map_chains(_run, args, backend=parallel):
             hist = hist + h
-            signs.append(sa / nm)
-        Gs = np.array(Gs)
-        G = Gs.mean(0)
+            Sbins.append(Sb); sbins.append(sb); cbins.append(cb)
+        Sb = np.concatenate(Sbins); sb = np.concatenate(sbins); cb = np.concatenate(cbins)
+        keep = cb > 0
+        Sb, sb, cb = Sb[keep], sb[keep], cb[keep]
         G0 = np.asarray(G0_K)[:, :m]
-        sig = 1.0 / G0 - 1.0 / G
-        sc = 1.0 / G0[None] - 1.0 / Gs
-        err = (sc.real.std(0, ddof=1) + 1j * sc.imag.std(0, ddof=1)) / np.sqrt(n_chains) if n_chains > 1 else None
+
+        def estimate(Ssum, ssum, csum):
+            Sm = 0.5 * (Ssum[0] + Ssum[1]) / ssum
+            Gk = G0t[:, :m] - G0t[:, :m] ** 2 * Sm / g.beta
+            return Gk, 1.0 / G0 - 1.0 / Gk, ssum / csum
+        G, sig, sgn = estimate(Sb.sum(0), sb.sum(), cb.sum())
+        nb = len(sb)
+        jG, jS, js = [], [], []
+        for b in range(nb):
+            a, bb, c = estimate(Sb.sum(0) - Sb[b], sb.sum() - sb[b], cb.sum() - cb[b])
+            jG.append(a); jS.append(bb); js.append(c)
+        jS, js = np.array(jS), np.array(js)
+        jk = lambda x: np.sqrt((nb - 1) * np.mean(np.abs(x - x.mean(0)) ** 2, axis=0))
+        err = jk(jS.real) + 1j * jk(jS.imag)
         hn = hist / hist.sum()
-        return dict(G_K=G, Sigma_K=sig, err_Sigma=err, sign=float(np.mean(signs)),
-                    k_mean=float((np.arange(len(hn)) * hn).sum()), iw=g.iw[:m])
+        k_mean = float((np.arange(len(hn)) * hn).sum())
+        return dict(G_K=G, Sigma_K=sig, err_Sigma=err, sign=float(sgn), sign_err=float(jk(js)),
+                    k_mean=k_mean, iw=g.iw[:m], n_bins_total=nb)
+
+
+def optimize_delta(solver_factory, G0_K, deltas=(0.51, 0.6, 0.75, 1.0), pilot=dict(n_warm=5000, n_meas=100000),
+                   **kw):
+    """Pilot runs over the auxiliary-field shift delta (alpha = 1/2 +- delta). The statistical error of a
+    sign-reweighted estimate scales as 1 / (<s> sqrt(N_eff)); with the CPU time t per pilot run the figure of merit
+    is efficiency = <s>^2 / t (error^2 x time is what the user pays). Returns (best_delta, table)."""
+    import time
+    table = []
+    for d in deltas:
+        s = solver_factory(d)
+        t0 = time.time()
+        r = s.solve(G0_K, **pilot, **kw)
+        dt = time.time() - t0
+        table.append(dict(delta=d, sign=r["sign"], sign_err=r["sign_err"], k_mean=r["k_mean"], time=dt,
+                          efficiency=r["sign"] ** 2 / dt))
+    best = max(table, key=lambda x: x["efficiency"])
+    return best["delta"], table
+
+
+def sign_cost_model(betas, signs, Nc):
+    """Fit <s>(beta) = exp(-beta Nc df) (Troyer & Wiese PRL 94, 170201 (2005): the sign is the ratio of two
+    partition functions, exponentially small in beta x volume). Returns (df, predict) with predict(beta) giving
+    the expected sign and the relative CPU cost ~ 1/<s>^2 for fixed error."""
+    b = np.asarray(betas, float)
+    y = -np.log(np.clip(np.asarray(signs, float), 1e-300, None))
+    df = float(np.sum(b * y) / np.sum(b * b) / Nc)
+
+    def predict(beta):
+        s = np.exp(-beta * Nc * df)
+        return dict(sign=s, relative_cost=1.0 / s**2)
+    return df, predict

@@ -1747,3 +1747,47 @@
 6. **B** — 
 
 </details>
+
+## T23 — Living with the CT-INT sign problem
+
+1. Why can the fermion sign problem not be removed by a general algorithm?
+   - A. it is a bug
+   - B. a general polynomial cure would solve NP-hard problems (Troyer & Wiese 2005)
+   - C. QMC is too slow
+   - D. it only exists in CT-HYB
+2. Why is <s> exponentially small in beta x N_c?
+   - A. it is a ratio of two partition functions Z / Z_|w|, i.e. exp(-beta N_c df)
+   - B. the expansion order grows
+   - C. rounding errors
+   - D. because of the bath
+3. Why should <sS> and <s> be pooled over chains rather than dividing per chain?
+   - A. speed
+   - B. a ratio of small, noisy per-chain averages is biased; pooling plus a jackknife propagates the sign fluctuations and their correlation with S
+   - C. the sign is chain independent
+   - D. it is required by numba
+4. Raising the auxiliary shift delta in CT-INT...
+   - A. always helps
+   - B. raises the sign but also the expansion order <k> ~ delta, so the efficiency <s>^2/t must be measured (optimum ~0.5 on the plaquette)
+   - C. has no effect
+   - D. removes the sign problem
+5. By what factor does the CPU time grow for fixed error when the sign drops from 1 to 0.55?
+   - A. 1.8
+   - B. about 3.3 (1/<s>^2)
+   - C. 0.55
+   - D. 10
+6. What does sign_cost_model provide?
+   - A. a sign-free algorithm
+   - B. a fit <s> = exp(-beta N_c df) from pilot runs and the predicted sign and relative cost at lower T
+   - C. the self-energy
+   - D. the optimal U
+
+<details><summary>Answer key</summary>
+
+1. **B** — 
+2. **A** — 
+3. **B** — 
+4. **B** — delta = 0.3 collapses the sign to 0.10.
+5. **B** — Predicted for beta = 20 on the 2x2 plaquette.
+6. **B** — 
+
+</details>

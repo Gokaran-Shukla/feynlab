@@ -592,3 +592,11 @@ def test_finite_range_kubo_reduces_to_delta_disorder():
     assert np.abs(fr.sigma_R - dh.sigma_R[None, None]).max() < 1e-9
     assert abs(fr.sigma_I() - dh.sigma_I()) < 1e-7
     assert abs(fr.sigma_xx() - dh.sigma_xx()) < 1e-6 * abs(dh.sigma_xx())
+
+
+def test_sign_cost_model_recovers_exponent():
+    from feynlab.qmc.ctint_cluster import sign_cost_model
+    b = np.array([2.0, 4.0, 8.0])
+    df, pred = sign_cost_model(b, np.exp(-b * 4 * 0.03), 4)
+    assert abs(df - 0.03) < 1e-12
+    assert abs(pred(10.0)["relative_cost"] - np.exp(2 * 10 * 4 * 0.03)) < 1e-9

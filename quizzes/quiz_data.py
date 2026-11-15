@@ -324,4 +324,12 @@ SOFTWARE = {
  ("What does smooth disorder do to the anomalous Hall mechanisms of the massive Dirac model?", ["nothing", "the Gaussian skew is suppressed much faster (-0.138 -> -0.017) than side jump + anomalous distribution (-0.43 -> -0.21)", "it reverses the intrinsic term", "it enhances skew"], 1, "Kubo and semiclassical routes agree within 0.6%."),
  ("Which diagrams remain delta-correlated in feynlab v1.3?", ["the ladder", "the third-order V1^3 skew vertex and the crossed X/Psi diagrams", "the Born self-energy", "the bare bubble"], 1, ""),
 ],
+"T23 — Living with the CT-INT sign problem": [
+ ("Why can the fermion sign problem not be removed by a general algorithm?", ["it is a bug", "a general polynomial cure would solve NP-hard problems (Troyer & Wiese 2005)", "QMC is too slow", "it only exists in CT-HYB"], 1, ""),
+ ("Why is <s> exponentially small in beta x N_c?", ["it is a ratio of two partition functions Z / Z_|w|, i.e. exp(-beta N_c df)", "the expansion order grows", "rounding errors", "because of the bath"], 0, ""),
+ ("Why should <sS> and <s> be pooled over chains rather than dividing per chain?", ["speed", "a ratio of small, noisy per-chain averages is biased; pooling plus a jackknife propagates the sign fluctuations and their correlation with S", "the sign is chain independent", "it is required by numba"], 1, ""),
+ ("Raising the auxiliary shift delta in CT-INT...", ["always helps", "raises the sign but also the expansion order <k> ~ delta, so the efficiency <s>^2/t must be measured (optimum ~0.5 on the plaquette)", "has no effect", "removes the sign problem"], 1, "delta = 0.3 collapses the sign to 0.10."),
+ ("By what factor does the CPU time grow for fixed error when the sign drops from 1 to 0.55?", ["1.8", "about 3.3 (1/<s>^2)", "0.55", "10"], 1, "Predicted for beta = 20 on the 2x2 plaquette."),
+ ("What does sign_cost_model provide?", ["a sign-free algorithm", "a fit <s> = exp(-beta N_c df) from pilot runs and the predicted sign and relative cost at lower T", "the self-energy", "the optimal U"], 1, ""),
+],
 }

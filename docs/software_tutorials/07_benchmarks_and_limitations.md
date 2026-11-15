@@ -103,7 +103,7 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 | ED-DMFT for t₂g limited to 1 bath site/orbital | **resolved**: `qmc.multiorbital_lanczos` (sectors, continued fraction, finite-T Boltzmann average), 2 bath sites per orbital = 9 sites | full ED 7e-12 (T→0), 3e-6 (β = 20) |
 | **bug fix**: `DFTDMFT` ED solver shifted bath levels by −μ twice | fixed; results of the `ed` solver before v1.2 are wrong whenever μ ≠ 0 | ED vs Lanczos vs CT-HYB at n = 0.8: Z = 0.5024 / 0.5025 / 0.497 |
 
-## v1.3 (in progress): closing the v1.2 list one by one
+## v1.3: closing the v1.2 list one by one
 
 | v1.2 limitation | status | check |
 |---|---|---|
@@ -111,6 +111,7 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 | matrix CT-HYB practical only for 2–3 orbitals | **resolved**: `qmc.cthyb_sector.SectorCTHYB` — (N↑,N↓) blocks, bound screening, outer-state matrix–vector propagation, lazy trace, optional Haule truncation | trace = dense to 1e-10; 5 orbitals vs exact ED (2²⁰ states): ⟨S_z²⟩ 1.936 ± 0.008 vs 1.933; 15× faster at 3 orbitals (`benchmarks/cthyb_5orb`) |
 | exact vertex only for small ED baths | **resolved**: two-particle G2 from segment CT-HYB (removal estimator, `solve(..., g2=(n_nu, n_om))`), any continuous Δ | vs ED: deviations at the statistical level (16 s vs 292 s); Schwinger–Dyson 1–2%; λ-DΓA box 32 (`benchmarks/vertex_cthyb`) |
 | finite-range disorder only semiclassical | **resolved**: `transport.finite_range.FiniteRangeHall` — k-dependent SCBA and ladder vertex by FFT convolution + GMRES | d = 0 equals DisorderedHall to 1e-9; σ_xx vs Bessel Boltzmann ≤ 0.4%; extrinsic AHE vs semiclassical ≤ 0.6% for k_F d ≤ 2.6 (`benchmarks/finite_range_kubo`) |
+| cluster CT-INT sign problem | **managed** (not removable, NP-hard): pooled sign-reweighted estimator with jackknife errors, pilot-run δ optimisation, exponential cost model | 2×2 plaquette U = 6t: ⟨s⟩(β) measured, Δf = 0.0076; optimal δ = 0.51 (δ = 0.3 → ⟨s⟩ = 0.10); jackknife ≈ spread of independent runs (`benchmarks/ctint_sign`) |
 | ED vertex slow (matrix exponential per frequency) | partly: closed-form divided differences with a near-degenerate fallback, 3.5–4.5× faster | 5e-11 relative vs the matrix exponential |
 
 ## Remaining limitations after v1.2 (honest list)
@@ -124,8 +125,9 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 * **λ-DΓA** (v1.3, `vertex.lambda_dga`): only the Moriya λ_m is applied, with no λ_dm and no self-consistency.
   With the small ED box the result depends on the sum-rule target by up to a factor 2 in Im Σ
   (`benchmarks/lambda_dga/RESULTS.md`).
-* **Cluster CT-INT** away from half filling has a sign problem for N_c ≥ 4, as all CT-INT codes do. The cost grows
-  as N_c³⟨k⟩³.
+* **Cluster CT-INT** away from half filling keeps its sign problem: it is NP-hard in general. v1.3 measures it
+  (jackknife), optimizes δ and predicts the cost, but large clusters at low T stay exponentially expensive. There
+  are no submatrix updates.
 * **Sector CT-HYB** (v1.3) handles 5 orbitals at about 1 ms per step. The trace is still recomputed per move
   (no tree or skip-list caching), H_loc must conserve (N↑, N↓), and Δ must be diagonal in flavour. The
   M-matrix G estimator is noisy at low expansion order with a strongly asymmetric Δ(τ); worm sampling is not

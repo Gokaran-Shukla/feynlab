@@ -75,7 +75,7 @@
   \ifx\insertframesubtitle\@empty\else\\[-1pt]{\normalsize\color{muted}\insertframesubtitle}\fi
   \par\vspace*{-0.1cm}{\color{accent}\rule{1.6cm}{2pt}}}
 \setbeamertemplate{footline}{%
-  \leavevmode\hbox to\paperwidth{\hspace{0.4cm}{\color{muted}\tiny feynlab v1.2 \,|\, \insertsectionhead}\hfill{\color{muted}\tiny\insertframenumber/\inserttotalframenumber}\hspace{0.4cm}}\vspace{0.18cm}}
+  \leavevmode\hbox to\paperwidth{\hspace{0.4cm}{\color{muted}\tiny feynlab v1.3 \,|\, \insertsectionhead}\hfill{\color{muted}\tiny\insertframenumber/\inserttotalframenumber}\hspace{0.4cm}}\vspace{0.18cm}}
 \AtBeginSection[]{%
   \begin{frame}[plain]
   \begin{tikzpicture}[remember picture,overlay]
@@ -98,7 +98,7 @@
 \newcommand{\refcite}[1]{{\color{muted}\scriptsize[#1]}}
 \newcommand{\ok}{{\color{cH}\checkmark}}
 
-\title{\textbf{feynlab} v1.2}
+\title{\textbf{feynlab} v1.3}
 \subtitle{Feynman diagrams, quantum Monte Carlo, many-body self-energies\\and anomalous/spin/orbital Hall transport in one validated Python package}
 \author{Gokaran Shukla}
 \institute{KAUST \quad\textbullet\quad github.com/Gokaran-Shukla/feynlab}
@@ -111,7 +111,7 @@
 \begin{tikzpicture}[remember picture,overlay]
  \fill[brand] (current page.south west) rectangle (current page.north east);
  \fill[accent] ($(current page.south west)+(0,1.05)$) rectangle ($(current page.south east)+(0,1.12)$);
- \node[anchor=north west,text=white,font=\fontsize{40}{40}\selectfont\bfseries] at ($(current page.north west)+(1.0,-1.1)$) {feynlab \,\normalsize v1.2};
+ \node[anchor=north west,text=white,font=\fontsize{40}{40}\selectfont\bfseries] at ($(current page.north west)+(1.0,-1.1)$) {feynlab \,\normalsize v1.3};
  \node[anchor=north west,text=white!85!brand,text width=11.5cm,font=\large] at ($(current page.north west)+(1.05,-2.6)$)
    {Feynman diagrams, quantum Monte Carlo, many-body self-energies and anomalous / spin / orbital Hall transport \textemdash{} in one validated Python package};
  \node[anchor=south west,text=white,font=\normalsize] at ($(current page.south west)+(1.05,1.6)$) {\textbf{Gokaran Shukla}\quad KAUST, Thuwal};
@@ -150,7 +150,7 @@
  \item Robustness: errors, mixing, I/O, CLI, CI
  \item v1.1: closing every v1.0 limitation
  \item v1.2: charge self-consistency with Quantum ESPRESSO
- \item v1.3: $\lambda$-D$\Gamma$A and the remaining limits
+ \item v1.3: $\lambda$-D$\Gamma$A, 5-orbital CT-HYB, CT-HYB vertex, finite-range Kubo, sign
  \item Benchmarks, limitations, learning material
 \end{enumerate}
 \end{columns}
@@ -159,8 +159,8 @@
 \centering
 \small
 \begin{tabular}{ccc}
-\textbf{35+} modules & \textbf{21} software tutorials & \textbf{22} book-chapter tutorials\\
-\textbf{43} quizzes, \textbf{234} questions & \textbf{200+} benchmark rows & \textbf{61} unit tests
+\textbf{35+} modules & \textbf{22} software tutorials & \textbf{22} book-chapter tutorials\\
+\textbf{44} quizzes, \textbf{240} questions & \textbf{200+} benchmark rows & \textbf{62} unit tests
 \end{tabular}
 \end{block}
 \end{frame}
@@ -376,7 +376,7 @@ IPT overestimates $U_{c2}$ (3.3D vs NRG 2.92--3.0D). feynlab flags such rows as 
 \]
 \begin{itemize}\small
  \item one configuration = \emph{all} diagrams with the given vertices
- \item auxiliary shift $\delta\approx0.51$ removes the sign problem for $\U>0$
+ \item auxiliary shift $\delta\approx0.51$ removes the sign problem for $\U>0$ (single site, half filling)
  \item fast updates $O(k^2)$; average order $\langle k\rangle\sim\bet\U$
  \item error bars from independent chains (+ $\Gamma$-method)
 \end{itemize}
@@ -1104,6 +1104,38 @@ larger box $\Rightarrow$ the two $\lambda$ targets converge (spread $2.2\to1.4$)
 \end{itemize}
 \end{frame}
 
+\begin{frame}{Cluster CT-INT: measuring, optimising and pricing the sign \refcite{Troyer \& Wiese 2005}}
+\begin{columns}[T]
+\column{0.46\textwidth}
+\footnotesize
+\[\langle O\rangle=\frac{\langle sO\rangle_{|w|}}{\langle s\rangle_{|w|}},\qquad \langle s\rangle\simeq e^{-\bet N_c\Delta f},\qquad \text{cost}\propto\langle s\rangle^{-2}\]
+\begin{itemize}\scriptsize
+ \item NP-hard in general: managed, not removed
+ \item pooled $\langle s\,\Sig\rangle/\langle s\rangle$ with jackknife over bins $\times$ chains
+ \item \texttt{optimize\_delta}: pilot runs, efficiency $\langle s\rangle^2/t$
+ \item \texttt{sign\_cost\_model}: $\Delta f$ from pilots $\to$ cost at low $T$
+\end{itemize}
+\column{0.52\textwidth}
+\scriptsize 2$\times$2 plaquette, $\U=6t$, hole doped\\[2pt]
+\begin{tabular}{@{}llll@{}}
+\toprule
+$\bet t$ & 2 & 6 & 10\\\midrule
+$\langle s\rangle$ & 0.9998 & 0.883 & 0.700\\
+$\langle k\rangle$ & 20 & 57 & 95\\
+\bottomrule
+\end{tabular}\\[2pt]
+$\Delta f=0.0076$: cost $\times3.4$ at $\bet t=20$\\[4pt]
+\begin{tabular}{@{}lllll@{}}
+\toprule
+$\delta$ & 0.30 & \textbf{0.51} & 0.75 & 1.0\\\midrule
+$\langle s\rangle$ & 0.10 & 0.74 & 0.77 & 0.85\\
+$\langle s\rangle^2/t$ & 0.004 & \textbf{0.10} & 0.04 & 0.02\\
+\bottomrule
+\end{tabular}\\[3pt]
+jackknife 0.10 vs run-to-run spread 0.13
+\end{columns}
+\end{frame}
+
 \section{Benchmarks, limitations, learning}
 \begin{frame}{Benchmark philosophy}
 \begin{columns}[T]
@@ -1170,7 +1202,7 @@ Wannier3D & stacked Chern & 0.333333 & $1/3$ & Halperin 1987\\
 {\scriptsize Full tables: \texttt{benchmarks/RESULTS.md} and \texttt{benchmarks/RESULTS\_v1.md}}
 \end{frame}
 
-\begin{frame}{Known limitations after v1.2 (stated honestly)}
+\begin{frame}{Known limitations after v1.3 (stated honestly)}
 \begin{columns}[T]
 \column{0.5\textwidth}
 \begin{itemize}\small
@@ -1181,7 +1213,7 @@ Wannier3D & stacked Chern & 0.333333 & $1/3$ & Halperin 1987\\
 \column{0.47\textwidth}
 \begin{itemize}\small
  \item sector CT-HYB: no tree caching; G estimator noisy at low order
- \item cluster CT-INT: usual sign problem off half filling, $N_c\ge4$
+ \item cluster CT-INT sign: measured, optimised, priced, not removable (NP-hard)
  \item finite-range Kubo--St\v{r}eda: Gaussian (NCA) diagrams only
 \end{itemize}
 \end{columns}
@@ -1213,7 +1245,7 @@ Wannier3D & stacked Chern & 0.333333 & $1/3$ & Halperin 1987\\
 \textbf{Book tutorials}: every chapter 0--19 + appendices of Mattuck, with runnable feynlab companions.
 \column{0.47\textwidth}
 \begin{block}{Quizzes}
-\small 43 quizzes, 234 questions with explanations: \texttt{quizzes/quiz.html} (self-contained, offline), \texttt{QUIZZES.md}, \texttt{quizzes.json}.
+\small 44 quizzes, 240 questions with explanations: \texttt{quizzes/quiz.html} (self-contained, offline), \texttt{QUIZZES.md}, \texttt{quizzes.json}.
 \end{block}
 \begin{block}{Slides}
 \small this deck: \texttt{docs/slides/feynlab\_slides.pdf} (source \texttt{.tex}, figures regenerated by \texttt{make\_figures.py})
@@ -1239,7 +1271,7 @@ print(r['Z'])
 \end{verbatim}
 \column{0.42\textwidth}
 \begin{block}{Cite}
-\small G.\ Shukla, \emph{feynlab: Feynman diagrams, QMC and Hall transport}, v1.2 (2026), github.com/Gokaran-Shukla/feynlab (see CITATION.cff)
+\small G.\ Shukla, \emph{feynlab: Feynman diagrams, QMC and Hall transport}, v1.3 (2026), github.com/Gokaran-Shukla/feynlab (see CITATION.cff)
 \end{block}
 \begin{block}{Roadmap}
 \small $\lambda_{dm}$-D$\Gamma$A, dual fermions, worm-sampled vertices, cluster sign mitigation

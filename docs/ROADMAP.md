@@ -1,6 +1,6 @@
 # feynlab roadmap — what would make it powerful and robust
 
-> **v1.3 (in progress):** λ-corrected DΓA (`vertex.lambda_dga`), 5-orbital CT-HYB (`qmc.cthyb_sector`) the CT-HYB vertex for continuous baths and finite-range Kubo–Středa done. Next: cluster CT-INT sign.
+> **v1.3:** every v1.2 limitation addressed — λ-corrected DΓA (`vertex.lambda_dga`), 5-orbital CT-HYB (`qmc.cthyb_sector`), CT-HYB vertex for continuous baths, finite-range Kubo–Středa (`transport.finite_range`), and cluster CT-INT sign management. Next: λ_dm-DΓA, worm sampling, tree-cached traces, finite-range V1³ skew and crossed diagrams.
 >
 > **v1.2:** fully charge self-consistent DFT+DMFT with Quantum ESPRESSO + Wannier90 (`feynlab.dft.qe_csc`) and a multi-orbital Lanczos solver. Next: λ-corrected DΓA, CT-HYB worm vertex for large baths, Krylov/tree CT-HYB for 5 orbitals, finite-range Kubo–Středa.
 >

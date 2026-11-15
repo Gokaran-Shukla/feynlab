@@ -3,7 +3,7 @@
 Companion software to R. D. Mattuck, *A Guide to Feynman Diagrams in the Many-Body Problem* (2nd ed.),
 extended to research-level tools for correlated electrons and Hall transport.
 
-**Status v1.2.0** — every check in `benchmarks/RESULTS.md` (102 core rows), `benchmarks/RESULTS_v1.md` (54 rows), `benchmarks/RESULTS_v11.md` (43 rows, 43/43 pass) and `benchmarks/qe_csc/RESULTS.md` (first-principles CSC) compares against an exact result, an independent solver or a published formula (PRL, PRB, RMP, EPL, Phys. Rep.).
+**Status v1.3.0** — every check in `benchmarks/RESULTS.md` (102 core rows), `benchmarks/RESULTS_v1.md` (54 rows), `benchmarks/RESULTS_v11.md` (43 rows, 43/43 pass) , `benchmarks/qe_csc/RESULTS.md` (first-principles CSC) and the v1.3 benchmark folders (`lambda_dga`, `cthyb_5orb`, `vertex_cthyb`, `finite_range_kubo`, `ctint_sign`) compares against an exact result, an independent solver or a published formula (PRL, PRB, RMP, EPL, Phys. Rep.).
 
 📑 **Slides:** [`docs/slides/feynlab_slides.pdf`](docs/slides/feynlab_slides.pdf) — a 56-page Beamer deck covering every module, equation (colour-coded by physical quantity), benchmark and limitation.
 
@@ -24,9 +24,10 @@ extended to research-level tools for correlated electrons and Hall transport.
 | **Hall transport** (charge, spin, orbital, orbital-quadrupole) | Berry / operator curvature; Kubo–Středa NCA (Born Σ + ladder + V₁³ skew vertex); **crossed X/Ψ diagrams** (v0.2); Boltzmann (side jump, anomalous distribution, skew) | Sinitsyn et al. PRB 75, 045315 (all 6 mechanism terms, ≤1e-5); Ado et al. EPL 111, 37004 (X, Ψ, full σ_xy); Inoue–Bauer–Molenkamp; QWZ/Haldane Chern; Rashba e/8π |
 | Models | massive Dirac (+tilt, +quadratic mass), Rashba(+exchange), QWZ, Haldane, p-orbital square lattice with SOC/orbital Rashba/exchange, **Wannier90 hr.dat (2D and 3D)** | — |
 
-### New in v1.3 (closing the v1.2 list)
+### New in v1.3 (every v1.2 limitation addressed)
 | capability | module | validated against |
 |---|---|---|
+| **Cluster CT-INT sign management**: pooled jackknife under the sign, δ optimisation, cost model ⟨s⟩ = e^{−βN_cΔf} | `qmc.ctint_cluster` | 2×2 plaquette sign scan; jackknife ≈ run-to-run spread |
 | **Finite-range disorder in Kubo–Středa** (k-dependent SCBA + ladder via FFT convolution, GMRES) | `transport.finite_range.FiniteRangeHall` | δ limit = DisorderedHall 1e-9; σ_xx vs Boltzmann ≤ 0.4%; extrinsic AHE vs semiclassical ≤ 0.6% |
 | **Vertex for continuous baths**: G2 from segment CT-HYB (removal estimator) → F, Γ, λ-DΓA | `CTHYBSolver.solve(g2=...)` | vs ED at the statistical level; Schwinger–Dyson 1–2%; box-32 λ-DΓA |
 | **5-orbital full-Kanamori CT-HYB** (sector-blocked, bound-screened, lazy trace, optional truncation) | `qmc.cthyb_sector.SectorCTHYB` | trace = dense to 1e-10; vs exact ED (2²⁰ states) ⟨S_z²⟩ 0.2%; 15× faster at 3 orbitals |
@@ -103,7 +104,7 @@ print(anomalous_hall_mechanisms(MassiveDirac(1.0, 0.5), mu=1.0, band=1, V1_over_
 All v1.0 limitations are addressed in v1.1 (`docs/software_tutorials/07_benchmarks_and_limitations.md`). What remains:
 ab-initio CSC needs an external DFT code (an N(k) export is provided); the vertex for continuous baths comes from CT-HYB (v1.3; single orbital);
 ladder DΓA now has the λ_m correction (v1.3; λ_dm is not implemented); 5-orbital CT-HYB via `SectorCTHYB` (v1.3; no tree caching, G estimator noisy at low order); the cluster CT-INT
-has the usual sign problem away from half filling; finite-range disorder in Kubo–Středa covers the Gaussian (NCA) diagrams (v1.3).
+sign problem is measured, optimised and priced, but not removable (NP-hard); finite-range disorder in Kubo–Středa covers the Gaussian (NCA) diagrams (v1.3).
 
 ## Citation
 If you use feynlab, please cite the original papers of the methods you use (listed in each module docstring).
