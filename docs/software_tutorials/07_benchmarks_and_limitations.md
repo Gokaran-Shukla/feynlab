@@ -77,16 +77,37 @@ Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath
 | D21 CLI + TOML | **done** | `feynlab dmft|hall|polaron|nrg|bench` |
 | D22 units | **done** | (e²/h)/Å → S/cm |
 
-## Remaining limitations after v1.0
+## What changed in v1.1 (every v1.0 limitation addressed)
 
-* CT-HYB: density–density interaction only (no full rotationally invariant Kanamori in the segment picture).
-* DFT+DMFT: no charge self-consistency; impurity solvers Hubbard-I and ED.
-* DCA: the cluster solver is second-order perturbation theory (exact only to U²).
-* Nevanlinna: no Hardy-basis optimisation; at most ~40 Matsubara points before precision loss.
-* Stochastic continuation: L1 error 0.8 vs 0.21 for MaxEnt on the two-Gaussian test (use as a cross-check).
-* Polaron m*: few-% statistical spread at 3·10⁷ steps per chain; finite-p O(p⁴) bias.
-* Two-particle: bubble and RPA only.
-* Adaptive 3D refinement improves accuracy at fixed coarse mesh but is not yet cost-optimal (refines whole Fermi-surface cells).
+| v1.0 limitation | v1.1 status | benchmark (`benchmarks/RESULTS_v11.md`) |
+|---|---|---|
+| CT-HYB density-density only | **resolved**: `qmc.cthyb_matrix.MatrixCTHYB` (full local trace, any H_loc, spin flip + pair hopping) | n, docc, ⟨S_z²⟩, G vs 2-orbital ED within 1σ; sign = 1 |
+| DFT+DMFT without charge self-consistency | **resolved at the Wannier level**: `solve_csc` (H(k) = H₀ + V[n], dc updated), `density_matrix_k`, `write_density_matrix` for external DFT codes; CT-HYB solver added; exact-tail electron count | CSC(U=0) = Hartree mean field to 6e-6; N(k) exact to 3e-7 |
+| DCA cluster solver second order | **resolved**: cluster CT-INT (`ClusterCTINT`, `DCA2D.solve(solver='ctint')`) | dimer+bath vs ED within 1σ; N_c = 1 = single-site CT-INT |
+| Nevanlinna without Hardy optimisation, n ≤ 40 | **resolved**: `hardy_optimize`, `hardy_auto`; multiprecision Pick test, dps = 3n | L1 0.04–0.06 (raw ~1) |
+| stochastic continuation worse than MaxEnt | **resolved**: SAC with continuous positions, adaptive moves, Shao–Sandvik Θ criterion | L1 0.075 vs MaxEnt 0.25 |
+| polaron m* few-% spread | **resolved**: momentum-fluctuation estimator | α = 0.2: 1.0340 ± 0.0002 (ref 1.0343) |
+| semiclassical Gaussian skew partial | **resolved** (the v1.0 reference had a factor-2 transcription error) | Sinitsyn to 1e-6; Kubo residual to 1e-4 |
+| two-particle = bubble/RPA only | **resolved**: ED vertex (Lehmann, divided differences), F/Γ in d/m channels, Schwinger–Dyson, DMFT χ(q), ladder DΓA, TPSC | Wick 1e-15; EOM vs ED 0.05%; χ_m(q=0) vs dm/dh 0.04%; DΓA → 2nd order as U → 0 |
+| finite-range disorder | **resolved** (semiclassical: Born, side jump, skew, Gaussian skew) | σ_xx vs Bessel formula 1e-10 |
+| orbital crossed diagrams for 3D Wannier | **resolved**: `LatticeCrossed` (any Bravais lattice, 2D/3D, operator currents) | oblique cell and 3D stacking reproduce the square-lattice result |
+| MPI (chains only) | **resolved**: `utils.parallel.map_chains` (MPI / process / serial) in all QMC solvers | identical results across backends |
+| Holstein / SSH polarons | **resolved**: variational ED (`qmc.lattice_polaron`) | Holstein E₀ = −2.46968472393287 (published 21-digit value) |
+| adaptive 3D refinement not cost-optimal | **improved**: velocity-based Fermi-surface criterion; hot spots opt-in | 0.1% at 263k points vs 0.2% for a uniform 216k mesh |
 
-"Best in the world" is not something a benchmark suite can establish. What the suite does establish is that
-every number it reports agrees with an exact or published result within the stated tolerance.
+## Remaining limitations after v1.1 (honest list)
+
+* **Charge self-consistency** is implemented at the level of the Wannier Hamiltonian, with a model functional
+  (`hartree_functional`) or through a user callback. A full ab-initio cycle needs an external DFT code fed with
+  `write_density_matrix`; no DFT code is bundled.
+* **ED vertex**: the impurity must be small (atom plus ≤ 3 bath sites, at most 256 states). Frequency sums
+  converge as 1/N_ν, so use the 1/N extrapolation as shown in the tutorials. CT-HYB worm sampling of the vertex
+  for continuous baths is not implemented.
+* **Ladder DΓA** has no λ correction (Moriya). Close to the antiferromagnetic instability in 2D, χ_m(Q) can
+  diverge at finite T in plain ladder DΓA.
+* **Cluster CT-INT** away from half filling has a sign problem for N_c ≥ 4, as all CT-INT codes do. The cost grows
+  as N_c³⟨k⟩³.
+* **Matrix CT-HYB** recomputes the trace from scratch, at cost O(K·4^{n_orb}) per move. It is practical for
+  2–3 orbitals; tree/sliding-window acceleration and Krylov traces are not implemented.
+* The finite-range-disorder **Kubo–Středa** (diagrammatic) route remains δ-correlated; finite range is
+  available in the semiclassical solver.

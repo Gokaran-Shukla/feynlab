@@ -351,15 +351,16 @@ class CTHYBSolver:
         return dtau[::-1].copy()
 
     def solve(self, delta_iw, mu, delta_dn=None, n_warm=20000, n_meas=2_000_000, meas_every=20,
-              n_chains=4, seed=7, kmax=300):
+              n_chains=4, seed=7, kmax=300, parallel="serial"):
         g = self.grid
         Fu = self._Ftab(delta_iw)
         Fd = self._Ftab(delta_iw if delta_dn is None else delta_dn)
         w = g.iw[: self.n_iw_meas].imag.copy()
         Gs, ns, ds = [], [], []
         hist = 0
-        for c in range(n_chains):
-            G, n, d, h = _run(g.beta, self.U, mu, mu, Fu, Fd, w, n_warm, n_meas, meas_every, seed + 977 * c, kmax)
+        from ..utils.parallel import map_chains
+        args = [(g.beta, self.U, mu, mu, Fu, Fd, w, n_warm, n_meas, meas_every, seed + 977 * c, kmax) for c in range(n_chains)]
+        for G, n, d, h in map_chains(_run, args, backend=parallel):
             Gs.append(G); ns.append(n); ds.append(d); hist = hist + h
         Gs = np.array(Gs)
         G = Gs.mean(0)

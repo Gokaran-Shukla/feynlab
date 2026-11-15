@@ -122,3 +122,101 @@ def crossed_hall(model, mu, op=None, runs=((0.015, 900.0, 1536), (0.0075, 1600.0
     else:
         X0, P0 = xs[0], ps[0]
     return dict(X=X0, Psi=P0, raw=dict(Gamma=gs, X=xs, Psi=ps))
+
+
+# ======================================================================================
+class LatticeCrossed:
+    """X and Psi diagrams for a tight-binding model on an arbitrary Bravais lattice in 2D or 3D
+    (Wannier90 models, `WannierTB` or `WannierTB3D`, or any object with H/dH and `recip`).
+
+    Momenta k = sum_a (n_a/N_a) b_a span the Brillouin zone; FFTs over the N_1 x N_2 (x N_3) grid give
+    the lattice-vector representation r of G_r and of the dressed vertices J_r.  With
+    int d^dk/(2pi)^d -> (1/(N V_cell)) sum_k and sum_r -> V_cell sum_R the formulas of CrossedDiagrams
+    are unchanged.  sigma_ab is computed for current component a (optionally an operator current
+    {O, v_a}/2) and velocity component b.  Units: e^2/h (charge) per layer (2D) or per Angstrom (3D)."""
+
+    def __init__(self, model, mu: float, nV2: float, N=(512, 512), born_iter: int = 60):
+        self.model, self.mu, self.nV2 = model, float(mu), float(nV2)
+        N = tuple(int(n) for n in N)
+        self.N, self.dim = N, len(N)
+        recip = np.asarray(model.recip, float)[: self.dim, : self.dim] if self.dim == 2 else np.asarray(model.recip, float)
+        self.vcell = (2 * np.pi) ** self.dim / abs(np.linalg.det(recip))
+        axes = [np.arange(n) / n for n in N]
+        F = np.stack(np.meshgrid(*axes, indexing="ij"), -1)
+        Kc = F @ recip
+        if self.dim == 2:
+            H = model.H(Kc[..., 0], Kc[..., 1])
+            vel = list(model.dH(Kc[..., 0], Kc[..., 1]))
+        else:
+            flat = Kc.reshape(-1, 3)
+            nb = model.nb
+            H = model.H(flat).reshape(N + (nb, nb))
+            vel = [v.reshape(N + (nb, nb)) for v in model.dH(flat)]
+        self.vel = vel
+        nb = H.shape[-1]
+        self.nb = nb
+        I = np.eye(nb)
+        self.Ntot = int(np.prod(N))
+        self.w = 1.0 / (self.Ntot * self.vcell)
+        z = self.mu * I - H
+        S = -1e-3j * I
+        for _ in range(born_iter):
+            G = np.linalg.inv(z - S)
+            g = self.w * G.reshape(-1, nb, nb).sum(0)
+            Sn = nV2 * g
+            Sn = 0.5 * (Sn - Sn.conj().T)
+            if np.max(np.abs(Sn - S)) < 1e-12:
+                S = Sn
+                break
+            S = 0.5 * (S + Sn)
+        self.Sigma = S
+        self.GR = np.linalg.inv(z - S)
+        self.GA = np.conj(np.swapaxes(self.GR, -1, -2))
+        self.axes = tuple(range(self.dim))
+
+    def _ar_vertex(self, v):
+        nb = self.nb
+        GA = self.GA.reshape(-1, nb, nb)
+        GR = self.GR.reshape(-1, nb, nb)
+        vv = v.reshape(-1, nb, nb)
+        M0 = self.w * np.einsum("kia,kab,kbj->ij", GA, vv, GR)
+        Lop = self.w * np.einsum("kia,kbj->ijab", GA, GR).reshape(nb * nb, nb * nb)
+        X = np.linalg.solve(np.eye(nb * nb) - self.nV2 * Lop, self.nV2 * M0.reshape(-1)).reshape(nb, nb)
+        return v + X
+
+    def _to_r(self, Ap):
+        return np.fft.ifftn(Ap, axes=self.axes) * self.Ntot * self.w
+
+    def _minus_r(self, Ar):
+        for ax, n in enumerate(self.N):
+            Ar = np.take(Ar, (-np.arange(n)) % n, axis=ax)
+        return Ar
+
+    def compute(self, a: int = 0, b: int = 1, op=None):
+        va, vb = self.vel[a], self.vel[b]
+        Ja_bare = va if op is None else 0.5 * (op @ va + va @ op)
+        Ga = self._ar_vertex(Ja_bare)
+        Gb = self._ar_vertex(vb)
+        Ja = self._to_r(self.GA @ Ga @ self.GR)
+        Jb = self._to_r(self.GA @ Gb @ self.GR)
+        GRr = self._to_r(self.GR)
+        GAr = self._to_r(self.GA)
+        GRm, GAm, Jbm = self._minus_r(GRr), self._minus_r(GAr), self._minus_r(Jb)
+        X = np.trace(Ja @ GRm @ Jb @ GAm, axis1=-2, axis2=-1).sum() * self.vcell
+        P = np.trace(Ja @ GRm @ GRr @ Jbm, axis1=-2, axis2=-1).sum()
+        Psi = (P + np.conj(P)) * self.vcell
+        f = self.nV2**2
+        return dict(X=float(np.real(f * X)), Psi=float(np.real(f * Psi)),
+                    Gamma_broadening=float(np.max(np.abs(self.Sigma))))
+
+
+def lattice_crossed_hall(model, mu, runs=((0.03, (1024, 1024)), (0.015, (2048, 2048))), a=0, b=1, op=None):
+    """Generic-lattice X and Psi extrapolated linearly to vanishing broadening."""
+    xs, ps, gs = [], [], []
+    for nv, N in runs:
+        r = LatticeCrossed(model, mu, nv, N=N).compute(a, b, op)
+        xs.append(r["X"]); ps.append(r["Psi"]); gs.append(r["Gamma_broadening"])
+    if len(gs) > 1:
+        return dict(X=float(np.polyval(np.polyfit(gs, xs, 1), 0.0)), Psi=float(np.polyval(np.polyfit(gs, ps, 1), 0.0)),
+                    raw=dict(Gamma=gs, X=xs, Psi=ps))
+    return dict(X=xs[0], Psi=ps[0], raw=dict(Gamma=gs, X=xs, Psi=ps))

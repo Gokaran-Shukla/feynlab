@@ -75,7 +75,7 @@
   \ifx\insertframesubtitle\@empty\else\\[-1pt]{\normalsize\color{muted}\insertframesubtitle}\fi
   \par\vspace*{-0.1cm}{\color{accent}\rule{1.6cm}{2pt}}}
 \setbeamertemplate{footline}{%
-  \leavevmode\hbox to\paperwidth{\hspace{0.4cm}{\color{muted}\tiny feynlab v1.0 \,|\, \insertsectionhead}\hfill{\color{muted}\tiny\insertframenumber/\inserttotalframenumber}\hspace{0.4cm}}\vspace{0.18cm}}
+  \leavevmode\hbox to\paperwidth{\hspace{0.4cm}{\color{muted}\tiny feynlab v1.1 \,|\, \insertsectionhead}\hfill{\color{muted}\tiny\insertframenumber/\inserttotalframenumber}\hspace{0.4cm}}\vspace{0.18cm}}
 \AtBeginSection[]{%
   \begin{frame}[plain]
   \begin{tikzpicture}[remember picture,overlay]
@@ -98,7 +98,7 @@
 \newcommand{\refcite}[1]{{\color{muted}\scriptsize[#1]}}
 \newcommand{\ok}{{\color{cH}\checkmark}}
 
-\title{\textbf{feynlab} v1.0}
+\title{\textbf{feynlab} v1.1}
 \subtitle{Feynman diagrams, quantum Monte Carlo, many-body self-energies\\and anomalous/spin/orbital Hall transport in one validated Python package}
 \author{Gokaran Shukla}
 \institute{KAUST \quad\textbullet\quad github.com/Gokaran-Shukla/feynlab}
@@ -111,7 +111,7 @@
 \begin{tikzpicture}[remember picture,overlay]
  \fill[brand] (current page.south west) rectangle (current page.north east);
  \fill[accent] ($(current page.south west)+(0,1.05)$) rectangle ($(current page.south east)+(0,1.12)$);
- \node[anchor=north west,text=white,font=\fontsize{40}{40}\selectfont\bfseries] at ($(current page.north west)+(1.0,-1.1)$) {feynlab \,\normalsize v1.0};
+ \node[anchor=north west,text=white,font=\fontsize{40}{40}\selectfont\bfseries] at ($(current page.north west)+(1.0,-1.1)$) {feynlab \,\normalsize v1.1};
  \node[anchor=north west,text=white!85!brand,text width=11.5cm,font=\large] at ($(current page.north west)+(1.05,-2.6)$)
    {Feynman diagrams, quantum Monte Carlo, many-body self-energies and anomalous / spin / orbital Hall transport \textemdash{} in one validated Python package};
  \node[anchor=south west,text=white,font=\normalsize] at ($(current page.south west)+(1.05,1.6)$) {\textbf{Gokaran Shukla}\quad KAUST, Thuwal};
@@ -148,6 +148,7 @@
  \item Hall transport: intrinsic, side jump, skew, crossed
  \item Orbitronics: OAM, BCD, Edelstein/SOT, 3D Wannier
  \item Robustness: errors, mixing, I/O, CLI, CI
+ \item v1.1: closing every v1.0 limitation
  \item Benchmarks, limitations, learning material
 \end{enumerate}
 \end{columns}
@@ -156,8 +157,8 @@
 \centering
 \small
 \begin{tabular}{ccc}
-\textbf{30+} modules & \textbf{14} software tutorials & \textbf{22} book-chapter tutorials\\
-\textbf{36} quizzes, \textbf{187} questions & \textbf{156} benchmark rows & \textbf{40} unit tests
+\textbf{35+} modules & \textbf{16} software tutorials & \textbf{22} book-chapter tutorials\\
+\textbf{38} quizzes, \textbf{202} questions & \textbf{200+} benchmark rows & \textbf{52} unit tests
 \end{tabular}
 \end{block}
 \end{frame}
@@ -819,6 +820,155 @@ converged $200^2\times160$ & 0.21040\\
 \end{columns}
 \end{frame}
 
+% ======================================================================== v1.1
+\section{v1.1: closing every v1.0 limitation}
+\begin{frame}{From limitation to validated feature}
+\scriptsize
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{p{3.9cm}p{5.3cm}p{4.0cm}}
+\toprule
+v1.0 limitation & v1.1 implementation & validation\\\midrule
+CT-HYB density--density only & matrix CT-HYB, full local trace & 2-orbital Kanamori ED, $1\sigma$\\
+DCA solver 2nd order & cluster CT-INT (exact) & dimer+bath ED, $1\sigma$\\
+no charge self-consistency & $H(\mathbf k)=H_0+V[n]$, $N(\mathbf k)$ export & Hartree mean field $6\times10^{-6}$\\
+two-particle = RPA & ED vertex, BSE, DMFT $\chiq(\mathbf q)$, ladder D$\Gamma$A, TPSC & $\chi_m(0)=dm/dh$ to 0.04\%\\
+Nevanlinna, no Hardy & Hardy-basis optimisation, dps $=3n$ & L1 $0.04$--$0.06$ (raw $\sim1$)\\
+stochastic $<$ MaxEnt & SAC, Shao--Sandvik criterion & L1 0.075 vs 0.25\\
+polaron $m^*$ $\pm$few\% & momentum-fluctuation estimator & $1.0340\pm0.0002$ (1.0343)\\
+semiclassical Gaussian skew & complete $w^{(4a)}$ (factor-2 slip found) & Sinitsyn $10^{-6}$\\
+$\delta$-correlated disorder & finite-range impurities & Bessel formula $10^{-10}$\\
+crossed diagrams: square only & any 2D/3D Bravais lattice & oblique cell, 3D stacks\\
+no lattice polarons & Holstein / SSH variational ED & $E_0=-2.46968472393287$\\
+chains serial & MPI / process pool & identical results\\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+\begin{frame}{Matrix CT-HYB: the full Kanamori interaction}
+\begin{columns}[T]
+\column{0.55\textwidth}
+{\small
+\[
+w(C)=\prod_f\det F_f\;\, s_P\,\mathrm{Tr}\Big[\prod_{i}^{\leftarrow} e^{-(t_{i-1}-t_i)\Ham}\,O_i\Big]e^{-t_K\Ham}
+\]}
+{\small ${\color{cD}F}(\tauv)=-\Hyb(\bet-\tauv)$; $s_P$ = parity of time ordering; operators in the eigenbasis of $\Ham_{\rm loc}$}
+\begin{itemize}\small
+ \item spin flip and pair hopping exact; observables by operator insertion
+ \item inside DFT+DMFT: noise-aware frequency cut-off + Kanamori HF tail $\Sig_\infty$
+\end{itemize}
+\begin{alertblock}{Two bugs found by the ED comparison}
+\small (i) \texttt{continue} on impossible moves skipped measurements $\Rightarrow$ $\G$ +10\%;\;
+(ii) stale operator ordering after a rejected removal $\Rightarrow$ sign 0.77.
+\end{alertblock}
+\column{0.42\textwidth}
+\begin{exampleblock}{2 orbitals, $U=2.5$, $J=0.4$, $\beta=5$}
+\small
+\begin{tabular}{lcc}
+ & CT-HYB & ED\\\midrule
+$n_{0\uparrow}$ & 0.4983(5) & 0.4988\\
+$\langle n_\uparrow n_\downarrow\rangle_0$ & 0.0942(5) & 0.0944\\
+$n_{1\uparrow}$ & 0.4465(11) & 0.4460\\
+$\langle S_z^2\rangle$ & 0.4810(5) & 0.4810\\
+sign & 1 & --\\
+\end{tabular}
+\end{exampleblock}
+{\small one-band lattice DMFT: $Z=0.250$ (matrix) vs $0.247$ (segment)}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Cluster CT-INT, exact DCA and charge self-consistency}
+\begin{columns}[T]
+\column{0.5\textwidth}
+\textbf{Cluster CT-INT}
+\[
+D_\sigma[p,q]=\tilde{\Gw}(\mathbf r_p-\mathbf r_q,\tauv_p-\tauv_q)-\alpha_\sigma(s_p)\delta_{pq}
+\]
+\[
+\G(\mathbf K)=\tilde{\Gw}(\mathbf K)-\tilde{\Gw}(\mathbf K)^2S(\mathbf K,\iw)/\bet
+\]
+\begin{itemize}\scriptsize
+ \item dimer in a bath: $\Sig(\mathbf K,i\omega_0)$ vs ED within $1\sigma$ ($K=0,\pi$)
+ \item DCA $N_c=1$: $Z=0.4721$ vs single-site CT-INT $0.4709$
+\end{itemize}
+\column{0.47\textwidth}
+\textbf{Charge self-consistency}
+\[
+N_{ab}(\mathbf k)=T\sum_n\G_{ab}(\mathbf k,\iw)e^{\iw0^+}
+\]
+\[
+\Ham(\mathbf k)=\Ham_0(\mathbf k)+V[n]
+\]
+\begin{itemize}\scriptsize
+ \item $N(\mathbf k)$ exact to $3\times10^{-7}$ at $U=0$ (analytic $1/(i\omega)^2$ tail)
+ \item $U_{\rm DMFT}=0$: CSC $\equiv$ Hartree mean field ($6\times10^{-6}$)
+ \item electron count now uses $c_2=\langle\Ham\rangle-\mu+\mathrm{Re}\Sig(i\infty)$ (was 1.2\% off)
+ \item \texttt{write\_density\_matrix} for an external DFT code
+\end{itemize}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Two-particle vertex, DMFT susceptibility, ladder D$\Gamma$A, TPSC}
+\begin{columns}[T]
+\column{0.53\textwidth}
+\small
+\[
+\int_{\beta>t_a>t_b>t_c>0}\!\!\!\!e^{\sum x t}=f[0,x_a,x_a{+}x_b,x_a{+}x_b{+}x_c]
+\]
+{\scriptsize divided differences via $\exp(\beta J)$, $J$ bidiagonal: stable for degenerate levels}
+\[
+\chiq_r(\mathbf q)^{-1}=\chiq_0(\mathbf q)^{-1}+\Gamma_r/\bet^2,\quad r=d,m
+\]
+{\footnotesize
+\begin{align*}
+\Sig_{\rm D\Gamma A}&=\Sig_{\rm DMFT}-\frac{\U}{\bet^2}\sum_{\mathbf q\omega\nu'}K(\mathbf q)\,\G\G\G\;-\;(\text{local})\\
+K(\mathbf q)&=\tfrac12F_d(\mathbf q)-\tfrac32F_m(\mathbf q)-\tfrac12F_d^{\rm loc}+\tfrac12F_m^{\rm loc}\;\xrightarrow{U\to0}\;\U
+\end{align*}}
+\column{0.44\textwidth}
+\begin{exampleblock}{Checks}
+\scriptsize
+\begin{itemize}
+ \item Wick ($U=0$): $10^{-15}$
+ \item Schwinger--Dyson with ED $F_{\uparrow\downarrow}$ = ED $\Sig$ (0.05\%)
+ \item DMFT $\chi_m(\mathbf q{=}0)$: BSE 2.9089 vs $dm/dh$ 2.9102
+ \item D$\Gamma$A $\to$ 2nd order as $U\to0$ (deviation $\propto U$)
+ \item TPSC: both sum rules exact; $\mathrm{Tr}\,\Sig G^0=U\langle n_\uparrow n_\downarrow\rangle$ ($1/N\to0$)
+\end{itemize}
+\end{exampleblock}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Transport closures: Gaussian skew from rates, smooth disorder, generic crossed diagrams}
+\begin{columns}[c]
+\column{0.42\textwidth}
+\small
+\begin{itemize}
+ \item $w^{(4a)}$: $T_1T_3^*$ (on-shell $\Sig$ $\times$ interband $\G$) $+\ |T_2|^2$ interference
+ \item Dirac: Sinitsyn to $10^{-6}$; quadratic-mass Dirac: Kubo residual to $10^{-4}$
+ \item the v1.0 ``missing half'' was a transcription factor 2
+ \item finite range $u(q)=e^{-q^2d^2/4}$: $\sigma_{xx}$ = Bessel formula; side jump suppressed by smooth disorder
+ \item \texttt{LatticeCrossed}: any Bravais lattice, 2D/3D, $\Op=S_z,L_z$
+\end{itemize}
+\column{0.56\textwidth}
+\includegraphics[width=\linewidth]{transport_dga_v11.png}
+\end{columns}
+\end{frame}
+
+\begin{frame}{Continuation and polarons, upgraded}
+\begin{columns}[c]
+\column{0.56\textwidth}
+\includegraphics[width=\linewidth]{continuation_v11.png}\\[2pt]
+\includegraphics[width=\linewidth]{holstein_v11.png}
+\column{0.41\textwidth}
+\small
+\begin{itemize}
+ \item SAC: L1 0.075 (MaxEnt 0.25)
+ \item Nevanlinna + Hardy: L1 0.04--0.06
+ \item Fr\"ohlich $m^*$: \[\frac{m}{m^*}=1-\lim_{\tau\to\infty}\frac{\langle X^2\rangle}{3\tau},\ X=\sum q\,(t_2-t_1)\]
+ \item Holstein $E_0=-2.46968472393287$ (published 21-digit value)
+\end{itemize}
+\end{columns}
+\end{frame}
+
 % ======================================================================== 13
 \section{Benchmarks, limitations, learning}
 \begin{frame}{Benchmark philosophy}
@@ -830,10 +980,11 @@ converged $200^2\times160$ & 0.21040\\
  \item cross-solver checks: CT-INT $\leftrightarrow$ CT-HYB $\leftrightarrow$ ED $\leftrightarrow$ NRG
  \item informational rows for approximations with known bias
 \end{itemize}
-\begin{block}{Two suites}
+\begin{block}{Three suites}
 \small
 \texttt{run\_benchmarks.py} --- 102 core checks (v0.1--v0.3)\\
 \texttt{run\_v1\_benchmarks.py} --- 54 checks for the v1.0 modules (54/54 pass)\\
+\texttt{run\_v11\_benchmarks.py} --- checks closing the v1.0 limitations\\
 \texttt{feynlab bench --suite all}
 \end{block}
 \column{0.47\textwidth}
@@ -885,25 +1036,25 @@ Wannier3D & stacked Chern & 0.333333 & $1/3$ & Halperin 1987\\
 {\scriptsize Full tables: \texttt{benchmarks/RESULTS.md} and \texttt{benchmarks/RESULTS\_v1.md}}
 \end{frame}
 
-\begin{frame}{Known limitations (stated honestly)}
+\begin{frame}{Known limitations after v1.1 (stated honestly)}
 \begin{columns}[T]
 \column{0.5\textwidth}
 \begin{itemize}\small
- \item CT-HYB: density--density only (no full Kanamori in the segment picture)
- \item DFT+DMFT: no charge self-consistency; Hubbard-I / ED solvers
- \item DCA solver: second-order perturbation theory in $\mathbf K$
- \item Nevanlinna: no Hardy-basis optimisation; $n\le40$ points
- \item stochastic continuation: L1 error 0.8 vs MaxEnt 0.21 (use as cross-check)
+ \item ab-initio CSC needs an external DFT code (we export $N(\mathbf k)$; model functional bundled)
+ \item ED vertex: small baths ($\le 256$ states); $1/N_\nu$ extrapolation needed
+ \item ladder D$\Gamma$A without $\lambda$ (Moriya) correction
 \end{itemize}
 \column{0.47\textwidth}
 \begin{itemize}\small
- \item polaron $m^*$: few-\% statistical spread; finite-$p$ $O(p^4)$ bias
- \item semiclassical Gaussian-skew rate decomposition reproduces 1/2 of the Kubo value (Kubo route exact)
- \item two-particle: bubble/RPA only (no vertex ladders, D$\Gamma$A)
- \item finite-range disorder and orbital crossed diagrams in 3D: future work
- \item MPI parallelism: chains only (multiprocessing)
+ \item matrix CT-HYB recomputes the trace: practical for 2--3 orbitals
+ \item cluster CT-INT: usual sign problem off half filling, $N_c\ge4$
+ \item finite-range disorder: semiclassical route only (Kubo--St\v{r}eda remains $\delta$-correlated)
 \end{itemize}
 \end{columns}
+\vfill
+\begin{block}{Next}
+\small $\lambda$-corrected D$\Gamma$A, dual fermions, worm-sampled vertices, Krylov/sliding-window matrix CT-HYB for 5 orbitals, VASP/QE interface for ab-initio CSC
+\end{block}
 \end{frame}
 
 \begin{frame}{Learning material}
@@ -922,11 +1073,13 @@ Wannier3D & stacked Chern & 0.333333 & $1/3$ & Halperin 1987\\
  \item DCA, two-particle, NRG \quad 12.\ Continuation
  \setcounter{enumi}{12}
  \item CDet, resummation, polaron \quad 14.\ Advanced transport
+ \setcounter{enumi}{14}
+ \item Matrix CT-HYB, cluster CT-INT, CSC, vertices \quad 16.\ v1.1 transport/continuation/polarons
 \end{enumerate}
 \textbf{Book tutorials}: every chapter 0--19 + appendices of Mattuck, with runnable feynlab companions.
 \column{0.47\textwidth}
 \begin{block}{Quizzes}
-\small 36 quizzes, 187 questions with explanations: \texttt{quizzes/quiz.html} (self-contained, offline), \texttt{QUIZZES.md}, \texttt{quizzes.json}.
+\small 38 quizzes, 202 questions with explanations: \texttt{quizzes/quiz.html} (self-contained, offline), \texttt{QUIZZES.md}, \texttt{quizzes.json}.
 \end{block}
 \begin{block}{Slides}
 \small this deck: \texttt{docs/slides/feynlab\_slides.pdf} (source \texttt{.tex}, figures regenerated by \texttt{make\_figures.py})
@@ -952,10 +1105,10 @@ print(r['Z'])
 \end{verbatim}
 \column{0.42\textwidth}
 \begin{block}{Cite}
-\small G.\ Shukla, \emph{feynlab: Feynman diagrams, QMC and Hall transport}, v1.0 (2026), github.com/Gokaran-Shukla/feynlab (see CITATION.cff)
+\small G.\ Shukla, \emph{feynlab: Feynman diagrams, QMC and Hall transport}, v1.1 (2026), github.com/Gokaran-Shukla/feynlab (see CITATION.cff)
 \end{block}
 \begin{block}{Roadmap}
-\small vertex ladders / D$\Gamma$A, full-$J$ CT-HYB, charge self-consistent DFT+DMFT, orbital crossed diagrams for Wannier models
+\small $\lambda$-corrected D$\Gamma$A, dual fermions, worm-sampled vertices, 5-orbital matrix CT-HYB, VASP/QE CSC interface
 \end{block}
 \end{columns}
 \end{frame}

@@ -39,6 +39,8 @@ def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax, p=0.0):
     hist = np.zeros(n_bins)
     hist0 = np.zeros(n_bins)
     order_hist = np.zeros(nmax)
+    hx2 = np.zeros(n_bins)          # accumulates X.X, X = sum_arcs q (t2 - t1)  (m* estimator)
+    X = np.zeros(3)
     e_p = 0.5 * p * p
     pref = np.sqrt(2.0) * alpha / np.pi   # (alpha/(2 sqrt2 pi^2)) * 4 pi
     for step in range(n_steps):
@@ -76,6 +78,9 @@ def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax, p=0.0):
                     t1[n], t2[n] = ta, tb
                     q[n, 0], q[n, 1], q[n, 2] = qx, qy, qz
                     n += 1
+                    X[0] += qx * dt
+                    X[1] += qy * dt
+                    X[2] += qz * dt
         else:
             # ---- remove an arc
             if n > 0:
@@ -93,6 +98,9 @@ def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax, p=0.0):
                             dS += (qx * q[j, 0] + qy * q[j, 1] + qz * q[j, 2]) * ov
                 R = (Pq * n) / (pref * tau * np.exp(-dS))
                 if np.random.random() < R:
+                    X[0] -= qx * dt
+                    X[1] -= qy * dt
+                    X[2] -= qz * dt
                     n -= 1
                     t1[i], t2[i] = t1[n], t2[n]
                     q[i, 0], q[i, 1], q[i, 2] = q[n, 0], q[n, 1], q[n, 2]
@@ -101,8 +109,9 @@ def _run(alpha, mu, tau_max, n_steps, n_bins, seed, nmax, p=0.0):
             hist[b] += 1.0
             if n == 0:
                 hist0[b] += 1.0
+            hx2[b] += X[0] * X[0] + X[1] * X[1] + X[2] * X[2]
         order_hist[n] += 1.0
-    return hist, order_hist, hist0
+    return hist, order_hist, hist0, hx2
 
 
 def polaron_diagmc(alpha: float, mu: float | None = None, tau_max: float = 30.0,
@@ -114,9 +123,9 @@ def polaron_diagmc(alpha: float, mu: float | None = None, tau_max: float = 30.0,
     if mu is None:
         mu = feynman_energy(alpha) - 0.3
     tau_grid = (np.arange(n_bins) + 0.5) * tau_max / n_bins
-    Es, Zs, hs, ords = [], [], [], []
+    Es, Zs, hs, ords, Ms = [], [], [], [], []
     for c in range(n_chains):
-        h, o, h0 = _run(alpha, mu, tau_max, n_steps, n_bins, seed + 101 * c, 4000, p)
+        h, o, h0, x2 = _run(alpha, mu, tau_max, n_steps, n_bins, seed + 101 * c, 4000, p)
         hs.append(h)
         ords.append(o)
         lo, hi = int(fit_window[0] * n_bins), int(fit_window[1] * n_bins)
@@ -127,16 +136,23 @@ def polaron_diagmc(alpha: float, mu: float | None = None, tau_max: float = 30.0,
         m0 = h0 > 20
         C = np.exp(np.mean(np.log(h0[m0]) + (0.5 * p * p - mu) * tau_grid[m0])) if m0.any() else np.nan
         Zs.append(np.exp(fit[1]) / C)
-    Es, Zs = np.array(Es), np.array(Zs)
+        # m/m* = 1 - lim d<X^2>/dtau / 3   (G(p,tau)/G(0,tau) = e^{-p^2 tau/2} <e^{p.X}>)
+        mm = h[lo:hi] > 50
+        sl = np.polyfit(tau_grid[lo:hi][mm], x2[lo:hi][mm] / h[lo:hi][mm], 1, w=np.sqrt(h[lo:hi][mm]))[0]
+        Ms.append(1.0 / (1.0 - sl / 3.0))
+    Es, Zs, Ms = np.array(Es), np.array(Zs), np.array(Ms)
     o = np.sum(ords, axis=0)
     se = lambda x: float(x.std(ddof=1) / np.sqrt(len(x))) if len(x) > 1 else np.nan
     return dict(E=float(Es.mean()), E_err=se(Es), Z=float(Zs.mean()), Z_err=se(Zs),
+                m_star=float(Ms.mean()), m_star_err=se(Ms),
                 tau=tau_grid, G=np.sum(hs, axis=0), order_mean=float((np.arange(len(o)) * o).sum() / o.sum()),
                 mu=mu, p=p)
 
 
 def polaron_effective_mass(alpha, p=0.4, **kw):
-    """m* from E(p) - E(0) = p^2 / (2 m*) (same seeds -> correlated errors partly cancel)."""
+    """m* from E(p) - E(0) = p^2 / (2 m*) (finite-difference route, O(p^4) bias).
+    The preferred, unbiased estimator is polaron_diagmc(...)['m_star'] (momentum-fluctuation
+    estimator m/m* = 1 - lim <X^2>/(3 tau), X = sum over phonon arcs of q (t2 - t1))."""
     r0 = polaron_diagmc(alpha, p=0.0, **kw)
     r1 = polaron_diagmc(alpha, p=p, **kw)
     dE = r1["E"] - r0["E"]

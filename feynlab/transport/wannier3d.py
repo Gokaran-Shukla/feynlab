@@ -6,8 +6,8 @@ Angstrom); velocities dH/dk_a = sum_R i R_a e^{ik.R} H_R.  The Berry-curvature p
 Kubo sum-over-states formula, as in intrinsic.py.
 
 Adaptive refinement (Wang, Yates, Souza, Vanderbilt PRB 74, 195118 (2006); Wannier90 'berry_curv_adpt_kmesh'):
-points of a uniform Monkhorst-Pack mesh where |Omega| exceeds a threshold are replaced by an n_sub^3 sub-mesh
-spanning their cell.  The result is in units of e^2/h per Angstrom; multiply by E2H_PER_A_TO_S_PER_CM for S/cm.
+points of a uniform Monkhorst-Pack mesh where |Omega| exceeds a threshold, or whose cell is crossed by the
+Fermi surface (|E_n - mu| < |v_n| * half cell diagonal + 4 k_B T), are replaced by an n_sub^3 sub-mesh.  The result is in units of e^2/h per Angstrom; multiply by E2H_PER_A_TO_S_PER_CM for S/cm.
 """
 from __future__ import annotations
 
@@ -44,7 +44,7 @@ class WannierTB3D:
         return [np.einsum("kr,rab->kab", 1j * self.R[:, a] * ph, self.HR) for a in range(3)]
 
     # ------------------------------------------------------------------
-    def curvature(self, k, op=None):
+    def curvature(self, k, op=None, return_velocity=False):
         """Returns E (nk, nb) and Omega (nk, nb, 3) with Omega_c = -2 Im sum_m J^a_nm v^b_mn / dE^2,
         (a, b) = (y, z), (z, x), (x, y) for c = x, y, z;  J^a = {op, v_a}/2 (op=None -> charge)."""
         E, U = np.linalg.eigh(self.H(k))
@@ -61,12 +61,16 @@ class WannierTB3D:
         Om = np.empty(E.shape + (3,))
         for c, (a, b) in enumerate(((1, 2), (2, 0), (0, 1))):
             Om[..., c] = -2 * np.imag(np.einsum("knm,kmn,knm->kn", J[a], v[b], inv))
+        if return_velocity:
+            vn = np.sqrt(sum(np.real(np.einsum("knn->kn", va)) ** 2 for va in v))
+            return E, Om, vn
         return E, Om
 
-    def _integrand(self, kf, mu, beta, op):
-        E, Om = self.curvature(self.frac_to_cart(kf), op)
+    def _integrand(self, kf, mu, beta, op, half_diag=0.0):
+        E, Om, vn = self.curvature(self.frac_to_cart(kf), op, return_velocity=True)
         f = fermi(E - mu, beta)
-        self._last_gap = np.min(np.abs(E - mu), axis=1)
+        # a cell is cut by the Fermi surface if some band has |E - mu| < |v| * (half cell diagonal) + 4 k_B T
+        self._last_gap = np.min(np.abs(E - mu) - vn * half_diag, axis=1) - 4.0 / beta
         return np.einsum("kn,knc->kc", f, Om)
 
     def intrinsic_hall(self, mu: float, nk=(20, 20, 20), op=None, beta: float = 1e4,
@@ -78,21 +82,22 @@ class WannierTB3D:
         nk = np.asarray(nk)
         axes = [(np.arange(n) + 0.5) / n for n in nk]
         K = np.stack(np.meshgrid(*axes, indexing="ij"), -1).reshape(-1, 3)
+        hd = 0.5 * np.sqrt(np.sum((np.linalg.norm(self.recip, axis=1) / nk) ** 2))   # half cell diagonal
         vals, gaps = [], []
         for i in range(0, len(K), chunk):
-            vals.append(self._integrand(K[i:i + chunk], mu, beta, op))
+            vals.append(self._integrand(K[i:i + chunk], mu, beta, op, hd))
             gaps.append(self._last_gap)
         vals, gaps = np.concatenate(vals), np.concatenate(gaps)
         w0 = 1.0 / nk.prod()
         nref = 0
         if adaptive:
             mag = np.linalg.norm(vals, axis=1)
-            thr = threshold if threshold is not None else 10 * np.mean(mag) + 1e-12
-            # refine (i) Berry-curvature hot spots and (ii) cells cut by the Fermi surface
-            if window is None:
-                bw = np.ptp(np.linalg.eigvalsh(self.H(self.frac_to_cart(K[:: max(1, len(K) // 500)]))))
-                window = 2.0 * bw / nk.max()
-            sel = np.where((mag > thr) | (gaps < window))[0]
+            # hot-spot refinement is opt-in (threshold): for gapped regions the uniform midpoint rule is already
+            # spectrally accurate, and mixing resolutions there only adds O(h^2) quadrature error
+            thr = threshold if threshold is not None else np.inf
+            # refine (i) optional Berry-curvature hot spots and (ii) cells actually cut by the Fermi surface
+            # (|E - mu| < |v| * half cell diagonal + 4 kT); 'window' adds an extra energy margin
+            sel = np.where((mag > thr) | (gaps < (0.0 if window is None else window)))[0]
             nref = len(sel)
             if nref:
                 s = (np.arange(n_sub) + 0.5) / n_sub - 0.5

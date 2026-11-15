@@ -211,7 +211,7 @@ SOFTWARE = {
 "T7 — Benchmarks & limitations": [
  ("Which v0.1 limitation is only PARTIALLY resolved in v0.2?", ["X/Ψ diagrams", "MaxEnt", "the semiclassical rate-by-rate Gaussian skew decomposition", "polaron DiagMC"], 2, "The Kubo route gives it exactly; the w(4a) decomposition reproduces 1/2."),
  ("Which analytic-continuation methods does feynlab v1.0 provide?", ["MaxEnt only", "MaxEnt, Nevanlinna and stochastic", "Padé only", "none"], 1, ""),
- ("Which DMFT flavours does feynlab v1.0 provide?", ["only single-site Bethe", "single-site (Bethe/lattice), DCA clusters and DFT+DMFT from Wannier90", "GW+DMFT", "lattice QMC only"], 1, ""),
+ ("Which DMFT flavours does feynlab provide?", ["only single-site Bethe", "single-site (Bethe/lattice), DCA clusters (exact cluster CT-INT), DFT+DMFT with charge self-consistency", "GW+DMFT", "lattice QMC only"], 1, ""),
  ("Practical limit of brute-force generic diagram enumeration:", ["order 4", "order 20", "order 1", "unlimited"], 0, ""),
  ("What does the test suite guarantee?", ["that feynlab is the best code in the world", "that every benchmarked number agrees with an exact or published result", "nothing", "experimental agreement"], 1, ""),
 ],
@@ -262,5 +262,24 @@ SOFTWARE = {
  ("The Berry-curvature dipole Fermi-sea and Fermi-surface forms agree because of…", ["integration by parts", "time reversal", "particle–hole symmetry", "Wick's theorem"], 0, ""),
  ("For the Rashba 2DEG with both bands occupied, |δS_y| per eEτ is…", ["mα/(4π), independent of μ", "∝ μ", "zero", "∝ α²"], 0, "Edelstein 1990."),
  ("Adaptive k refinement in WannierTB3D refines points where…", ["k is large", "|Ω| is large or a band lies within a window of μ", "randomly", "at Γ only"], 1, "Wang, Yates, Souza, Vanderbilt PRB 74, 195118 (2006)."),
+],
+"T16 — v1.1 solvers: matrix CT-HYB, cluster CT-INT, CSC, vertices": [
+ ("Why can the matrix CT-HYB treat spin-flip and pair-hopping terms while the segment solver cannot?", ["it uses a larger bath", "it evaluates the full local trace in the eigenbasis of H_loc instead of segment overlaps", "it works at T = 0", "it neglects them"], 1, ""),
+ ("A 'continue' statement on impossible moves (removal at k = 0) biased G by 10%. Why?", ["numba bug", "those steps skipped the measurement, under-sampling low expansion orders", "the determinant was wrong", "the trace overflowed"], 1, "Every Monte Carlo step must reach the measurement."),
+ ("In cluster CT-INT for DCA, the Weiss field in the determinant is…", ["local only", "G~0(r_p - r_q, tau_p - tau_q), cluster-translation invariant", "the lattice G(k)", "the bare G0(k)"], 1, ""),
+ ("charge self-consistency at U_DMFT = 0 with a Hartree functional must reproduce…", ["the atomic limit", "static (Hartree) mean field", "DMFT with IPT", "nothing"], 1, "feynlab: agreement 6e-6."),
+ ("The imaginary-time integrals in the Lehmann representation of G2 are computed as…", ["Monte Carlo averages", "divided differences of exp(beta z), via exp of a bidiagonal matrix", "FFTs", "Pade approximants"], 1, "Stable for degenerate energies."),
+ ("The DMFT Bethe-Salpeter chi_m(q = 0) equals dm/dh of the DMFT magnetisation because…", ["of the sum rule", "DMFT is thermodynamically consistent (Phi-derivable with a local irreducible vertex)", "coincidence", "of particle-hole symmetry"], 1, "2.9089 vs 2.9102 in feynlab."),
+ ("In ladder DGA the kernel K = F_d/2 - 3F_m/2 - F_d^loc/2 + F_m^loc/2 reduces at lowest order to…", ["2U", "U", "0", "3U/2"], 1, "So DGA -> second-order PT as U -> 0."),
+ ("TPSC fixes U_sp and U_ch by…", ["fitting QMC", "the local spin and charge sum rules plus U_sp = U<n_up n_dn>/(<n_up><n_dn>)", "RPA", "Hubbard-I"], 1, "Vilk & Tremblay 1997."),
+],
+"T17 — v1.1 transport, continuation, polarons": [
+ ("Why did v1.0 conclude that the semiclassical Gaussian skew was 'half missing'?", ["an approximation in the rate", "the reference formula had been transcribed with an extra factor 2", "numerical noise", "missing crossed diagrams"], 1, "Validated by feeding the transcribed rate into the Boltzmann solver."),
+ ("For Gaussian-shaped (finite-range) impurities the Born rate is multiplied by…", ["exp(-q^2 d^2/2)", "q^2", "1/q^2", "nothing"], 0, ""),
+ ("Smooth disorder reduces the side-jump contribution because…", ["the DOS changes", "large-momentum transfer, which carries interband coherence, is suppressed", "time-reversal symmetry", "the Fermi velocity grows"], 1, ""),
+ ("The generic-lattice crossed-diagram code was validated by…", ["experiment", "writing QWZ in an oblique unit cell and in 3D stacked layers and recovering the square-lattice result", "comparing with Boltzmann", "it was not"], 1, ""),
+ ("SAC (Shao-Sandvik) chooses the sampling temperature Theta where…", ["chi^2 is minimal", "<chi^2> = chi^2_min + a sqrt(2 chi^2_min), a ~ 0.5", "Theta = 1", "entropy is maximal"], 1, ""),
+ ("The momentum-fluctuation estimator gives m*/m from…", ["finite p differences", "m/m* = 1 - lim <X^2>/(3 tau), X = sum q (t2 - t1) over phonon arcs", "Z", "the average order"], 1, "alpha = 0.2: 1.0340 +- 0.0002 vs 1.0343."),
+ ("Variational ED for the Holstein polaron builds its basis by…", ["random sampling", "repeated application of H to |electron, no phonons> in a translation-invariant frame", "Lanczos only", "DMRG"], 1, "Bonca-Trugman-Batistic; E0 = -2.46968472393287 at t = w = g = 1."),
 ],
 }

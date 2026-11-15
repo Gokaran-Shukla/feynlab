@@ -7,10 +7,11 @@ the self-energy is constant within a patch, Sigma(k) = Sigma(K).
     G(K, iw)  = (Nc/N) sum_{k in patch K} [iw + mu - eps_k - Sigma(K, iw)]^{-1}
     G0(K, iw) = [G(K)^{-1} + Sigma(K)]^{-1}            (cluster Weiss field)
 
-Cluster solver here: second-order perturbation theory on the cluster (cluster IPT,
-weak-to-moderate coupling), Sigma_ij(tau) = U^2 G0~_ij(tau)^2 G0~_ji(beta - tau) with the
-Hartree-shifted G0~.  Nc = 1 reduces exactly to single-site DMFT with IPT (tested).
-CT-INT/CT-HYB cluster solvers are on the roadmap.
+Cluster solvers:
+  'second_order' : second-order perturbation theory on the cluster (cluster IPT),
+                   Sigma_ij(tau) = U^2 G0~_ij(tau)^2 G0~_ji(beta - tau); Nc = 1 reduces exactly to DMFT+IPT.
+  'ctint'        : numerically exact cluster CT-INT (qmc.ctint_cluster), validated against ED of a
+                   cluster+bath; high frequencies use the Hartree tail Sigma -> U n/2 + c/(iw).
 """
 from __future__ import annotations
 
@@ -80,14 +81,36 @@ class DCA2D:
         G(r,-iw) = conj(G(r,iw)) so G(r,tau) is real."""
         return self.grid.iw_to_tau(f_iw, c1, 0.0, 0.0)
 
-    def solve(self, n_iter=100, mix=0.5, tol=1e-6):
+    def cluster_sigma_ctint(self, G0K, **kw):
+        from ..qmc.ctint_cluster import ClusterCTINT
+        Lc = self.Lc
+        sites = [(x, y) for x in range(Lc) for y in range(Lc)]
+        kw = dict(kw)
+        m = kw.pop("n_iw_meas", 48)
+        solver = ClusterCTINT(self.grid, self.U, sites=sites, L=[Lc, Lc], K=self.K, n_iw_meas=m)
+        r = solver.solve(G0K, **kw)
+        self.ctint_last = r
+        iw = self.grid.iw
+        out = np.empty((self.Nc, len(iw)), complex)
+        n = 1.0 if abs(self.mu - self.U / 2) < 1e-12 else None
+        for p in range(self.Nc):
+            sl = r["Sigma_K"][p]
+            er = np.abs(r["err_Sigma"][p]) if r["err_Sigma"] is not None else np.zeros(m)
+            sinf = self.U / 2.0 if n is not None else float(np.real(sl[-1]))
+            bad = np.where(er > 0.05 + 0.05 * np.abs(sl - sinf))[0]
+            mc = max(int(bad[0]) if len(bad) else m, 2)
+            out[p, :mc] = sl[:mc]
+            out[p, mc:] = sinf + (sl[mc - 1] - sinf) * iw[mc - 1] / iw[mc:]
+        return out
+
+    def solve(self, n_iter=100, mix=0.5, tol=1e-6, solver="second_order", ctint_kwargs=None):
         iw = self.grid.iw
         sig = np.full((self.Nc, len(iw)), self.U / 2.0, complex)
         hist = []
         for it in range(n_iter):
             G = self.coarse_grain(sig)
             G0 = 1.0 / (1.0 / G + sig)
-            new = self.cluster_sigma(G0)
+            new = self.cluster_sigma(G0) if solver == "second_order" else self.cluster_sigma_ctint(G0, **(ctint_kwargs or {}))
             diff = float(np.max(np.abs(new - sig)))
             sig = mix * new + (1 - mix) * sig
             hist.append(diff)

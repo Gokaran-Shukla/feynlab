@@ -144,6 +144,24 @@ class MultiOrbitalED:
             self.blocks.append((sel, v))
         self.H = H
 
+    def expectation(self, op, beta):
+        """Thermal <op> for a Fock-space operator (sparse or dense) on the impurity+bath system."""
+        E0 = self.E.min()
+        tot, Z = 0.0, 0.0
+        op = op.tocsr() if hasattr(op, "tocsr") else op
+        for sel, v in self.blocks:
+            wts = np.exp(-beta * (self.E[sel] - E0))
+            if wts.max() < 1e-14:
+                continue
+            sub = op[sel][:, sel]
+            sub = sub.toarray() if hasattr(sub, "toarray") else sub
+            tot += np.sum(wts * np.einsum("ia,ij,ja->a", v, sub, v))
+            Z += wts.sum()
+        return float(tot / Z)
+
+    def n_op(self, a, s):
+        return self.c[2 * a + s].T @ self.c[2 * a + s]
+
     def hybridization(self, z, a):
         z = np.asarray(z, complex)
         return np.sum(self.Vb[a][None, :] ** 2 / (z[:, None] - self.eb[a][None, :]), axis=1)

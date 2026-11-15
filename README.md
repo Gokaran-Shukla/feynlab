@@ -3,7 +3,7 @@
 Companion software to R. D. Mattuck, *A Guide to Feynman Diagrams in the Many-Body Problem* (2nd ed.),
 extended to research-level tools for correlated electrons and Hall transport.
 
-**Status v1.0.0** — every check in `benchmarks/RESULTS.md` (102 core rows) and `benchmarks/RESULTS_v1.md` (54 rows, 54/54 pass) compares against an exact result, an independent solver or a published formula (PRL, PRB, RMP, EPL, Phys. Rep.).
+**Status v1.1.0** — every check in `benchmarks/RESULTS.md` (102 core rows), `benchmarks/RESULTS_v1.md` (54 rows) and `benchmarks/RESULTS_v11.md` (v1.1 rows) compares against an exact result, an independent solver or a published formula (PRL, PRB, RMP, EPL, Phys. Rep.).
 
 📑 **Slides:** [`docs/slides/feynlab_slides.pdf`](docs/slides/feynlab_slides.pdf) — a 46-page Beamer deck covering every module, equation (colour-coded by physical quantity), benchmark and limitation.
 
@@ -23,6 +23,19 @@ extended to research-level tools for correlated electrons and Hall transport.
 | Superconductivity | BCS gap equation, T_c | 1.764, 1.134 |
 | **Hall transport** (charge, spin, orbital, orbital-quadrupole) | Berry / operator curvature; Kubo–Středa NCA (Born Σ + ladder + V₁³ skew vertex); **crossed X/Ψ diagrams** (v0.2); Boltzmann (side jump, anomalous distribution, skew) | Sinitsyn et al. PRB 75, 045315 (all 6 mechanism terms, ≤1e-5); Ado et al. EPL 111, 37004 (X, Ψ, full σ_xy); Inoue–Bauer–Molenkamp; QWZ/Haldane Chern; Rashba e/8π |
 | Models | massive Dirac (+tilt, +quadratic mass), Rashba(+exchange), QWZ, Haldane, p-orbital square lattice with SOC/orbital Rashba/exchange, **Wannier90 hr.dat (2D and 3D)** | — |
+
+### New in v1.1 (every v1.0 limitation closed)
+| capability | module | validated against |
+|---|---|---|
+| **Matrix CT-HYB** (full Kanamori: spin flip, pair hopping) | `qmc.cthyb_matrix` | 2-orbital ED within 1σ |
+| **Cluster CT-INT**; exact DCA | `qmc.ctint_cluster`, `DCA2D(solver='ctint')` | dimer+bath ED; N_c = 1 = DMFT |
+| **Charge self-consistent DFT+DMFT** (Wannier level), N(k) export, CT-HYB solver | `dmft.dftdmft` | Hartree mean field 6e-6 |
+| **Two-particle vertex from ED**, Schwinger–Dyson, DMFT χ(q), **ladder DΓA**, **TPSC** | `vertex` | Wick 1e-15; EOM 0.05%; χ_m(0) = dm/dh 0.04% |
+| **SAC** and **Nevanlinna + Hardy** continuation | `continuation` | L1 0.075 / 0.04–0.06 |
+| **Polaron m\*** (momentum-fluctuation estimator); **Holstein/SSH** (variational ED) | `qmc.polaron`, `qmc.lattice_polaron` | 1.0340 vs 1.0343; −2.46968472393287 |
+| **Gaussian skew from w⁽⁴ᵃ⁾**, **finite-range impurities** | `transport.boltzmann` | Sinitsyn 1e-6; Bessel formula 1e-10 |
+| **Crossed X/Ψ for any 2D/3D Wannier lattice** | `transport.crossed.LatticeCrossed` | oblique cell, 3D stacking |
+| **MPI / process-parallel chains** | `utils.parallel` | identical across backends |
 
 ### New in v1.0 (all ROADMAP items)
 | capability | module | validated against |
@@ -49,9 +62,10 @@ pip install -e .
 pytest -q tests
 python benchmarks/run_benchmarks.py          # core suite
 python benchmarks/run_v1_benchmarks.py       # v1.0 modules (~10 min)
+python benchmarks/run_v11_benchmarks.py      # v1.1 closures (~1 h)
 feynlab bench --suite all                    # both, via the CLI
 feynlab hall --model dirac                   # AHE mechanisms from the command line
-open quizzes/quiz.html                        # 36 quizzes, 187 questions
+open quizzes/quiz.html                        # 38 quizzes, 202 questions
 open docs/slides/feynlab_slides.pdf           # presentation
 ```
 
@@ -62,7 +76,7 @@ print(anomalous_hall_mechanisms(MassiveDirac(1.0, 0.5), mu=1.0, band=1, V1_over_
 ```
 
 ## Documentation
-* `docs/software_tutorials/01…14` — using the package (09–14 cover the v1.0 modules)
+* `docs/software_tutorials/01…16` — using the package (09–14: v1.0 modules, 15–16: v1.1)
 * `docs/slides/feynlab_slides.pdf` — presentation slides (source `feynlab_slides.tex`, figures via `make_figures.py`)
 * `docs/book_tutorials/ch00…ch19, appendices` — one tutorial per chapter of Mattuck: goals, key ideas, guide to the book's exercises, feynlab hands-on, self-check
 * `quizzes/quiz.html` (interactive), `quizzes/QUIZZES.md` (printable with answer keys), `quizzes/quizzes.json`
@@ -71,10 +85,10 @@ print(anomalous_hall_mechanisms(MassiveDirac(1.0, 0.5), mu=1.0, band=1, V1_over_
 `docs/ROADMAP.md` lists the 22 roadmap items with their v1.0 status (all implemented; partial items are marked) and the next steps.
 
 ## Known limitations
-See `docs/software_tutorials/07_benchmarks_and_limitations.md`: CT-HYB is density–density only; DFT+DMFT has no charge
-self-consistency; the DCA cluster solver is second order; Nevanlinna lacks Hardy optimisation; stochastic continuation is a
-cross-check only; two-particle = bubble/RPA (no vertex ladders); polaron m* has a few-% statistical spread; the semiclassical
-Gaussian-skew rate decomposition is partial (the Kubo route is exact).
+All v1.0 limitations are addressed in v1.1 (`docs/software_tutorials/07_benchmarks_and_limitations.md`). What remains:
+ab-initio CSC needs an external DFT code (an N(k) export is provided); the ED vertex is limited to small baths;
+ladder DΓA has no λ correction; the matrix CT-HYB trace is recomputed from scratch (2–3 orbitals); the cluster CT-INT
+has the usual sign problem away from half filling; finite-range disorder is semiclassical only.
 
 ## Citation
 If you use feynlab, please cite the original papers of the methods you use (listed in each module docstring).

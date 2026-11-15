@@ -6,6 +6,7 @@
     skew_V1 (conventional skew)    semiclassical third-order rate  (~ V1^3 / (n_i V0^4))
     skew_gaussian (intrinsic skew) Kubo-Streda NCA total - (intrinsic + side jump + adist),
                                    extrapolated to vanishing disorder broadening
+    skew_gaussian_semiclassical    the same quantity from the fourth-order rate w^(4a) (independent check)
     X, Psi (optional)              crossed impurity-line diagrams (skew scattering on pairs of
                                    close impurities), Ado et al. EPL 111, 37004 (2015)
     total                          sum
@@ -65,7 +66,8 @@ def anomalous_hall_mechanisms(model, mu: float, band: int, V1_over_V0: float = 0
     skew_g = total_nca - intrinsic_value - sc["side_jump"] - sc["anomalous_distribution"]
     out = dict(intrinsic=intrinsic_value, side_jump=sc["side_jump"],
                anomalous_distribution=sc["anomalous_distribution"],
-               skew_gaussian=skew_g, skew_V1=sc["skew_V1"], sigma_xx=sc["sigma_xx"],
+               skew_gaussian=skew_g, skew_gaussian_semiclassical=sc["skew_gaussian"],
+               skew_V1=sc["skew_V1"], sigma_xx=sc["sigma_xx"],
                total_gaussian_nca=total_nca)
     out["total"] = total_nca + sc["skew_V1"]
     if include_crossed:

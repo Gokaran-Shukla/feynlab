@@ -191,7 +191,7 @@ class CTINTSolver:
         return gt
 
     def solve(self, g0_up_iw, g0_dn_iw=None, n_warm=20000, n_meas=400000,
-              meas_every=20, seed=1234, n_chains: int = 1, kmax: int = 400):
+              meas_every=20, seed=1234, n_chains: int = 1, kmax: int = 400, parallel: str = "serial"):
         """g0_*_iw: Weiss field of the *physical* problem 1/(iw + mu - Delta(iw)).
         Returns dict with G(iw), Sigma(iw), average sign, <k>, order histogram."""
         g = self.grid
@@ -213,9 +213,10 @@ class CTINTSolver:
         nm = 0
         acc = 0
         G_chains_up, G_chains_dn = [], []
-        for c in range(n_chains):
-            a, b, h, s, n, ai, ar = _run(beta, U, self.delta, gt_up, gt_dn, n0_up, n0_dn,
-                                          w, n_warm, n_meas, meas_every, seed + 7919 * c, kmax)
+        from ..utils.parallel import map_chains
+        args = [(beta, U, self.delta, gt_up, gt_dn, n0_up, n0_dn, w, n_warm, n_meas, meas_every, seed + 7919 * c, kmax)
+                for c in range(n_chains)]
+        for a, b, h, s, n, ai, ar in map_chains(_run, args, backend=parallel):
             hist += h
             sgn_tot += s
             nm += n

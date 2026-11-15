@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "feynlab"
-version = "1.0.0"
+version = "1.1.0"
 description = "Feynman-diagram toolkit: diagram enumeration & diagrammatic MC, CT-INT QMC, self-energies from weak to strong coupling (2OPT, RPA/FLEX, IPT-DMFT, Hubbard-I, CT-INT-DMFT), RPA electron gas, BCS, and Hall transport (intrinsic, side jump, skew) for charge/spin/orbital/quadrupole currents."
 requires-python = ">=3.10"
 dependencies = ["numpy>=1.24", "scipy>=1.10", "numba>=0.58", "matplotlib>=3.7", "h5py>=3.8", "mpmath>=1.3"]

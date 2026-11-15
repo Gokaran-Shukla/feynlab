@@ -315,3 +315,126 @@ def test_cli_parser():
     from feynlab.cli.main import build_parser
     p = build_parser()
     assert p.parse_args(["hall", "--model", "dirac"]).command == "hall"
+
+
+# ============================================================================ v1.1 (closing the v1.0 limitations)
+def test_polaron_mstar_estimator():
+    from feynlab.qmc.polaron import polaron_diagmc, feynman_energy, weak_coupling_mass
+    r = polaron_diagmc(0.2, mu=feynman_energy(0.2) - 0.15, tau_max=40, n_steps=8_000_000, n_chains=2,
+                       fit_window=(0.4, 0.97))
+    assert abs(r["m_star"] - weak_coupling_mass(0.2)) < 0.01
+
+
+def test_sac_beats_threshold():
+    from feynlab.continuation.stochastic import stochastic_continuation
+    w = np.linspace(-4, 4, 801); dw = w[1] - w[0]
+    A0 = 0.5 * (np.exp(-(w - 1.5) ** 2 / 0.18) + np.exp(-(w + 1.5) ** 2 / 0.18)) / np.sqrt(0.18 * np.pi)
+    iw = 1j * np.pi * (2 * np.arange(30) + 1) / 50
+    G = (A0[None] * dw / (iw[:, None] - w[None])).sum(1) + 1e-4 * np.random.default_rng(0).standard_normal(30)
+    wc = np.linspace(-4, 4, 161)
+    r = stochastic_continuation(iw, G, 1e-4, wc, n_sweeps=150, n_final=800)
+    assert abs(np.sum(r["A"]) * (wc[1] - wc[0]) - 1) < 0.02
+    assert np.sum(np.abs(r["A"] - np.interp(wc, w, A0))) * (wc[1] - wc[0]) < 0.3
+
+
+def test_finite_range_sigma_xx():
+    from feynlab.transport.models import MassiveDirac
+    from feynlab.transport.boltzmann import SemiclassicalHall, dirac_finite_range_sigma_xx
+    r = SemiclassicalHall(MassiveDirac(1.0, 0.5), 1.0, 1, n_i=1.0, V0=0.1, n_theta=64, range_d=1.0).compute()
+    assert abs(r["sigma_xx"] / dirac_finite_range_sigma_xx(1, 0.5, 1.0, 1.0, 0.1, 1.0) - 1) < 1e-6
+
+
+def test_semiclassical_gaussian_skew():
+    from feynlab.transport.models import MassiveDirac
+    from feynlab.transport.boltzmann import SemiclassicalHall
+    d = MassiveDirac(1.0, 0.5)
+    r = SemiclassicalHall(d, 1.0, 1, n_i=1.0, V0=0.1, n_theta=64).compute()
+    assert abs(r["skew_gaussian"] - d.ref_intrinsic_skew(1.0)) < 1e-6
+
+
+def test_generic_lattice_crossed_matches_square():
+    from feynlab.transport.models import QWZ, WannierTB
+    from feynlab.transport.crossed import CrossedDiagrams, LatticeCrossed
+    from feynlab.transport.wannier3d import stacked_qwz_hr
+    from feynlab.dmft.dftdmft import write_hr
+    import tempfile, os
+    a = CrossedDiagrams(QWZ(-1.7), 0.6, 0.03, N=128, lattice=True).compute()
+    R, H = stacked_qwz_hr(-1.7, 0.0); m = R[:, 2] == 0
+    f = os.path.join(tempfile.mkdtemp(), "q_hr.dat"); write_hr(f, R[m], H[m])
+    b = LatticeCrossed(WannierTB(f, np.eye(3)), 0.6, 0.03, N=(128, 128)).compute()
+    assert abs(a["X"] - b["X"]) < 1e-4 and abs(a["Psi"] - b["Psi"]) < 1e-4
+
+
+def test_matrix_cthyb_single_orbital():
+    from feynlab.qmc.cthyb_matrix import MatrixCTHYB
+    g = MatsubaraGrid(5.0, 256)
+    ed = AndersonED(-1.2, 3.0, [-1.0, 0.0, 1.2], [0.5, 0.4, 0.6])
+    r = MatrixCTHYB(g, 1, 3.0, 0.0, eps=[-1.2], n_iw_meas=2).solve(ed.hybridization(g.iw), n_meas=150000, n_chains=2)
+    assert r["sign"] > 0.99
+    assert abs(r["n_0"] - ed.occupation(5.0)) < 0.01 and abs(r["docc_0"] - ed.double_occupancy(5.0)) < 0.01
+
+
+def test_cluster_ctint_nc1_matches_single_site():
+    from feynlab.qmc.ctint_cluster import ClusterCTINT
+    from feynlab.qmc.ctint import CTINTSolver
+    g = MatsubaraGrid(5.0, 256)
+    ed = AndersonED(-1.0, 2.0, [-0.8, 0.8], [0.5, 0.5])
+    G0 = 1.0 / (g.iw + 1.0 - ed.hybridization(g.iw))
+    a = ClusterCTINT(g, 2.0, sites=[[0]], L=[1], K=[[0.0]], n_iw_meas=2).solve(G0[None], n_meas=100000, n_chains=2)
+    ex = ed.sigma(g.iw[:2], 5.0)
+    assert abs(a["Sigma_K"][0, 0] - ex[0]) < 0.03
+
+
+def test_dftdmft_density_matrix_and_csc():
+    from feynlab.dmft.dftdmft import DFTDMFT, write_hr, hartree_functional, hartree_fock_reference, read_hr, hk_on_mesh
+    from feynlab.core.matsubara import fermi
+    import tempfile, os
+    f = os.path.join(tempfile.mkdtemp(), "c_hr.dat")
+    Rs = np.array([(0, 0, 0), (1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0)])
+    HR = np.array([np.diag([0.0, 0.6]) + 0j] + [(-0.25 * np.diag([1.0, 0.6]) - 0.05 * np.array([[0, 1], [1, 0]])) + 0j] * 4)
+    write_hr(f, Rs, HR)
+    m = DFTDMFT(f, corr=[0], U=0.0, J=0.0, n_elec=1.4, beta=40, nk=(16, 16, 1))
+    N = m.density_matrix_k(np.zeros((1, m.grid.n_iw), complex), 0.1)
+    E, V = np.linalg.eigh(m.Hk)
+    assert np.abs(N - np.einsum("kan,kn,kbn->kab", V, fermi(E - 0.1, 40), V.conj())).max() < 1e-5
+    r = m.solve_csc(hartree_functional(1.5), n_outer=60, mix_rho=0.5, dmft_iter=5, tol_rho=1e-8)
+    ref, _ = hartree_fock_reference(hk_on_mesh(*read_hr(f), (16, 16, 1)), 1.5, 1.4, 40)
+    assert np.abs(r["n_orbital"] - ref).max() < 1e-4
+
+
+def test_two_particle_ed_wick_and_eom():
+    from feynlab.vertex import ImpurityED, vertices, eom_sigma
+    beta = 5.0
+    ed0 = ImpurityED(-0.2, 0.0, [0.5], [0.6])
+    gs = ed0.generalized_susceptibilities(beta, n_nu=3, n_om=1)
+    assert np.abs(gs["chi_uu"][1] - np.diag(gs["chi0"][1])).max() < 1e-12 and np.abs(gs["chi_ud"]).max() < 1e-12
+    ed = ImpurityED(-1.0, 2.0, [0.0], [0.5])
+    gs = ed.generalized_susceptibilities(beta, n_nu=8, n_om=8)
+    S = eom_sigma(vertices(gs, beta)["F_ud"], gs, beta, 2.0, 2 * ed.occupation(beta))
+    assert abs(S[8] - ed.sigma(1j * gs["nu"][8:9], beta)[0]) < 5e-3
+
+
+def test_tpsc_sum_rules():
+    from feynlab.vertex import tpsc
+    from feynlab.core.lattice import square_lattice_eps
+    r = tpsc(square_lattice_eps(16), 5.0, 2.0, 1.0, n_iw=128)
+    assert abs(r["sum_sp"] - r["target_sp"]) < 1e-6 and abs(r["sum_ch"] - r["target_ch"]) < 1e-6
+    assert r["U_sp"] < 2.0 < r["U_ch"]
+
+
+def test_holstein_ved():
+    from feynlab.qmc.lattice_polaron import LatticePolaronVED, holstein_weak_coupling
+    r = LatticePolaronVED("holstein", 1.0, 1.0, 1.0, n_gen=12).ground_state()
+    assert abs(r["E"] + 2.469684723932870) < 1e-8
+    w = LatticePolaronVED("holstein", 1.0, 1.0, 0.1, n_gen=8).ground_state()
+    assert abs(w["E"] - holstein_weak_coupling(1.0, 1.0, 0.1)) < 1e-5
+
+
+def test_parallel_backends_identical():
+    from feynlab.qmc.cthyb import CTHYBSolver
+    g = MatsubaraGrid(5.0, 256)
+    ed = AndersonED(-1.0, 2.0, [-0.5, 0.5], [0.5, 0.5])
+    s = CTHYBSolver(g, 2.0, n_iw_meas=2)
+    a = s.solve(ed.hybridization(g.iw), 1.0, n_meas=40000, n_chains=2, parallel="serial")
+    b = s.solve(ed.hybridization(g.iw), 1.0, n_meas=40000, n_chains=2, parallel="process")
+    assert abs(a["docc"] - b["docc"]) < 1e-12

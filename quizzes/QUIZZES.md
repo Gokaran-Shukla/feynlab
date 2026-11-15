@@ -1120,9 +1120,9 @@
    - B. MaxEnt, Nevanlinna and stochastic
    - C. Padé only
    - D. none
-3. Which DMFT flavours does feynlab v1.0 provide?
+3. Which DMFT flavours does feynlab provide?
    - A. only single-site Bethe
-   - B. single-site (Bethe/lattice), DCA clusters and DFT+DMFT from Wannier90
+   - B. single-site (Bethe/lattice), DCA clusters (exact cluster CT-INT), DFT+DMFT with charge self-consistency
    - C. GW+DMFT
    - D. lattice QMC only
 4. Practical limit of brute-force generic diagram enumeration:
@@ -1407,5 +1407,111 @@
 4. **A** — 
 5. **A** — Edelstein 1990.
 6. **B** — Wang, Yates, Souza, Vanderbilt PRB 74, 195118 (2006).
+
+</details>
+
+## T16 — v1.1 solvers: matrix CT-HYB, cluster CT-INT, CSC, vertices
+
+1. Why can the matrix CT-HYB treat spin-flip and pair-hopping terms while the segment solver cannot?
+   - A. it uses a larger bath
+   - B. it evaluates the full local trace in the eigenbasis of H_loc instead of segment overlaps
+   - C. it works at T = 0
+   - D. it neglects them
+2. A 'continue' statement on impossible moves (removal at k = 0) biased G by 10%. Why?
+   - A. numba bug
+   - B. those steps skipped the measurement, under-sampling low expansion orders
+   - C. the determinant was wrong
+   - D. the trace overflowed
+3. In cluster CT-INT for DCA, the Weiss field in the determinant is…
+   - A. local only
+   - B. G~0(r_p - r_q, tau_p - tau_q), cluster-translation invariant
+   - C. the lattice G(k)
+   - D. the bare G0(k)
+4. charge self-consistency at U_DMFT = 0 with a Hartree functional must reproduce…
+   - A. the atomic limit
+   - B. static (Hartree) mean field
+   - C. DMFT with IPT
+   - D. nothing
+5. The imaginary-time integrals in the Lehmann representation of G2 are computed as…
+   - A. Monte Carlo averages
+   - B. divided differences of exp(beta z), via exp of a bidiagonal matrix
+   - C. FFTs
+   - D. Pade approximants
+6. The DMFT Bethe-Salpeter chi_m(q = 0) equals dm/dh of the DMFT magnetisation because…
+   - A. of the sum rule
+   - B. DMFT is thermodynamically consistent (Phi-derivable with a local irreducible vertex)
+   - C. coincidence
+   - D. of particle-hole symmetry
+7. In ladder DGA the kernel K = F_d/2 - 3F_m/2 - F_d^loc/2 + F_m^loc/2 reduces at lowest order to…
+   - A. 2U
+   - B. U
+   - C. 0
+   - D. 3U/2
+8. TPSC fixes U_sp and U_ch by…
+   - A. fitting QMC
+   - B. the local spin and charge sum rules plus U_sp = U<n_up n_dn>/(<n_up><n_dn>)
+   - C. RPA
+   - D. Hubbard-I
+
+<details><summary>Answer key</summary>
+
+1. **B** — 
+2. **B** — Every Monte Carlo step must reach the measurement.
+3. **B** — 
+4. **B** — feynlab: agreement 6e-6.
+5. **B** — Stable for degenerate energies.
+6. **B** — 2.9089 vs 2.9102 in feynlab.
+7. **B** — So DGA -> second-order PT as U -> 0.
+8. **B** — Vilk & Tremblay 1997.
+
+</details>
+
+## T17 — v1.1 transport, continuation, polarons
+
+1. Why did v1.0 conclude that the semiclassical Gaussian skew was 'half missing'?
+   - A. an approximation in the rate
+   - B. the reference formula had been transcribed with an extra factor 2
+   - C. numerical noise
+   - D. missing crossed diagrams
+2. For Gaussian-shaped (finite-range) impurities the Born rate is multiplied by…
+   - A. exp(-q^2 d^2/2)
+   - B. q^2
+   - C. 1/q^2
+   - D. nothing
+3. Smooth disorder reduces the side-jump contribution because…
+   - A. the DOS changes
+   - B. large-momentum transfer, which carries interband coherence, is suppressed
+   - C. time-reversal symmetry
+   - D. the Fermi velocity grows
+4. The generic-lattice crossed-diagram code was validated by…
+   - A. experiment
+   - B. writing QWZ in an oblique unit cell and in 3D stacked layers and recovering the square-lattice result
+   - C. comparing with Boltzmann
+   - D. it was not
+5. SAC (Shao-Sandvik) chooses the sampling temperature Theta where…
+   - A. chi^2 is minimal
+   - B. <chi^2> = chi^2_min + a sqrt(2 chi^2_min), a ~ 0.5
+   - C. Theta = 1
+   - D. entropy is maximal
+6. The momentum-fluctuation estimator gives m*/m from…
+   - A. finite p differences
+   - B. m/m* = 1 - lim <X^2>/(3 tau), X = sum q (t2 - t1) over phonon arcs
+   - C. Z
+   - D. the average order
+7. Variational ED for the Holstein polaron builds its basis by…
+   - A. random sampling
+   - B. repeated application of H to |electron, no phonons> in a translation-invariant frame
+   - C. Lanczos only
+   - D. DMRG
+
+<details><summary>Answer key</summary>
+
+1. **B** — Validated by feeding the transcribed rate into the Boltzmann solver.
+2. **A** — 
+3. **B** — 
+4. **B** — 
+5. **B** — 
+6. **B** — alpha = 0.2: 1.0340 +- 0.0002 vs 1.0343.
+7. **B** — Bonca-Trugman-Batistic; E0 = -2.46968472393287 at t = w = g = 1.
 
 </details>

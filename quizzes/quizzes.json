@@ -1806,10 +1806,10 @@
     "explanation": ""
    },
    {
-    "q": "Which DMFT flavours does feynlab v1.0 provide?",
+    "q": "Which DMFT flavours does feynlab provide?",
     "options": [
      "only single-site Bethe",
-     "single-site (Bethe/lattice), DCA clusters and DFT+DMFT from Wannier90",
+     "single-site (Bethe/lattice), DCA clusters (exact cluster CT-INT), DFT+DMFT with charge self-consistency",
      "GW+DMFT",
      "lattice QMC only"
     ],
@@ -2269,6 +2269,183 @@
     ],
     "answer": 1,
     "explanation": "Wang, Yates, Souza, Vanderbilt PRB 74, 195118 (2006)."
+   }
+  ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T16 — v1.1 solvers: matrix CT-HYB, cluster CT-INT, CSC, vertices",
+  "questions": [
+   {
+    "q": "Why can the matrix CT-HYB treat spin-flip and pair-hopping terms while the segment solver cannot?",
+    "options": [
+     "it uses a larger bath",
+     "it evaluates the full local trace in the eigenbasis of H_loc instead of segment overlaps",
+     "it works at T = 0",
+     "it neglects them"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "A 'continue' statement on impossible moves (removal at k = 0) biased G by 10%. Why?",
+    "options": [
+     "numba bug",
+     "those steps skipped the measurement, under-sampling low expansion orders",
+     "the determinant was wrong",
+     "the trace overflowed"
+    ],
+    "answer": 1,
+    "explanation": "Every Monte Carlo step must reach the measurement."
+   },
+   {
+    "q": "In cluster CT-INT for DCA, the Weiss field in the determinant is…",
+    "options": [
+     "local only",
+     "G~0(r_p - r_q, tau_p - tau_q), cluster-translation invariant",
+     "the lattice G(k)",
+     "the bare G0(k)"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "charge self-consistency at U_DMFT = 0 with a Hartree functional must reproduce…",
+    "options": [
+     "the atomic limit",
+     "static (Hartree) mean field",
+     "DMFT with IPT",
+     "nothing"
+    ],
+    "answer": 1,
+    "explanation": "feynlab: agreement 6e-6."
+   },
+   {
+    "q": "The imaginary-time integrals in the Lehmann representation of G2 are computed as…",
+    "options": [
+     "Monte Carlo averages",
+     "divided differences of exp(beta z), via exp of a bidiagonal matrix",
+     "FFTs",
+     "Pade approximants"
+    ],
+    "answer": 1,
+    "explanation": "Stable for degenerate energies."
+   },
+   {
+    "q": "The DMFT Bethe-Salpeter chi_m(q = 0) equals dm/dh of the DMFT magnetisation because…",
+    "options": [
+     "of the sum rule",
+     "DMFT is thermodynamically consistent (Phi-derivable with a local irreducible vertex)",
+     "coincidence",
+     "of particle-hole symmetry"
+    ],
+    "answer": 1,
+    "explanation": "2.9089 vs 2.9102 in feynlab."
+   },
+   {
+    "q": "In ladder DGA the kernel K = F_d/2 - 3F_m/2 - F_d^loc/2 + F_m^loc/2 reduces at lowest order to…",
+    "options": [
+     "2U",
+     "U",
+     "0",
+     "3U/2"
+    ],
+    "answer": 1,
+    "explanation": "So DGA -> second-order PT as U -> 0."
+   },
+   {
+    "q": "TPSC fixes U_sp and U_ch by…",
+    "options": [
+     "fitting QMC",
+     "the local spin and charge sum rules plus U_sp = U<n_up n_dn>/(<n_up><n_dn>)",
+     "RPA",
+     "Hubbard-I"
+    ],
+    "answer": 1,
+    "explanation": "Vilk & Tremblay 1997."
+   }
+  ]
+ },
+ {
+  "group": "Software: feynlab",
+  "title": "T17 — v1.1 transport, continuation, polarons",
+  "questions": [
+   {
+    "q": "Why did v1.0 conclude that the semiclassical Gaussian skew was 'half missing'?",
+    "options": [
+     "an approximation in the rate",
+     "the reference formula had been transcribed with an extra factor 2",
+     "numerical noise",
+     "missing crossed diagrams"
+    ],
+    "answer": 1,
+    "explanation": "Validated by feeding the transcribed rate into the Boltzmann solver."
+   },
+   {
+    "q": "For Gaussian-shaped (finite-range) impurities the Born rate is multiplied by…",
+    "options": [
+     "exp(-q^2 d^2/2)",
+     "q^2",
+     "1/q^2",
+     "nothing"
+    ],
+    "answer": 0,
+    "explanation": ""
+   },
+   {
+    "q": "Smooth disorder reduces the side-jump contribution because…",
+    "options": [
+     "the DOS changes",
+     "large-momentum transfer, which carries interband coherence, is suppressed",
+     "time-reversal symmetry",
+     "the Fermi velocity grows"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "The generic-lattice crossed-diagram code was validated by…",
+    "options": [
+     "experiment",
+     "writing QWZ in an oblique unit cell and in 3D stacked layers and recovering the square-lattice result",
+     "comparing with Boltzmann",
+     "it was not"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "SAC (Shao-Sandvik) chooses the sampling temperature Theta where…",
+    "options": [
+     "chi^2 is minimal",
+     "<chi^2> = chi^2_min + a sqrt(2 chi^2_min), a ~ 0.5",
+     "Theta = 1",
+     "entropy is maximal"
+    ],
+    "answer": 1,
+    "explanation": ""
+   },
+   {
+    "q": "The momentum-fluctuation estimator gives m*/m from…",
+    "options": [
+     "finite p differences",
+     "m/m* = 1 - lim <X^2>/(3 tau), X = sum q (t2 - t1) over phonon arcs",
+     "Z",
+     "the average order"
+    ],
+    "answer": 1,
+    "explanation": "alpha = 0.2: 1.0340 +- 0.0002 vs 1.0343."
+   },
+   {
+    "q": "Variational ED for the Holstein polaron builds its basis by…",
+    "options": [
+     "random sampling",
+     "repeated application of H to |electron, no phonons> in a translation-invariant frame",
+     "Lanczos only",
+     "DMRG"
+    ],
+    "answer": 1,
+    "explanation": "Bonca-Trugman-Batistic; E0 = -2.46968472393287 at t = w = g = 1."
    }
   ]
  }
