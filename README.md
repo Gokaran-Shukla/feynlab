@@ -1,5 +1,7 @@
 # feynlab — a Feynman-diagram laboratory
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24334635.svg)](https://doi.org/10.5281/zenodo.24334635)
+
 Companion software to R. D. Mattuck, *A Guide to Feynman Diagrams in the Many-Body Problem* (2nd ed.),
 extended to research-level tools for correlated electrons and Hall transport.
 
@@ -108,3 +110,23 @@ sign problem is measured, optimised and priced, but not removable (NP-hard); fin
 
 ## Citation
 If you use feynlab, please cite the original papers of the methods you use (listed in each module docstring).
+
+## Citing feynlab
+
+If feynlab helps your work, please cite the software:
+
+> G. Shukla, *feynlab: a Feynman-diagram laboratory for many-body physics and Hall transport*, version 1.3.0 (2026). Zenodo. https://doi.org/10.5281/zenodo.24334635
+
+```bibtex
+@software{shukla_feynlab_2026,
+  author    = {Shukla, Gokaran},
+  title     = {feynlab: a Feynman-diagram laboratory for many-body physics and Hall transport},
+  version   = {1.3.0},
+  year      = {2026},
+  publisher = {Zenodo},
+  doi       = {10.5281/zenodo.24334635},
+  url       = {https://github.com/Gokaran-Shukla/feynlab}
+}
+```
+
+GitHub's **"Cite this repository"** button (from `CITATION.cff`) gives the same reference in APA and BibTeX.
