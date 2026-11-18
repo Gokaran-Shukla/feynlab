@@ -1,12 +1,33 @@
 cff-version: 1.2.0
-message: "If you use feynlab, please cite it as below and cite the original method papers listed in the module docstrings."
+message: "If you use feynlab in your work, please cite it as below."
 title: "feynlab: a Feynman-diagram laboratory for many-body physics and Hall transport"
+abstract: >-
+  Companion software to Mattuck's Guide to Feynman Diagrams in the Many-Body Problem, extended
+  to research-grade tools: diagram enumeration and diagrammatic Monte Carlo, perturbation
+  theory, RPA/FLEX self-energies, dynamical mean-field theory with exact-diagonalisation,
+  Hubbard-I and continuous-time QMC solvers (CT-HYB, CT-INT, DCA), charge self-consistent
+  DFT+DMFT, lambda-corrected dynamical vertex approximation and TPSC, BCS, and anomalous,
+  spin, orbital and quadrupole Hall transport (intrinsic, side jump, skew scattering) with
+  Kubo-Streda ladders and Boltzmann theory. Every module is benchmarked against exact or
+  published results; tutorials, quizzes and a Beamer lecture deck are included.
+type: software
 authors:
   - family-names: Shukla
     given-names: Gokaran
     orcid: "https://orcid.org/0000-0001-9332-3332"
     affiliation: "King Abdullah University of Science and Technology (KAUST)"
-version: 1.3.0
-license: MIT
+    email: gokaran.shukla@kaust.edu.sa
 repository-code: "https://github.com/Gokaran-Shukla/feynlab"
-keywords: [Feynman diagrams, DMFT, quantum Monte Carlo, diagrammatic Monte Carlo, anomalous Hall effect, orbital Hall effect, many-body theory]
+license: MIT
+version: 1.3.0
+date-released: 2026-11-15
+keywords:
+  - "Feynman diagrams"
+  - "many-body theory"
+  - "DMFT"
+  - "quantum Monte Carlo"
+  - "diagrammatic Monte Carlo"
+  - "dynamical vertex approximation"
+  - "anomalous Hall effect"
+  - "spin Hall effect"
+  - "orbital Hall effect"
