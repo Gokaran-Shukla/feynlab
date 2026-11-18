@@ -108,12 +108,9 @@ ab-initio CSC needs an external DFT code (an N(k) export is provided); the verte
 ladder DΓA now has the λ_m correction (v1.3; λ_dm is not implemented); 5-orbital CT-HYB via `SectorCTHYB` (v1.3; no tree caching, G estimator noisy at low order); the cluster CT-INT
 sign problem is measured, optimised and priced, but not removable (NP-hard); finite-range disorder in Kubo–Středa covers the Gaussian (NCA) diagrams (v1.3).
 
-## Citation
-If you use feynlab, please cite the original papers of the methods you use (listed in each module docstring).
-
 ## Citing feynlab
 
-If feynlab helps your work, please cite the software:
+If feynlab helps your work, please cite the software, together with the original papers of the methods you use (listed in each module docstring):
 
 > G. Shukla, *feynlab: a Feynman-diagram laboratory for many-body physics and Hall transport*, version 1.3.0 (2026). Zenodo. https://doi.org/10.5281/zenodo.24334635
 
