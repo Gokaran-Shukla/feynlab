@@ -83,7 +83,8 @@ html = HTML.replace("__DATA__", json.dumps(data, ensure_ascii=False)).replace("_
 open(os.path.join(HERE, "quiz.html"), "w").write(html)
 
 # markdown versions (printable, with answer key)
-md = ["# Quizzes — Mattuck chapters and feynlab tutorials", ""]
+md = ["# Quizzes — Mattuck chapters and feynlab tutorials", "", "<!-- gs-watermark -->",
+      "> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.", ""]
 for qz in data:
     md += [f"## {qz['title']}", ""]
     for j, q in enumerate(qz["questions"]):

@@ -1,5 +1,7 @@
 # feynlab — a Feynman-diagram laboratory
 
+📘 **Complete manual (PDF):** [docs/feynlab_manual.pdf](docs/feynlab_manual.pdf) — documentation, tutorials and quizzes in one file.
+
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24334635.svg)](https://doi.org/10.5281/zenodo.24334635)
 
 Companion software to R. D. Mattuck, *A Guide to Feynman Diagrams in the Many-Body Problem* (2nd ed.),

@@ -1,5 +1,8 @@
 # Quizzes — Mattuck chapters and feynlab tutorials
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
 ## Ch 0 — The many-body problem for everybody
 
 1. A quasi particle is best described as…
