@@ -376,5 +376,5 @@ CH["appendices"] = ("Appendices A–N (intermediate part)", r"""
 for k, (title, body) in CH.items():
     head = f"# Chapter {int(k)} — {title}" if k.isdigit() else f"# {title}"
     with open(os.path.join(HERE, f"ch{k}.md" if k.isdigit() else "appendices.md"), "w") as f:
-        f.write(f"{head}\n*Companion to R. D. Mattuck, A Guide to Feynman Diagrams in the Many-Body Problem (2nd ed.)*\n{body}")
+        f.write(f"{head}\n*Companion to R. D. Mattuck, A Guide to Feynman Diagrams in the Many-Body Problem (2nd ed.)*\n\n<!-- gs-watermark -->\n> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.\n{body}")
 print("wrote", len(CH))

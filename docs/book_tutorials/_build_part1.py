@@ -223,5 +223,5 @@ Every row above corresponds to a module: `diagrams` (topology), `selfenergy`/`dm
 
 for k, (title, body) in CH.items():
     with open(os.path.join(HERE, f"ch{k}.md"), "w") as f:
-        f.write(f"# Chapter {int(k)} — {title}\n*Companion to R. D. Mattuck, A Guide to Feynman Diagrams in the Many-Body Problem (2nd ed.)*\n{body}")
+        f.write(f"# Chapter {int(k)} — {title}\n*Companion to R. D. Mattuck, A Guide to Feynman Diagrams in the Many-Body Problem (2nd ed.)*\n\n<!-- gs-watermark -->\n> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.\n{body}")
 print("wrote", len(CH))

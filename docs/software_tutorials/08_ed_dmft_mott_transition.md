@@ -1,5 +1,9 @@
 # Tutorial 8 — The Mott transition with exact-diagonalization DMFT (T = 0, Lanczos)
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 Goal: reproduce the published critical interactions of the half-filled Hubbard model on the Bethe lattice
 (DMFT, half bandwidth D = 1):
 

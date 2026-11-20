@@ -1,5 +1,9 @@
 # Tutorial 19 — Full-Kanamori CT-HYB for 5 orbitals (`SectorCTHYB`)
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 `MatrixCTHYB` multiplies dense 4^{n_orb} × 4^{n_orb} matrices for every operator in the local trace. That is fine
 for 2 orbitals (16 states), slow for 3 (64), and impossible for a full d shell (1024 states).
 `qmc.cthyb_sector.SectorCTHYB` samples the same configuration space with the same weights and estimators, but

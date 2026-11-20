@@ -1,5 +1,9 @@
 # Tutorial 6 — Electron gas, superconductivity and the book companions
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 ## RPA electron gas (Mattuck Chs. 10.4, 12.3, 13.6)
 
 ```python

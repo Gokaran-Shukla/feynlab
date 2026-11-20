@@ -1,5 +1,9 @@
 # Tutorial 7 — Benchmarks, accuracy and limitations
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 Run `python benchmarks/run_benchmarks.py` (≈30 min; `--quick` ≈15 min); bath-size study: `benchmarks/ed_dmft/` →
 `benchmarks/RESULTS.md`, `results.json`, figures.
 

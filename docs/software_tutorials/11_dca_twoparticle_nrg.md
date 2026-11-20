@@ -1,5 +1,9 @@
 # Tutorial 11 — Beyond single-site DMFT: DCA, two-particle response, NRG and the Kondo effect
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 Roadmap items A3, A6 and A7.
 
 ## 1. Dynamical cluster approximation (`feynlab.dmft.dca`)

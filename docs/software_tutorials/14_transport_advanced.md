@@ -1,5 +1,9 @@
 # Tutorial 14 — Advanced transport: T-matrix and matrix disorder, lattice crossed diagrams, orbital moments, Berry-curvature dipole, Edelstein/SOT, finite T and 3D Wannier
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 Roadmap items C12–C16. Everything uses the same band-model interface: `H(kx, ky)`, `dH(kx, ky)` and `operators`.
 
 ## 1. Beyond scalar Gaussian disorder (`DisorderedHall`)

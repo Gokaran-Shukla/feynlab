@@ -1,5 +1,9 @@
 # Tutorial 12 — Analytic continuation: MaxEnt, Nevanlinna and stochastic
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 Roadmap item A5. The task is to find A(ω) ≥ 0 from G(iω_n) = ∫ dω A(ω)/(iω_n − ω). The problem is
 exponentially ill-conditioned: very different A give the same G within the noise. Each method adds a different
 piece of prior information.

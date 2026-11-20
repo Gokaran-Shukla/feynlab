@@ -1,5 +1,9 @@
 # Tutorial 16 — Gaussian skew from rates, finite-range disorder, crossed diagrams for Wannier lattices, better continuation, polaron masses
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 ## 1. The semiclassical Gaussian ("intrinsic") skew scattering is complete
 
 `SemiclassicalHall(...).compute()['skew_gaussian']` builds the antisymmetric fourth-order rate w⁽⁴ᵃ⁾ for any band

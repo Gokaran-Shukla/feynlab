@@ -1,5 +1,9 @@
 # Tutorial 15 — Full-Kanamori CT-HYB, cluster CT-INT, charge self-consistency and two-particle vertices
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 Version 1.1 closes the solver-side limitations of v1.0. Every statement below is backed by a row of
 `benchmarks/RESULTS_v11.md`.
 

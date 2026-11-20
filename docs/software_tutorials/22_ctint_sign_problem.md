@@ -1,5 +1,9 @@
 # Tutorial 22 — Living with the CT-INT sign problem
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 ## Why it cannot be removed
 
 Away from half filling, a fermionic cluster has configurations with negative weight. QMC then samples |w|, and every

@@ -1,5 +1,9 @@
 # Tutorial 9 — Robust infrastructure: errors, mixing, checkpoints, CLI, GPU, units
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 Roadmap items D17–D22. These are the parts that make a long QMC or DMFT run trustworthy and repeatable.
 
 ## 1. Error bars for correlated Monte Carlo data (`feynlab.utils.errors`)

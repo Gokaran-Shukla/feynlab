@@ -1,5 +1,9 @@
 # Tutorial 21 — Finite-range disorder in the Kubo–Středa formalism
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 `DisorderedHall` assumes δ-correlated impurities. With that assumption the Born self-energy and the ladder vertex
 do not depend on k, and the Bethe–Salpeter equation is an nb² × nb² linear system. Real disorder has a range d:
 remote dopants, charged impurities and ripples. The impurity line then carries a form factor:

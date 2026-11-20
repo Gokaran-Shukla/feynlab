@@ -1,5 +1,9 @@
 # Tutorial 13 — Connected determinants, resummation, bold-series diagnostics and polaron Z / m*
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 Roadmap items B8–B11.
 
 ## 1. Connected-determinant DiagMC (`feynlab.qmc.cdet`)

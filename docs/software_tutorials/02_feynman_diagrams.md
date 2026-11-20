@@ -1,5 +1,9 @@
 # Tutorial 2 — Feynman diagrams as data structures
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 ## Representation
 
 A Green's-function diagram of order n is fixed by *who connects to whom*:

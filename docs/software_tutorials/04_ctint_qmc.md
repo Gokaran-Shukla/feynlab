@@ -1,5 +1,9 @@
 # Tutorial 4 — CT-INT: quantum Monte Carlo as a sum of Feynman diagrams
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 ## The idea
 
 Expand the partition function in the interaction:

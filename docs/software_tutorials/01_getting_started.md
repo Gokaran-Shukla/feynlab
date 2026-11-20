@@ -1,5 +1,9 @@
 # Tutorial 1 — Getting started with feynlab
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 ## Install
 
 ```bash

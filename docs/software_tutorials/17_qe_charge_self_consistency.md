@@ -1,5 +1,9 @@
 # Tutorial 17 — Fully charge self-consistent DFT+DMFT with Quantum ESPRESSO and Wannier90
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 This closes the last DFT-side limitation: feynlab now drives a real first-principles cycle. Quantum ESPRESSO
 supplies the Kohn–Sham bands and the density, Wannier90 the projectors, and feynlab the DMFT.
 

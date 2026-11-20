@@ -1,5 +1,9 @@
 # Tutorial 10 — CT-HYB, Kanamori multi-orbital physics and DFT+DMFT
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 Roadmap items A1, A2 and A4.
 
 ## 1. CT-HYB in the segment picture (`feynlab.qmc.cthyb`)

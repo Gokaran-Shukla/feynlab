@@ -1,4 +1,8 @@
 # Tutorial 5 — Hall transport: intrinsic, side jump and skew scattering
+
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
 ### for anomalous (AHC), spin (SHC), orbital (OHC) and orbital-quadrupole Hall conductivities
 
 ## 1. Models

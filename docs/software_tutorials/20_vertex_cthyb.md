@@ -1,5 +1,9 @@
 # Tutorial 20 — Two-particle vertex for continuous baths (CT-HYB)
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 The Lehmann ED vertex (`vertex.ImpurityED.g2`) is exact, but it lives in a finite Fock space. The cost grows with
 the number of 4-state chains: 2 bath sites (64 states) take minutes, and 3 bath sites (256 states) exhaust
 memory. A DMFT bath discretized with 2 sites also shifts the lattice susceptibility. Segment CT-HYB samples the

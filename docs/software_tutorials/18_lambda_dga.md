@@ -1,5 +1,9 @@
 # Tutorial 18 — λ-corrected ladder DΓA
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 The plain ladder DΓA (`vertex.ladder_dga_sigma`) builds the lattice susceptibility from the local DMFT vertex. It
 inherits two defects of DMFT:
 

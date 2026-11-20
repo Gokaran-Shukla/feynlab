@@ -1,5 +1,9 @@
 # Tutorial 3 — Self-energy from weak to very strong correlation
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 | regime (U vs bandwidth W) | method in feynlab | diagrams summed | module |
 |---|---|---|---|
 | weak, U ≪ W | Hartree–Fock | tadpole + exchange | `selfenergy.local.hartree_sigma` |

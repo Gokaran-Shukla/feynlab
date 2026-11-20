@@ -47,7 +47,8 @@ main h2{margin:0 0 4px;font-size:22px}.sub{color:var(--muted);margin:0 0 22px}
 .bar .ghost{background:none;color:var(--acc);border:1px solid var(--acc)}
 .score{font-variant-numeric:tabular-nums;font-weight:600}
 @media (max-width:760px){.wrap{grid-template-columns:1fr}nav{position:static;max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
-</style></head><body><div class="wrap"><nav id="nav"></nav><main id="main"></main></div>
+/* gs-watermark */body::before{content:"\00A9  Gokaran Shukla";position:fixed;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-30deg);font:700 11vw/1 system-ui,sans-serif;color:var(--ink);opacity:.05;white-space:nowrap;pointer-events:none;z-index:0}.wrap{position:relative;z-index:1}.gs-foot{position:fixed;bottom:6px;right:12px;font-size:11px;color:var(--muted);opacity:.85;z-index:2;pointer-events:none}
+</style></head><body><div class="gs-foot">© 2026 Gokaran Shukla · github.com/Gokaran-Shukla/feynlab · MIT License</div><div class="wrap"><nav id="nav"></nav><main id="main"></main></div>
 <script>
 const DATA = __DATA__;
 let state = {}; try { state = JSON.parse(localStorage.getItem('feynlabQuiz') || '{}'); } catch(e) {}

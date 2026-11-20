@@ -1,6 +1,10 @@
 # Appendices A–N (intermediate part)
 *Companion to R. D. Mattuck, A Guide to Feynman Diagrams in the Many-Body Problem (2nd ed.)*
 
+<!-- gs-watermark -->
+> **© 2026 Gokaran Shukla** · part of [feynlab](https://github.com/Gokaran-Shukla/feynlab) · MIT License — any reuse must keep this copyright notice and credit the author.
+
+
 | appendix | content (paraphrased) | where it lives in feynlab |
 |---|---|---|
 | canonical transformation | finding fictitious particles by changing variables | — (concept) |
